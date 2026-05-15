@@ -520,7 +520,7 @@ body{
 .stats-card{
   position: relative; z-index: 5;
   margin: 0 22px;
-  padding: 22px 22px 20px;
+  padding: 14px 14px 12px;
   background: var(--bg-card);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
@@ -942,14 +942,6 @@ body{
   </div>
   <a href="profit.html" class="stats-card-link">
   <div class="stats-card">
-    <div class="stats-head">
-      <div>
-        <div class="stats-label">This month's profit</div>
-        <div class="stats-num" id="profit-month-total">+¥0</div>
-        <div class="stats-source"><span class="dot"></span><span id="profit-source-text">Discord #収支報告 から自動取得</span></div>
-      </div>
-      <div class="stats-delta" id="profit-month-delta" style="display:none;">▲ 0%</div>
-    </div>
     <div class="profit-tl" id="profit-timeline">
       <div class="ptl-empty">まだ収支報告がありません</div>
     </div>
@@ -1154,39 +1146,10 @@ async function loadStorage(key) {
   }
 }
 
-// ============= Profit timeline & monthly total =============
+// ============= Profit timeline =============
 async function renderProfit() {
   const posts = await loadStorage('profit-posts');
   const tl = document.getElementById('profit-timeline');
-  const totalEl = document.getElementById('profit-month-total');
-  const deltaEl = document.getElementById('profit-month-delta');
-  const sourceEl = document.getElementById('profit-source-text');
-
-  // Calculate this month's total
-  const now = new Date();
-  const thisMonth = now.getMonth();
-  const thisYear = now.getFullYear();
-  let monthTotal = 0;
-  let monthCount = 0;
-  posts.forEach(p => {
-    const d = new Date(p.timestamp || p.date || 0);
-    if (d.getMonth() === thisMonth && d.getFullYear() === thisYear) {
-      monthTotal += Number(p.pnl || 0);
-      monthCount++;
-    }
-  });
-
-  if (totalEl) {
-    if (monthCount > 0) {
-      const sign = monthTotal >= 0 ? '+' : '−';
-      const abs = Math.abs(monthTotal).toLocaleString('ja-JP');
-      totalEl.innerHTML = `<span class="plus">${sign}</span>¥${abs}`;
-      sourceEl.textContent = `今月の収支報告 ${monthCount}件`;
-    } else {
-      totalEl.innerHTML = `<span class="plus">+</span>¥0`;
-      sourceEl.textContent = 'Discord #収支報告 から自動取得';
-    }
-  }
 
   // Render latest 3 posts as timeline
   if (!tl) return;
