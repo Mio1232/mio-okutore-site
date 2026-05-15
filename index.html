@@ -236,6 +236,14 @@ body{
   color: var(--ink-mid);
   font-weight: 500;
   letter-spacing: 0.05em;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+.section-title a.more:hover{
+  background: var(--bg-soft);
+  color: var(--rose-deep);
 }
 
 /* MENU GRID */
@@ -503,6 +511,12 @@ body{
 }
 
 /* STATS */
+.stats-card-link{
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.stats-card-link:active .stats-card{ transform: scale(0.98); }
 .stats-card{
   position: relative; z-index: 5;
   margin: 0 22px;
@@ -511,6 +525,11 @@ body{
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-md);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.stats-card-link:hover .stats-card{
+  box-shadow: 0 12px 32px rgba(58,46,42,0.08);
+  transform: translateY(-2px);
 }
 .stats-head{ display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
 .stats-label{
@@ -919,8 +938,9 @@ body{
   <!-- STATS -->
   <div class="section-title" style="margin-top:30px;">
     <h2>コミュニティ収支 <span class="en">— Performance</span></h2>
-    <div class="more">詳細 →</div>
+    <a class="more" href="profit.html">詳細 →</a>
   </div>
+  <a href="profit.html" class="stats-card-link">
   <div class="stats-card">
     <div class="stats-head">
       <div>
@@ -934,11 +954,12 @@ body{
       <div class="ptl-empty">まだ収支報告がありません</div>
     </div>
   </div>
+  </a>
 
   <!-- NEWS -->
   <div class="section-title" style="margin-top:30px;">
     <h2>最新の動き <span class="en">— Latest</span></h2>
-    <div class="more">All →</div>
+    <a class="more" href="news.html">All →</a>
   </div>
 
   <div class="news-list" id="news-list">
@@ -1080,22 +1101,31 @@ async function loadStorage(key) {
       .from(config.table)
       .select('*')
       .order(config.orderBy, { ascending: false });
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error for', key, ':', error.message, error.details, error.hint);
+      return [];
+    }
     if (!data) return [];
 
     // Map fields to match what index.html expects
     if (key === 'profit-posts') {
-      return data.map(row => ({
-        id: row.id,
-        author: row.author,
-        userName: row.author,
-        comment: row.comment || '',
-        content: row.comment || '',
-        timestamp: row.timestamp,
-        pair: row.pair,
-        pnl: row.pnl,
-        reactions: row.reactions ? JSON.parse(row.reactions) : []
-      }));
+      return data.map(row => {
+        let reactions = [];
+        try {
+          if (row.reactions) reactions = JSON.parse(row.reactions);
+        } catch(_) { reactions = []; }
+        return {
+          id: row.id,
+          author: row.author,
+          userName: row.author,
+          comment: row.comment || '',
+          content: row.comment || '',
+          timestamp: row.timestamp,
+          pair: row.pair,
+          pnl: row.pnl,
+          reactions: reactions
+        };
+      });
     } else if (key === 'news-items') {
       return data.map(row => ({
         id: row.id,
@@ -1119,7 +1149,7 @@ async function loadStorage(key) {
     }
     return data;
   } catch(e) {
-    console.error('Load error for', key, ':', e);
+    console.error('Load error for', key, ':', e.message || JSON.stringify(e));
     return [];
   }
 }
@@ -1182,7 +1212,6 @@ async function renderProfit() {
     const pnlAbs = Math.abs(pnl).toLocaleString('ja-JP');
     const text = (p.comment || p.text || '').slice(0, 80);
     return `<div class="profit-tl-item">
-      <img class="ptl-av" src="${av}" alt="${name}">
       <div class="ptl-body">
         <div class="ptl-head">
           <span class="ptl-name">${name}</span>
