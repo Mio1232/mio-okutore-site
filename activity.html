@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>最新の動き — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = "https://iupkaxzesrximmfkipzd.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
+<style>
+:root{
+  --bg: #F7F2EA;
+  --bg-soft: #EFE7DA;
+  --bg-card: #FFFEFB;
+  --ink: #3A2E2A;
+  --ink-mid: #6B5D57;
+  --ink-soft: #998B83;
+  --rose: #C98B95;
+  --rose-soft: #E8D0D2;
+  --rose-deep: #B06B75;
+  --sage: #9BB59C;
+  --sage-soft: #D5DFCE;
+  --sage-deep: #7B9B7C;
+  --honey: #D4B677;
+  --honey-soft: #EDE0C0;
+  --mauve: #A89BB0;
+  --mauve-soft: #DCD3E2;
+  --line: rgba(58,46,42,0.08);
+  --line-strong: rgba(58,46,42,0.14);
+  --shadow-sm: 0 2px 6px rgba(58,46,42,0.04);
+  --shadow-md: 0 8px 24px rgba(58,46,42,0.06);
+  --r-sm: 8px;
+  --r-md: 16px;
+  --r-lg: 20px;
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+html, body{ width:100%; min-height:100vh; }
+body{
+  font-family: 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.app{
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  padding-bottom: 90px;
+}
+
+/* HEADER */
+.page-header{
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(247,242,234,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.back-btn{
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  color: var(--ink-mid); text-decoration: none;
+  transition: transform 0.15s;
+}
+.back-btn:active{ transform: scale(0.96); }
+.back-btn svg{ width: 16px; height: 16px; }
+.page-title{
+  flex: 1;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px; font-weight: 600;
+  letter-spacing: 0.04em; line-height: 1.2;
+}
+.page-title .en{
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-weight: 500;
+  font-size: 10px; color: var(--rose-deep);
+  margin-top: 2px;
+}
+
+/* HERO */
+.hero{
+  padding: 26px 22px 18px;
+  text-align: center;
+}
+.hero h1{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.hero .en{
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--rose-deep);
+  letter-spacing: 0.18em;
+}
+.hero p{
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+/* TABS */
+.tabs{
+  display: flex;
+  gap: 6px;
+  margin: 8px 18px 18px;
+  padding: 4px;
+  background: var(--bg-soft);
+  border-radius: 999px;
+}
+.tab{
+  flex: 1;
+  padding: 9px 14px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+}
+.tab.active{
+  background: var(--bg-card);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+.tab .count{
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 6px;
+  background: var(--rose-soft);
+  color: var(--rose-deep);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.tab:not(.active) .count{
+  background: rgba(58,46,42,0.06);
+  color: var(--ink-soft);
+}
+
+/* LIST */
+.list-wrap{
+  padding: 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* NEWS CARD */
+.news-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.news-card:active{ transform: scale(0.98); }
+.news-card:hover{
+  box-shadow: 0 12px 24px rgba(58,46,42,0.08);
+  transform: translateY(-1px);
+}
+.news-thumb{
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--honey-soft);
+  color: var(--honey);
+}
+.news-thumb svg{ width: 20px; height: 20px; }
+.news-body{ flex: 1; min-width: 0; }
+.news-meta-row{
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 5px;
+  flex-wrap: wrap;
+}
+.news-cat{
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.news-cat.news{
+  background: var(--honey-soft);
+  color: #8A6F2E;
+}
+.news-cat.event{
+  background: var(--mauve-soft);
+  color: #5F4F6C;
+}
+.news-date{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--ink-soft);
+}
+.news-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+.news-comment{
+  font-size: 11px;
+  color: var(--ink-soft);
+  line-height: 1.65;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+.news-comment .mini-av{
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 1px;
+  background: var(--rose-soft);
+}
+
+/* EVENT-specific styling */
+.event-thumb{
+  background: var(--mauve-soft);
+  color: var(--mauve);
+}
+.event-time{
+  font-family: 'Inter', sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--rose-deep);
+  letter-spacing: 0.04em;
+}
+
+/* EMPTY STATE */
+.empty-state{
+  padding: 60px 22px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.empty-state .icon{
+  width: 60px; height: 60px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: var(--bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+}
+.empty-state .icon svg{ width: 24px; height: 24px; }
+.empty-state h3{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.empty-state p{
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+/* LOADING */
+.loading{
+  padding: 40px 22px;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  background: rgba(247,242,234,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--line);
+  padding: 10px 16px 22px;
+  display: flex; justify-content: space-around;
+  z-index: 100;
+}
+.nav-item{
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px; font-weight: 500;
+  color: var(--ink-soft);
+  padding: 4px 8px;
+  letter-spacing: 0.04em;
+  min-width: 56px;
+  text-decoration: none;
+}
+.nav-item .ico{
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-soft);
+}
+.nav-item .ico svg{ width: 16px; height: 16px; }
+.nav-item.active{ color: var(--rose-deep); }
+.nav-item.active .ico{ background: var(--rose-soft); color: var(--rose-deep); }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <a class="back-btn" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="page-title">
+      最新の動き
+      <span class="en">— Latest Activity</span>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>最新の動き</h1>
+    <div class="en">— Latest Activity —</div>
+    <p>ニュースと配信スケジュールを<br>まとめてチェックできます</p>
+  </section>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" data-tab="all">すべて <span class="count" id="count-all">0</span></button>
+    <button class="tab" data-tab="news">ニュース <span class="count" id="count-news">0</span></button>
+    <button class="tab" data-tab="event">配信予定 <span class="count" id="count-event">0</span></button>
+  </div>
+
+  <!-- LIST -->
+  <div class="list-wrap" id="list">
+    <div class="loading">LOADING...</div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="index.html">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
+      </div>
+      <div>HOME</div>
+    </a>
+    <a class="nav-item" href="profit.html">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 16l4-4 4 4 5-7"/></svg>
+      </div>
+      <div>PROFIT</div>
+    </a>
+    <a class="nav-item" href="chat.html">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+      </div>
+      <div>AI</div>
+    </a>
+    <a class="nav-item" href="calendar.html">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      </div>
+      <div>CAL</div>
+    </a>
+    <a class="nav-item" href="members.html">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <div>MEMBER</div>
+    </a>
+  </nav>
+
+</div>
+
+<script>
+let allItems = [];
+let activeTab = 'all';
+
+function fmtDateTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  const hh = String(d.getHours()).padStart(2,'0');
+  const mm = String(d.getMinutes()).padStart(2,'0');
+  return `${m}/${day} ${hh}:${mm}`;
+}
+
+function timeAgo(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = (now - d) / 1000;
+  if (diff < 60) return 'たった今';
+  if (diff < 3600) return Math.floor(diff/60) + '分前';
+  if (diff < 86400) return Math.floor(diff/3600) + '時間前';
+  if (diff < 86400*7) return Math.floor(diff/86400) + '日前';
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${m}/${day}`;
+}
+
+const PERSONA_NAMES = {
+  mio: '美桜Mio',
+  miyabi: 'みやび',
+  sakura: 'さくら',
+  hinata: 'ひなた'
+};
+
+const NEWS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg>';
+const EVENT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>';
+const EMPTY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h0M15 9h0"/></svg>';
+
+async function loadData() {
+  try {
+    const [newsRes, eventsRes] = await Promise.all([
+      sb.from('news_items').select('*').order('timestamp', { ascending: false }),
+      sb.from('discord_events').select('*').order('datetime', { ascending: true })
+    ]);
+
+    const items = [];
+    const news = newsRes.data || [];
+    const events = eventsRes.data || [];
+    const now = new Date();
+
+    news.forEach(n => {
+      items.push({
+        kind: 'NEWS',
+        time: new Date(n.timestamp || n.created_at),
+        title: n.title || '',
+        url: n.url || '',
+        comment: n.comment || '',
+        author: n.author || 'mio'
+      });
+    });
+
+    events.forEach(e => {
+      const t = new Date(e.datetime || e.created_at);
+      if (t < now) return;  // only future events
+      items.push({
+        kind: 'EVENT',
+        time: t,
+        title: e.title || '',
+        host: e.host || 'mio',
+        isFuture: true
+      });
+    });
+
+    // Sort: future events first by time asc, then news by time desc
+    items.sort((a, b) => {
+      if (a.isFuture && !b.isFuture) return -1;
+      if (!a.isFuture && b.isFuture) return 1;
+      if (a.isFuture) return a.time - b.time;
+      return b.time - a.time;
+    });
+
+    allItems = items;
+    updateCounts();
+    render();
+  } catch (err) {
+    console.error('Load error:', err);
+    document.getElementById('list').innerHTML = `
+      <div class="empty-state">
+        <div class="icon">${EMPTY_ICON}</div>
+        <h3>読み込みエラー</h3>
+        <p>少し時間をおいて再度お試しください</p>
+      </div>
+    `;
+  }
+}
+
+function updateCounts() {
+  document.getElementById('count-all').textContent = allItems.length;
+  document.getElementById('count-news').textContent = allItems.filter(i => i.kind === 'NEWS').length;
+  document.getElementById('count-event').textContent = allItems.filter(i => i.kind === 'EVENT').length;
+}
+
+function render() {
+  const list = document.getElementById('list');
+  let items = allItems;
+  if (activeTab === 'news') items = items.filter(i => i.kind === 'NEWS');
+  if (activeTab === 'event') items = items.filter(i => i.kind === 'EVENT');
+
+  if (items.length === 0) {
+    const msg = activeTab === 'news' ? 'ニュース' : activeTab === 'event' ? '配信予定' : '更新';
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">${EMPTY_ICON}</div>
+        <h3>${msg}はまだありません</h3>
+        <p>新しい${msg}が追加されるとここに表示されます</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = items.map(it => {
+    if (it.kind === 'NEWS') {
+      const href = it.url || 'news.html';
+      const target = it.url ? '_blank' : '_self';
+      return `
+        <a class="news-card" href="${href}" ${it.url ? `target="${target}" rel="noopener"` : ''}>
+          <div class="news-thumb">${NEWS_ICON}</div>
+          <div class="news-body">
+            <div class="news-meta-row">
+              <span class="news-cat news">NEWS</span>
+              <span class="news-date">${timeAgo(it.time)}</span>
+            </div>
+            <div class="news-title">${escapeHtml(it.title)}</div>
+            ${it.comment ? `<div class="news-comment"><div class="mini-av"></div>${escapeHtml(it.comment)}</div>` : ''}
+          </div>
+        </a>
+      `;
+    } else {
+      const hostName = PERSONA_NAMES[it.host] || it.host;
+      return `
+        <a class="news-card" href="events.html">
+          <div class="news-thumb event-thumb">${EVENT_ICON}</div>
+          <div class="news-body">
+            <div class="news-meta-row">
+              <span class="news-cat event">EVENT</span>
+              <span class="event-time">${fmtDateTime(it.time)}</span>
+            </div>
+            <div class="news-title">${escapeHtml(it.title)}</div>
+            <div class="news-comment"><div class="mini-av"></div>${escapeHtml(hostName)}がホスト</div>
+          </div>
+        </a>
+      `;
+    }
+  }).join('');
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeTab = tab.dataset.tab;
+    render();
+  });
+});
+
+loadData();
+</script>
+
+</body>
+</html>

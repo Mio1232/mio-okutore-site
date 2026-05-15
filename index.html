@@ -951,7 +951,7 @@ body{
   <!-- NEWS -->
   <div class="section-title" style="margin-top:30px;">
     <h2>最新の動き <span class="en">— Latest</span></h2>
-    <a class="more" href="news.html">All →</a>
+    <a class="more" href="activity.html">All →</a>
   </div>
 
   <div class="news-list" id="news-list">
@@ -1201,10 +1201,9 @@ async function renderActivity() {
   const list = document.getElementById('news-list');
   if (!list) return;
 
-  const [news, events, profits] = await Promise.all([
+  const [news, events] = await Promise.all([
     loadStorage('news-items'),
-    loadStorage('discord-events'),
-    loadStorage('profit-posts')
+    loadStorage('discord-events')
   ]);
 
   const items = [];
@@ -1235,19 +1234,7 @@ async function renderActivity() {
     });
   });
 
-  // Latest profits
-  profits.slice(0, 3).forEach(p => {
-    const persona = (p.author || p.persona || 'mio').toLowerCase();
-    const name = PERSONA_NAMES[persona] || 'mio';
-    const pair = PAIR_LABEL[p.pair] || p.pair || '';
-    items.push({
-      kind: 'PROFIT',
-      time: new Date(p.timestamp || p.date || 0),
-      title: pair ? `${name} の収支報告 (${pair})` : `${name} の収支報告`,
-      author: persona,
-      comment: (p.comment || '').slice(0, 50)
-    });
-  });
+  // (Profits are NOT included in latest activity — they have their own section)
 
   // Sort & take 4 most recent / soonest
   items.sort((a, b) => {
@@ -1270,7 +1257,9 @@ async function renderActivity() {
     const av = AVATARS[persona] || AVATARS.mio;
     const name = PERSONA_NAMES[persona] || 'mio';
     const dateText = it.isFuture ? fmtDateTime(it.time) : timeAgo(it.time);
-    return `<div class="news-item">
+    // Link target: NEWS → news.html, EVENT → events.html
+    const href = it.kind === 'EVENT' ? 'events.html' : 'news.html';
+    return `<a class="news-item" href="${href}" style="text-decoration:none; color:inherit;">
       <div class="news-thumb ${style.bg}">${icon}</div>
       <div class="news-body">
         <div class="news-meta-row">
@@ -1282,7 +1271,7 @@ async function renderActivity() {
           ${av ? `<img class="mini-av" src="${av}" alt="${name}">` : ''}${it.comment}
         </div>` : ''}
       </div>
-    </div>`;
+    </a>`;
   }).join('');
 }
 
