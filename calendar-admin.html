@@ -220,7 +220,7 @@ textarea:focus{
 <script>
   const SUPABASE_URL = "https://iupkaxzesrximmfkipzd.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ";
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 </script>
 </head>
 <body>
@@ -286,7 +286,7 @@ input.addEventListener('input', () => {
 // Load current value
 async function loadCurrent() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from('calendar_comment')
       .select('*')
       .order('updated', { ascending: false })
@@ -314,8 +314,8 @@ document.getElementById('comment-form').addEventListener('submit', async (e) => 
   }
   try {
     // Delete all existing rows then insert new one (keeps only latest)
-    await supabase.from('calendar_comment').delete().gte('id', 0);
-    const { error } = await supabase.from('calendar_comment').insert({
+    await sb.from('calendar_comment').delete().gte('id', 0);
+    const { error } = await sb.from('calendar_comment').insert({
       comment: comment,
       updated: new Date().toISOString()
     });

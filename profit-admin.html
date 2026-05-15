@@ -381,7 +381,7 @@ body{
 <script>
   const SUPABASE_URL = "https://iupkaxzesrximmfkipzd.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ";
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 </script>
 </head>
 <body>
@@ -485,7 +485,7 @@ function showToast(msg, isError) {
 
 async function load() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from('profit_posts')
       .select('*')
       .order('timestamp', { ascending: false });
@@ -509,7 +509,7 @@ async function load() {
 
 async function insertPost(data) {
   try {
-    const { error } = await supabase.from('profit_posts').insert({
+    const { error } = await sb.from('profit_posts').insert({
       author: data.userName,
       comment: data.content,
       timestamp: data.timestamp,
@@ -527,7 +527,7 @@ async function insertPost(data) {
 
 async function updatePost(id, data) {
   try {
-    const { error } = await supabase.from('profit_posts').update({
+    const { error } = await sb.from('profit_posts').update({
       author: data.userName,
       comment: data.content,
       timestamp: data.timestamp,
@@ -545,7 +545,7 @@ async function updatePost(id, data) {
 
 async function removePost(id) {
   try {
-    const { error } = await supabase.from('profit_posts').delete().eq('id', id);
+    const { error } = await sb.from('profit_posts').delete().eq('id', id);
     if (error) throw error;
     return true;
   } catch (err) {

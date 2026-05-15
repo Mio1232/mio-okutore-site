@@ -390,7 +390,7 @@ body{
 <script>
   const SUPABASE_URL = "https://iupkaxzesrximmfkipzd.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ";
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 </script>
 </head>
 <body>
@@ -515,7 +515,7 @@ function showToast(msg, isError) {
 
 async function load() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from('discord_events')
       .select('*')
       .order('datetime', { ascending: true });
@@ -539,7 +539,7 @@ async function load() {
 
 async function insertEvent(data) {
   try {
-    const { error } = await supabase.from('discord_events').insert({
+    const { error } = await sb.from('discord_events').insert({
       title: data.title,
       datetime: data.startTime,
       host: data.hostId,
@@ -557,7 +557,7 @@ async function insertEvent(data) {
 
 async function updateEvent(id, data) {
   try {
-    const { error } = await supabase.from('discord_events').update({
+    const { error } = await sb.from('discord_events').update({
       title: data.title,
       datetime: data.startTime,
       host: data.hostId,
@@ -575,7 +575,7 @@ async function updateEvent(id, data) {
 
 async function removeEvent(id) {
   try {
-    const { error } = await supabase.from('discord_events').delete().eq('id', id);
+    const { error } = await sb.from('discord_events').delete().eq('id', id);
     if (error) throw error;
     return true;
   } catch (err) {
