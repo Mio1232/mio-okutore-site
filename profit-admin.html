@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>収支報告 管理 — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: #F7F2EA;
+  --bg-soft: #EFE7DA;
+  --bg-card: #FFFEFB;
+  --ink: #3A2E2A;
+  --ink-mid: #6B5D57;
+  --ink-soft: #998B83;
+  --rose: #C98B95;
+  --rose-soft: #E8D0D2;
+  --sage: #9BB59C;
+  --sage-soft: #D5DFCE;
+  --honey: #D4B677;
+  --honey-soft: #ECDDB8;
+  --mauve: #A89BB0;
+  --mauve-soft: #DCD3DC;
+  --terra: #C28D6F;
+  --terra-soft: #E8D5C5;
+  --line: rgba(58,46,42,0.08);
+  --line-strong: rgba(58,46,42,0.14);
+  --shadow-sm: 0 2px 8px rgba(58,46,42,0.04);
+  --shadow-md: 0 8px 24px rgba(58,46,42,0.06);
+  --r-lg: 20px;
+  --r-md: 16px;
+  --r-sm: 12px;
+}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0; padding:0;}
+body{
+  font-family: 'Noto Sans JP', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  overflow-x: hidden;
+  font-feature-settings: "palt";
+}
+
+.app{
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  padding-bottom: 40px;
+  overflow: hidden;
+}
+.app::before{
+  content:''; position: absolute;
+  top: -80px; right: -120px;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(201,139,149,0.08), transparent 70%);
+  border-radius: 50%;
+  z-index: 0; pointer-events: none;
+}
+
+/* HEADER */
+.page-header{
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(247,242,234,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.back-btn{
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: var(--ink-mid);
+  text-decoration: none;
+}
+.back-btn svg{ width: 16px; height: 16px; }
+.title-wrap{ flex: 1; min-width: 0; }
+.page-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px; font-weight: 700;
+  letter-spacing: 0.04em; line-height: 1.1;
+}
+.page-sub{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--ink-soft);
+  font-weight: 500;
+  margin-top: 3px;
+  letter-spacing: 0.04em;
+}
+.admin-badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  color: var(--rose);
+  background: var(--rose-soft);
+  padding: 3px 7px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* WARNING NOTICE */
+.notice{
+  position: relative; z-index: 5;
+  margin: 14px 18px 14px;
+  padding: 12px 14px;
+  background: var(--honey-soft);
+  border: 1px solid rgba(212,182,119,0.4);
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  line-height: 1.6;
+  color: #6F5520;
+}
+.notice strong{ font-weight: 700; }
+
+/* FORM CARD */
+.form-card{
+  position: relative; z-index: 5;
+  margin: 0 18px 20px;
+  padding: 18px 18px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+.form-card-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.form-card-title svg{ width: 16px; height: 16px; color: var(--rose); }
+
+.field{
+  margin-bottom: 12px;
+}
+.field-label{
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px;
+  color: var(--ink-mid);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.field-label .required{ color: var(--rose); margin-left: 3px; }
+.field input,
+.field textarea{
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.field input:focus,
+.field textarea:focus{
+  border-color: var(--rose);
+  background: var(--bg-card);
+}
+.field textarea{
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.6;
+  font-family: inherit;
+}
+.field-row{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.field-hint{
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.form-actions{
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.btn{
+  flex: 1;
+  padding: 11px 16px;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.15s;
+}
+.btn:active{ transform: scale(0.98); }
+.btn-primary{
+  background: var(--ink);
+  color: var(--bg);
+}
+.btn-secondary{
+  background: var(--bg-card);
+  color: var(--ink-mid);
+  border: 1px solid var(--line-strong);
+}
+.btn-danger{
+  background: transparent;
+  color: var(--rose);
+  border: 1px solid var(--rose-soft);
+}
+
+/* SECTION TITLE */
+.section-title{
+  position: relative; z-index: 5;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 4px 22px 12px;
+  margin-top: 6px;
+}
+.section-title h2{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+.section-title .meta{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--ink-soft);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+/* POST LIST */
+.post-list{
+  position: relative; z-index: 5;
+  padding: 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.post-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+}
+.post-card-head{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.post-card-name{
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  flex: 1;
+}
+.post-card-time{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+.post-card-content{
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--ink-mid);
+  white-space: pre-wrap;
+  margin-bottom: 10px;
+}
+.post-card-reactions{
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+.post-card-actions{
+  display: flex;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.btn-mini{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-card);
+  color: var(--ink-mid);
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+}
+.btn-mini:active{ transform: scale(0.97); }
+.btn-mini.edit{ color: var(--ink); }
+.btn-mini.delete{
+  color: var(--rose);
+  border-color: var(--rose-soft);
+}
+
+/* EMPTY */
+.empty-state{
+  text-align: center;
+  padding: 48px 24px;
+}
+.empty-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  color: var(--ink-mid);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.empty-desc{
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+/* TOAST */
+.toast{
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--bg);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(58,46,42,0.25);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  letter-spacing: 0.04em;
+}
+.toast.show{
+  opacity: 1;
+  transform: translateX(-50%) translateY(-8px);
+}
+.toast.error{ background: #B07474; }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <a class="back-btn" href="profit.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="title-wrap">
+      <div class="page-title">収支報告 管理</div>
+      <div class="page-sub">
+        <span class="admin-badge">ADMIN</span>
+        <span style="margin-left:6px;">投稿の追加・編集・削除</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- NOTICE -->
+  <div class="notice">
+    <strong>💡 使い方</strong><br>
+    Discordの収支報告チャンネルから投稿をコピーして、下のフォームに貼り付けて保存してください。投稿は即座に公開ページに反映されます。
+  </div>
+
+  <!-- FORM -->
+  <section class="form-card">
+    <div class="form-card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span id="form-title">新規投稿を追加</span>
+    </div>
+
+    <div class="field">
+      <label class="field-label">ユーザー名<span class="required">*</span></label>
+      <input type="text" id="f-name" placeholder="例: トレーダーA / N.K">
+      <div class="field-hint">プライバシー保護のため、半匿名(イニシャル+さん など)推奨</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">本文<span class="required">*</span></label>
+      <textarea id="f-content" placeholder="例: USDJPYロング決済 +¥17,500&#10;0.5lot · +35pips · 押し目買い狙い通り✨" rows="4"></textarea>
+      <div class="field-hint">Discordの投稿内容をそのままコピペでOK。改行も保持されます。</div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">日付</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="field">
+        <label class="field-label">時刻</label>
+        <input type="time" id="f-time">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">リアクション(任意)</label>
+      <input type="text" id="f-reactions" placeholder="例: 🎉:8, 👏:5, 💪:3">
+      <div class="field-hint">絵文字:数 をカンマ区切りで入力(空欄でもOK)</div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-secondary" id="btn-cancel" style="display:none;">キャンセル</button>
+      <button class="btn btn-primary" id="btn-save">保存</button>
+    </div>
+  </section>
+
+  <!-- POST LIST -->
+  <div class="section-title">
+    <h2>登録済みの投稿</h2>
+    <span class="meta" id="post-count">0件</span>
+  </div>
+
+  <div class="post-list" id="post-list">
+    <div class="empty-state">
+      <div class="empty-title">まだ投稿がありません</div>
+      <div class="empty-desc">上のフォームから追加してください</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let posts = [];
+let editingId = null;
+
+function genId() {
+  return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+async function load() {
+  try {
+    const result = await window.storage.get('profit-posts', true);
+    if (result && result.value) {
+      posts = JSON.parse(result.value);
+    } else {
+      posts = [];
+    }
+  } catch (err) {
+    posts = [];
+  }
+  render();
+}
+
+async function save() {
+  try {
+    await window.storage.set('profit-posts', JSON.stringify(posts), true);
+    return true;
+  } catch (err) {
+    showToast('保存に失敗しました', true);
+    return false;
+  }
+}
+
+function parseReactions(text) {
+  if (!text || !text.trim()) return [];
+  return text.split(',').map(part => {
+    const m = part.trim().match(/^(.+?)[:：](\d+)$/);
+    if (!m) return null;
+    return { emoji: m[1].trim(), count: parseInt(m[2], 10) };
+  }).filter(Boolean);
+}
+
+function formatReactions(reactions) {
+  if (!reactions || reactions.length === 0) return '';
+  return reactions.map(r => `${r.emoji}:${r.count}`).join(', ');
+}
+
+function formatDateTime(iso) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function getFormValues() {
+  const name = document.getElementById('f-name').value.trim();
+  const content = document.getElementById('f-content').value.trim();
+  const date = document.getElementById('f-date').value;
+  const time = document.getElementById('f-time').value;
+  const reactionsText = document.getElementById('f-reactions').value.trim();
+
+  if (!name) { showToast('ユーザー名を入力してください', true); return null; }
+  if (!content) { showToast('本文を入力してください', true); return null; }
+
+  let timestamp;
+  if (date && time) {
+    timestamp = new Date(`${date}T${time}:00`).toISOString();
+  } else if (date) {
+    timestamp = new Date(`${date}T12:00:00`).toISOString();
+  } else {
+    timestamp = new Date().toISOString();
+  }
+
+  return {
+    userName: name,
+    content: content,
+    timestamp: timestamp,
+    reactions: parseReactions(reactionsText)
+  };
+}
+
+function clearForm() {
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-content').value = '';
+  document.getElementById('f-reactions').value = '';
+  // Reset date/time to now
+  const now = new Date();
+  const tzOffset = now.getTimezoneOffset() * 60000;
+  const local = new Date(now.getTime() - tzOffset).toISOString().slice(0, 16);
+  document.getElementById('f-date').value = local.slice(0, 10);
+  document.getElementById('f-time').value = local.slice(11, 16);
+  editingId = null;
+  document.getElementById('form-title').textContent = '新規投稿を追加';
+  document.getElementById('btn-cancel').style.display = 'none';
+  document.getElementById('btn-save').textContent = '保存';
+}
+
+document.getElementById('btn-save').addEventListener('click', async () => {
+  const data = getFormValues();
+  if (!data) return;
+
+  if (editingId) {
+    const idx = posts.findIndex(p => p.id === editingId);
+    if (idx !== -1) {
+      posts[idx] = { ...posts[idx], ...data };
+    }
+  } else {
+    posts.push({ id: genId(), ...data });
+  }
+
+  if (await save()) {
+    showToast(editingId ? '更新しました' : '追加しました');
+    clearForm();
+    render();
+  }
+});
+
+document.getElementById('btn-cancel').addEventListener('click', () => {
+  clearForm();
+});
+
+function startEdit(id) {
+  const p = posts.find(x => x.id === id);
+  if (!p) return;
+  editingId = id;
+  document.getElementById('f-name').value = p.userName;
+  document.getElementById('f-content').value = p.content;
+  const d = new Date(p.timestamp);
+  const tzOffset = d.getTimezoneOffset() * 60000;
+  const local = new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
+  document.getElementById('f-date').value = local.slice(0, 10);
+  document.getElementById('f-time').value = local.slice(11, 16);
+  document.getElementById('f-reactions').value = formatReactions(p.reactions);
+  document.getElementById('form-title').textContent = '投稿を編集';
+  document.getElementById('btn-cancel').style.display = 'block';
+  document.getElementById('btn-save').textContent = '更新';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function deletePost(id) {
+  if (!confirm('この投稿を削除しますか?')) return;
+  posts = posts.filter(p => p.id !== id);
+  if (await save()) {
+    showToast('削除しました');
+    if (editingId === id) clearForm();
+    render();
+  }
+}
+
+function escapeHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+function render() {
+  const list = document.getElementById('post-list');
+  document.getElementById('post-count').textContent = `${posts.length}件`;
+
+  if (posts.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-title">まだ投稿がありません</div>
+        <div class="empty-desc">上のフォームから追加してください</div>
+      </div>
+    `;
+    return;
+  }
+
+  const sorted = [...posts].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  list.innerHTML = sorted.map(p => `
+    <div class="post-card">
+      <div class="post-card-head">
+        <div class="post-card-name">${escapeHtml(p.userName)}</div>
+        <div class="post-card-time">${formatDateTime(p.timestamp)}</div>
+      </div>
+      <div class="post-card-content">${escapeHtml(p.content)}</div>
+      ${p.reactions && p.reactions.length > 0 ? `<div class="post-card-reactions">${p.reactions.map(r => `${r.emoji} ${r.count}`).join('  ')}</div>` : ''}
+      <div class="post-card-actions">
+        <button class="btn-mini edit" data-action="edit" data-id="${p.id}">編集</button>
+        <button class="btn-mini delete" data-action="delete" data-id="${p.id}">削除</button>
+      </div>
+    </div>
+  `).join('');
+
+  // Wire up buttons
+  list.querySelectorAll('[data-action="edit"]').forEach(btn => {
+    btn.addEventListener('click', () => startEdit(btn.dataset.id));
+  });
+  list.querySelectorAll('[data-action="delete"]').forEach(btn => {
+    btn.addEventListener('click', () => deletePost(btn.dataset.id));
+  });
+}
+
+// Init
+clearForm();
+load();
+</script>
+
+</body>
+</html>

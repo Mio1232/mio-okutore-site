@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>収支報告 — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: #F7F2EA;
+  --bg-soft: #EFE7DA;
+  --bg-card: #FFFEFB;
+  --ink: #3A2E2A;
+  --ink-mid: #6B5D57;
+  --ink-soft: #998B83;
+  --rose: #C98B95;
+  --rose-soft: #E8D0D2;
+  --sage: #9BB59C;
+  --sage-soft: #D5DFCE;
+  --honey: #D4B677;
+  --honey-soft: #ECDDB8;
+  --mauve: #A89BB0;
+  --mauve-soft: #DCD3DC;
+  --terra: #C28D6F;
+  --terra-soft: #E8D5C5;
+  --profit: #6B9577;
+  --profit-soft: #C8DCC8;
+  --loss: #B07474;
+  --loss-soft: #E8D0D0;
+  --line: rgba(58,46,42,0.08);
+  --line-strong: rgba(58,46,42,0.14);
+  --shadow-sm: 0 2px 8px rgba(58,46,42,0.04);
+  --shadow-md: 0 8px 24px rgba(58,46,42,0.06);
+  --r-lg: 20px;
+  --r-md: 16px;
+  --r-sm: 12px;
+}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0; padding:0;}
+body{
+  font-family: 'Noto Sans JP', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  overflow-x: hidden;
+  font-feature-settings: "palt";
+}
+
+.app{
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  padding-bottom: 100px;
+  overflow: hidden;
+}
+.app::before{
+  content:''; position: absolute;
+  top: -80px; right: -120px;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(107,149,119,0.10), transparent 70%);
+  border-radius: 50%;
+  z-index: 0; pointer-events: none;
+}
+
+/* HEADER */
+.page-header{
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(247,242,234,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.back-btn{
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  color: var(--ink-mid);
+  text-decoration: none;
+}
+.back-btn:active{ transform: scale(0.96); }
+.back-btn svg{ width: 16px; height: 16px; }
+.title-wrap{ flex: 1; min-width: 0; }
+.page-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px; font-weight: 700;
+  letter-spacing: 0.04em; line-height: 1.1;
+}
+.channel-name{
+  display: flex; align-items: center; gap: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--ink-soft);
+  font-weight: 500;
+  margin-top: 3px;
+  letter-spacing: 0.02em;
+}
+.channel-name .hash{ color: var(--ink-soft); font-weight: 600; }
+.sync-status{
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  color: var(--sage);
+  font-weight: 700;
+  margin-left: 6px;
+  background: var(--sage-soft);
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+.sync-status .dot{
+  width: 5px; height: 5px;
+  background: var(--sage);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse{
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.header-icon{
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--ink-mid);
+  flex-shrink: 0;
+}
+.header-icon svg{ width: 15px; height: 15px; }
+
+/* CHANNEL INTRO */
+.channel-intro{
+  position: relative; z-index: 5;
+  margin: 16px 18px 18px;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, #F5EFE5 0%, #EBE0D0 100%);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+  display: flex; gap: 12px; align-items: center;
+}
+.intro-icon{
+  width: 40px; height: 40px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--ink-mid);
+}
+.intro-icon svg{ width: 20px; height: 20px; }
+.intro-body{ flex: 1; min-width: 0; }
+.intro-name{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+.intro-desc{
+  font-size: 11px; color: var(--ink-mid); line-height: 1.5;
+}
+
+/* FILTER */
+.filter-bar{
+  position: relative; z-index: 5;
+  padding: 0 18px 16px;
+  display: flex; gap: 6px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.filter-bar::-webkit-scrollbar{ display: none; }
+.filter-chip{
+  flex-shrink: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 500;
+  padding: 7px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--ink-mid);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+}
+.filter-chip.active{
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+/* DAY DIVIDER */
+.day-divider{
+  position: relative; z-index: 5;
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 22px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.day-divider::before,
+.day-divider::after{
+  content:''; flex: 1; height: 1px;
+  background: var(--line-strong);
+}
+
+/* MESSAGES */
+.messages{
+  position: relative; z-index: 5;
+  padding: 0 14px;
+  display: flex; flex-direction: column;
+}
+.msg{
+  display: flex; gap: 12px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+.msg:hover{
+  background: rgba(58,46,42,0.02);
+}
+.msg-avatar{
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px; font-weight: 700;
+  color: var(--bg-card);
+}
+.av-mauve{ background: var(--mauve); }
+.av-honey{ background: var(--honey); }
+.av-sage{ background: var(--sage); }
+.av-terra{ background: var(--terra); }
+.av-rose{ background: var(--rose); }
+.msg-body{ flex: 1; min-width: 0; }
+.msg-head{
+  display: flex; align-items: baseline; gap: 8px;
+  margin-bottom: 4px;
+}
+.msg-name{
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px; font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+.msg-time{
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.msg-content{
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.msg-content .pnl-profit{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px; font-weight: 600;
+  color: var(--profit);
+  letter-spacing: 0.02em;
+  display: inline-block;
+  margin-right: 4px;
+  vertical-align: -2px;
+}
+.msg-content .pnl-loss{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px; font-weight: 600;
+  color: var(--loss);
+  letter-spacing: 0.02em;
+  display: inline-block;
+  margin-right: 4px;
+  vertical-align: -2px;
+}
+.msg-content .tag-symbol{
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px; font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin: 0 4px 0 0;
+  vertical-align: 1px;
+}
+.tag-usdjpy{ background: var(--mauve-soft); color: #6E5F7E; }
+.tag-gold{ background: var(--honey-soft); color: #8B7036; }
+.tag-eurusd{ background: var(--sage-soft); color: #5E7A60; }
+.tag-gbpusd{ background: var(--terra-soft); color: #8B5C3F; }
+.tag-other{ background: var(--rose-soft); color: #8B5A65; }
+.msg-content .light{ color: var(--ink-soft); font-size: 11.5px; }
+.msg-embed{
+  margin-top: 8px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  border-left: 3px solid var(--profit);
+  max-width: 280px;
+}
+.msg-embed.loss{ border-left-color: var(--loss); }
+.embed-label{
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.embed-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 12px; font-weight: 700;
+  margin-bottom: 6px;
+}
+.embed-detail{
+  font-size: 11px;
+  color: var(--ink-mid);
+  line-height: 1.6;
+}
+.embed-detail span{
+  display: inline-block;
+  margin-right: 10px;
+}
+.embed-detail .key{
+  color: var(--ink-soft);
+  font-size: 10px;
+  margin-right: 3px;
+}
+.msg-reactions{
+  display: flex; gap: 5px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.reaction{
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px; font-weight: 600;
+  color: var(--ink-mid);
+  cursor: pointer;
+}
+.reaction .emoji{ font-size: 11px; }
+.reaction.you{
+  background: var(--rose-soft);
+  border-color: var(--rose-soft);
+  color: var(--rose);
+}
+
+/* EMPTY STATE */
+.empty-state{
+  position: relative; z-index: 5;
+  text-align: center;
+  padding: 60px 24px;
+}
+.empty-icon{
+  width: 56px; height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-soft);
+}
+.empty-icon svg{ width: 24px; height: 24px; }
+.empty-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-mid);
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+.empty-desc{
+  font-size: 11px;
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+/* LOADING */
+.loading-state{
+  text-align: center;
+  padding: 60px 24px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: var(--ink-soft);
+  letter-spacing: 0.1em;
+}
+
+/* SOURCE */
+.source-note{
+  position: relative; z-index: 5;
+  text-align: center;
+  padding: 28px 18px 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+.source-note .dot{
+  width: 5px; height: 5px;
+  background: var(--sage);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position: fixed;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  background: rgba(255, 254, 251, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--line);
+  padding: 10px 16px 22px;
+  display: flex; justify-content: space-around;
+  z-index: 100;
+}
+.nav-item{
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px; font-weight: 500;
+  color: var(--ink-soft);
+  cursor: pointer;
+  padding: 4px 8px;
+  letter-spacing: 0.04em;
+  min-width: 56px;
+  text-decoration: none;
+}
+.nav-item.active{ color: var(--rose); }
+.nav-item.active .ico{ background: var(--rose-soft); color: var(--rose); }
+.nav-item .ico{
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-soft);
+  transition: all 0.2s;
+}
+.nav-item .ico svg{ width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <a class="back-btn" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="title-wrap">
+      <div class="page-title">収支報告</div>
+      <div class="channel-name">
+        <span class="hash">#</span>
+        <span>shushi-houkoku</span>
+        <span class="sync-status">
+          <span class="dot"></span>
+          LIVE
+        </span>
+      </div>
+    </div>
+    <a class="header-icon" href="profit-admin.html" title="管理画面" style="text-decoration:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </a>
+  </header>
+
+  <!-- CHANNEL INTRO -->
+  <section class="channel-intro">
+    <div class="intro-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+    </div>
+    <div class="intro-body">
+      <div class="intro-name">#収支報告</div>
+      <div class="intro-desc">コミュニティメンバーがDiscordで投稿した収支報告のタイムラインです。</div>
+    </div>
+  </section>
+
+  <!-- TIMELINE (dynamically rendered) -->
+  <div id="timeline-container">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+      </div>
+      <div class="empty-title">まだ投稿がありません</div>
+      <div class="empty-desc">管理画面から収支報告を追加できます</div>
+    </div>
+  </div>
+
+  <!-- SOURCE -->
+  <div class="source-note">
+    <span class="dot"></span>
+    Synced from Discord #shushi-houkoku · Updated 12 min ago
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="index.html">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
+      </div>
+      <div>HOME</div>
+    </a>
+    <div class="nav-item active">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 16l4-4 4 4 5-7"/></svg>
+      </div>
+      <div>PROFIT</div>
+    </div>
+    <a class="nav-item" href="chat.html">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+      </div>
+      <div>AI</div>
+    </a>
+    <a class="nav-item" href="calendar.html">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      </div>
+      <div>CAL</div>
+    </a>
+    <a class="nav-item" href="members.html">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <div>MEMBER</div>
+    </a>
+  </nav>
+
+</div>
+
+<script>
+// Avatar color classes for cycling
+const AV_COLORS = ['av-mauve', 'av-honey', 'av-sage', 'av-terra', 'av-rose'];
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function getInitial(name) {
+  if (!name) return '?';
+  return name.trim()[0].toUpperCase();
+}
+
+function getAvColor(name) {
+  if (!name) return AV_COLORS[0];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return AV_COLORS[Math.abs(hash) % AV_COLORS.length];
+}
+
+function formatDayHeader(dateStr) {
+  const d = new Date(dateStr);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const target = new Date(d);
+  target.setHours(0,0,0,0);
+
+  const dows = ['日','月','火','水','木','金','土'];
+  const dateText = `${d.getMonth()+1}月${d.getDate()}日(${dows[d.getDay()]})`;
+
+  if (target.getTime() === today.getTime()) return `Today · ${dateText}`;
+  if (target.getTime() === yesterday.getTime()) return `Yesterday · ${dateText}`;
+  return dateText;
+}
+
+function formatTime(dateStr) {
+  const d = new Date(dateStr);
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function renderReactions(reactions) {
+  if (!reactions || reactions.length === 0) return '';
+  const chips = reactions.map(r =>
+    `<div class="reaction"><span class="emoji">${escapeHtml(r.emoji)}</span><span>${r.count}</span></div>`
+  ).join('');
+  return `<div class="msg-reactions">${chips}</div>`;
+}
+
+function renderMessage(post) {
+  const initial = getInitial(post.userName);
+  const avColor = getAvColor(post.userName);
+  const time = formatTime(post.timestamp);
+  const reactions = renderReactions(post.reactions);
+
+  // Content with line breaks preserved
+  const content = escapeHtml(post.content || '').replace(/\n/g, '<br>');
+
+  return `
+    <div class="msg">
+      <div class="msg-avatar ${avColor}">${escapeHtml(initial)}</div>
+      <div class="msg-body">
+        <div class="msg-head">
+          <span class="msg-name">${escapeHtml(post.userName)}</span>
+          <span class="msg-time">${time}</span>
+        </div>
+        <div class="msg-content">${content}</div>
+        ${reactions}
+      </div>
+    </div>
+  `;
+}
+
+function groupByDate(posts) {
+  const groups = {};
+  posts.forEach(p => {
+    const d = new Date(p.timestamp);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(p);
+  });
+  return Object.entries(groups).sort((a,b) => b[0].localeCompare(a[0]));
+}
+
+async function loadAndRender() {
+  const container = document.getElementById('timeline-container');
+  container.innerHTML = '<div class="loading-state">LOADING...</div>';
+
+  let posts = [];
+  try {
+    const result = await window.storage.get('profit-posts', true); // shared = true
+    if (result && result.value) {
+      posts = JSON.parse(result.value);
+    }
+  } catch (err) {
+    // No data yet — treat as empty
+    posts = [];
+  }
+
+  if (posts.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+        </div>
+        <div class="empty-title">まだ投稿がありません</div>
+        <div class="empty-desc">管理画面から収支報告を追加できます</div>
+      </div>
+    `;
+    return;
+  }
+
+  // Sort posts within each group by timestamp desc
+  const groups = groupByDate(posts);
+  groups.forEach(([_, ps]) => ps.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)));
+
+  const html = groups.map(([date, ps]) => `
+    <div class="day-divider">${formatDayHeader(date)}</div>
+    <div class="messages">
+      ${ps.map(renderMessage).join('')}
+    </div>
+  `).join('');
+
+  container.innerHTML = html;
+}
+
+loadAndRender();
+</script>
+
+</body>
+</html>

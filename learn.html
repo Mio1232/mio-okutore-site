@@ -1,0 +1,2623 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FX基礎知識と手法 — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Klee+One:wght@400;600&family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Serif+JP:wght@500;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#fdf8f3;
+  --cream-2:#f7ede2;
+  --blush:#f5d9d3;
+  --rose:#e8a5a5;
+  --rose-deep:#c97e7e;
+  --rose-soft: #E8D0D2;
+  --sage:#b8c5a8;
+  --sage-deep:#7a8a6a;
+  --gold:#c9a87c;
+  --ink:#5a4a44;
+  --ink-soft:#7d6e68;
+  --muted:#a89a92;
+  --line:#e8d9cd;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:"Zen Maru Gothic","Klee One",sans-serif;
+  font-size:15px;
+  line-height:1.9;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(245,217,211,0.4), transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(184,197,168,0.25), transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(253,248,243,0.6), transparent 60%);
+  min-height:100vh;
+}
+body::before{
+  content:"";
+  position:fixed;inset:0;
+  background-image:radial-gradient(circle, rgba(201,168,124,0.08) 1px, transparent 1px);
+  background-size:24px 24px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ============= APP WRAPPER (mobile-first) ============= */
+.app{
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 90px;
+}
+
+/* ============= HEADER (sticky) ============= */
+.page-header{
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(253,248,243,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.back-btn{
+  width: 36px; height: 36px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  color: var(--ink-soft); text-decoration: none;
+}
+.back-btn:active{ transform: scale(0.96); }
+.back-btn svg{ width: 16px; height: 16px; }
+.page-title{
+  flex: 1;
+  font-family: 'Klee One', "Noto Serif JP", serif;
+  font-size: 15px; font-weight: 600;
+  letter-spacing: 0.04em; line-height: 1.2;
+}
+.page-title .en{
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-weight: 500;
+  font-size: 10px; color: var(--rose-deep);
+  margin-top: 2px;
+}
+.header-spacer{ width: 36px; }
+
+/* ============= HERO ============= */
+.hero{
+  position:relative;
+  padding:36px 22px 32px;
+  text-align:center;
+  z-index:1;
+}
+.hero-deco{
+  display:inline-block;
+  font-family:"Cormorant Garamond",serif;
+  font-size:13px;font-style:italic;
+  color:var(--rose-deep);
+  letter-spacing:0.15em;
+  margin-bottom:16px;
+  position:relative;
+}
+.hero-deco::before,.hero-deco::after{
+  content:"❀";
+  margin:0 12px;
+  font-size:10px;
+  color:var(--rose);
+}
+.hero h1{
+  font-family:"Klee One","Zen Maru Gothic",serif;
+  font-size:30px;
+  font-weight:600;
+  letter-spacing:0.04em;
+  line-height:1.35;
+  color:var(--ink);
+  margin-bottom:8px;
+  position:relative;
+  display:inline-block;
+}
+.hero h1 .accent{
+  position:relative;
+  display:inline-block;
+}
+.hero h1 .accent::after{
+  content:"";
+  position:absolute;
+  left:-2px;right:-2px;bottom:5px;
+  height:9px;
+  background:var(--blush);
+  z-index:-1;
+  border-radius:6px;
+}
+.hero .english{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:14px;
+  color:var(--rose-deep);
+  margin-bottom:22px;
+  letter-spacing:0.1em;
+}
+.hero p.lead{
+  font-size:13px;
+  line-height:2;
+  color:var(--ink-soft);
+}
+.hero-illust{
+  margin:28px auto 0;
+  width:240px;
+  height:110px;
+  position:relative;
+}
+
+/* ============= PART HEAD ============= */
+.part-head{
+  position: relative; z-index: 1;
+  padding: 18px 22px 16px;
+  text-align: center;
+}
+.part-head .num{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:12px;
+  color:var(--rose-deep);
+  font-weight: 500;
+  letter-spacing:0.06em;
+  margin-bottom:4px;
+}
+.part-head h2{
+  font-family:"Klee One",serif;
+  font-size:18px;
+  font-weight:600;
+  margin:0;
+  color:var(--ink);
+  letter-spacing:0.04em;
+}
+.part-head h2::before,.part-head h2::after{
+  content:"・";
+  color:var(--rose);
+  margin:0 8px;
+}
+.part-head .lead{
+  font-size:11.5px;
+  color:var(--ink-soft);
+  line-height:1.7;
+  margin-top:6px;
+}
+
+/* ============= CARDS GRID ============= */
+.cards-section{
+  position:relative;
+  padding:8px 18px 24px;
+  z-index:1;
+}
+.cards-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.card-btn{
+  background:#fff;
+  border:none;
+  border-radius:18px;
+  padding:18px 14px;
+  text-align:left;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  box-shadow:
+    0 2px 12px rgba(201,126,126,0.06),
+    0 1px 3px rgba(201,126,126,0.03);
+  transition:all 0.3s cubic-bezier(0.2,0.8,0.2,1);
+  font-family:inherit;
+  color:inherit;
+  display:flex;
+  flex-direction:column;
+}
+.card-btn:active{ transform: translateY(1px); }
+.card-btn::before{
+  content:"";
+  position:absolute;
+  top:-25px;right:-25px;
+  width:75px;height:75px;
+  border-radius:50%;
+  opacity:0.6;
+  transition:transform 0.6s;
+}
+.card-btn:hover::before{transform:scale(1.4)}
+
+.card-btn.c1::before{background:var(--blush)}
+.card-btn.c2::before{background:#f0e0d0}
+.card-btn.c3::before{background:#e8d8e0}
+.card-btn.c4::before{background:#d8e3d0}
+.card-btn.c5::before{background:#e8dccf}
+.card-btn.c6::before{background:#f3d3c8}
+.card-btn.c7::before{background:#dde6ec}
+.card-btn.c8::before{background:#ecdde6}
+.card-btn.c9::before{background:#e6e0d4}
+.card-btn.c10::before{background:#dce6dc}
+.card-btn.c11::before{background:#f5e3d3}
+.card-btn.c12::before{background:#e3d8e8}
+
+.card-num{
+  font-family:"Cormorant Garamond",serif;
+  font-size:10.5px;
+  font-style:italic;
+  color:var(--rose-deep);
+  letter-spacing:0.12em;
+  margin-bottom:8px;
+  position:relative;
+}
+.card-icon{
+  width:42px;height:42px;
+  margin-bottom:10px;
+  position:relative;
+}
+.card-icon svg{width:100%;height:100%}
+.card-title{
+  font-family:"Klee One",serif;
+  font-size:14px;
+  font-weight:600;
+  margin-bottom:6px;
+  letter-spacing:0.02em;
+  color:var(--ink);
+  position:relative;
+  line-height:1.45;
+}
+.card-desc{
+  font-size:10.5px;
+  color:var(--ink-soft);
+  line-height:1.7;
+  margin-bottom:10px;
+  position:relative;
+  flex: 1;
+}
+.card-cta{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:10px;
+  font-weight:600;
+  color:var(--rose-deep);
+  letter-spacing:0.08em;
+  position:relative;
+  padding:5px 10px;
+  background:var(--cream-2);
+  border-radius:14px;
+  align-self:flex-start;
+  transition:all 0.3s;
+}
+
+/* ============= MIO MESSAGE BRIDGE ============= */
+.mio-message{
+  position: relative; z-index: 1;
+  margin: 22px 18px 14px;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, #F5EFE5 0%, #EBE0D0 100%);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(58,46,42,0.06);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.mio-face{
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(58,46,42,0.10);
+}
+.mio-body{ flex: 1; min-width: 0; }
+.mio-head{
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 6px;
+}
+.mio-name{
+  font-family: 'Klee One', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.mio-tag{
+  font-family: 'Inter', sans-serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--rose-deep);
+  background: var(--rose-soft);
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.mio-msg{
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--ink-soft);
+}
+.mio-msg .em{ color: var(--ink); font-weight: 600; }
+
+/* ============= SOURCE LINK ============= */
+.source-link{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-top:8px;
+  padding:4px 10px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:999px;
+  font-family:'Inter',sans-serif;
+  font-size:9.5px;
+  color:var(--ink-soft);
+  font-weight:500;
+  letter-spacing:0.05em;
+  text-decoration:none;
+}
+.source-link svg{width:9px;height:9px}
+
+/* ============= VIDEO LIST ============= */
+.video-list{
+  position: relative; z-index: 1;
+  padding: 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.video-item{
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(58,46,42,0.04);
+  overflow: hidden;
+}
+.video-meta{
+  padding: 12px 14px 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.video-num{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--rose-deep);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.video-info{ flex: 1; min-width: 0; }
+.video-cat{
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--rose-deep);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.video-title{
+  font-family: 'Klee One', serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+.video-frame{
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background: #000;
+  margin-top: 10px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.video-frame iframe{
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+.video-thumb{
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s, filter 0.3s;
+}
+.video-frame:hover .video-thumb{
+  transform: scale(1.04);
+  filter: brightness(0.85);
+}
+.video-frame::after{
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.35) 100%);
+  pointer-events: none;
+}
+.play-btn{
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px; height: 42px;
+  background: rgba(0,0,0,0.65);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: background 0.3s, transform 0.3s;
+  z-index: 2;
+}
+.video-frame:hover .play-btn{
+  background: #FF0000;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+.play-btn svg{
+  width: 22px; height: 22px;
+  fill: #fff;
+  margin-left: 3px;
+}
+.video-frame.playing .video-thumb,
+.video-frame.playing .play-btn,
+.video-frame.playing::after{
+  display: none;
+}
+
+/* ============= BOTTOM CTA ============= */
+.bottom-cta{
+  position: relative; z-index: 1;
+  margin: 28px 18px 0;
+  padding: 26px 22px 24px;
+  background: linear-gradient(135deg, #3A2E2A 0%, #5A4842 100%);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(58,46,42,0.06);
+  color: var(--cream);
+  text-align: center;
+  overflow: hidden;
+}
+.bottom-cta::before{
+  content:'';
+  position: absolute;
+  top: -40px; right: -20px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(212,182,119,0.18), transparent 70%);
+  border-radius: 50%;
+}
+.bottom-cta-eyebrow{
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  color: rgba(253,248,243,0.6);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  position: relative; z-index: 1;
+}
+.bottom-cta-title{
+  font-family: 'Klee One', serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.55;
+  margin-bottom: 16px;
+  letter-spacing: 0.04em;
+  position: relative; z-index: 1;
+}
+.bottom-cta-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  background: var(--cream);
+  color: var(--ink);
+  border-radius: 999px;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  position: relative; z-index: 1;
+}
+.bottom-cta-btn svg{ width: 12px; height: 12px; }
+
+/* ============= MODAL ============= */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(90,74,68,0.5);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:300;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.4s;
+}
+.modal-overlay.active{
+  opacity:1;
+  pointer-events:auto;
+}
+.modal{
+  background:var(--cream);
+  border-radius:24px 24px 0 0;
+  width:100%;
+  max-width:430px;
+  max-height:92vh;
+  overflow-y:auto;
+  position:relative;
+  transform:translateY(60px);
+  transition:transform 0.45s cubic-bezier(0.2,0.8,0.2,1);
+  box-shadow:0 -10px 40px rgba(90,74,68,0.25);
+  scrollbar-width:thin;
+  scrollbar-color:var(--rose) transparent;
+}
+.modal::-webkit-scrollbar{width:5px}
+.modal::-webkit-scrollbar-thumb{background:var(--rose);border-radius:3px}
+.modal-overlay.active .modal{
+  transform:translateY(0);
+}
+.modal-grip{
+  width:36px; height:4px;
+  background: var(--line);
+  border-radius:999px;
+  margin: 8px auto 0;
+}
+.modal-header{
+  position:sticky;
+  top:0;
+  background:linear-gradient(180deg, var(--cream) 70%, transparent);
+  padding:14px 22px 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  z-index:5;
+}
+.modal-chapter{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:11.5px;
+  color:var(--rose-deep);
+  letter-spacing:0.15em;
+}
+.modal-close{
+  width:32px;height:32px;
+  border-radius:50%;
+  background:var(--blush);
+  border:none;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  color:var(--rose-deep);
+  font-family:inherit;
+}
+.modal-close:active{ transform: scale(0.92); }
+.modal-body{
+  padding:0 22px 36px;
+}
+.modal-cover{
+  text-align:center;
+  margin-bottom:24px;
+  padding-bottom:20px;
+  border-bottom:1px dashed var(--line);
+}
+.modal-cover .icon-large{
+  width:70px;height:70px;
+  margin:0 auto 14px;
+}
+.modal-cover h2{
+  font-family:"Klee One",serif;
+  font-size:22px;
+  font-weight:600;
+  margin-bottom:4px;
+  color:var(--ink);
+  letter-spacing:0.03em;
+}
+.modal-cover .english{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:12px;
+  color:var(--rose-deep);
+  letter-spacing:0.15em;
+}
+.modal-body p{
+  margin-bottom:14px;
+  font-size:13.5px;
+  line-height:1.95;
+  color:var(--ink);
+}
+.modal-body p.lead{
+  font-size:14px;
+  background:#fff;
+  padding:16px 18px;
+  border-radius:14px;
+  border-left:4px solid var(--rose);
+  font-family:"Klee One",serif;
+  margin-bottom:22px;
+  color:var(--ink-soft);
+  position:relative;
+}
+.modal-body p.lead::before{
+  content:"♡";
+  position:absolute;
+  top:-8px;left:14px;
+  background:var(--rose);
+  color:#fff;
+  width:22px;height:22px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+}
+.modal-body h3{
+  font-family:"Klee One",serif;
+  font-size:16px;
+  font-weight:600;
+  color:var(--ink);
+  margin:22px 0 12px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.modal-body h3::before{
+  content:"";
+  display:inline-block;
+  width:15px;height:15px;
+  background:var(--rose);
+  border-radius:50%;
+  border:3px solid var(--blush);
+  flex-shrink:0;
+}
+.modal-body strong{
+  color:var(--rose-deep);
+  font-weight:600;
+  background:linear-gradient(transparent 65%, var(--blush) 65%);
+  padding:0 2px;
+}
+.modal-body ul{
+  list-style:none;
+  margin:12px 0 18px;
+  background:#fff;
+  padding:16px 18px;
+  border-radius:14px;
+}
+.modal-body ul li{
+  padding:6px 0 6px 22px;
+  position:relative;
+  font-size:12.5px;
+  line-height:1.85;
+  border-bottom:1px dashed var(--line);
+}
+.modal-body ul li:last-child{border-bottom:none}
+.modal-body ul li::before{
+  content:"❀";
+  position:absolute;
+  left:0;top:6px;
+  color:var(--rose);
+  font-size:11px;
+}
+.modal-body code{
+  font-family:"Klee One",monospace;
+  font-size:12px;
+  background:var(--blush);
+  color:var(--rose-deep);
+  padding:2px 7px;
+  border-radius:6px;
+  font-weight:600;
+}
+.term-card{
+  background:#fff;
+  border-radius:14px;
+  padding:16px 18px;
+  margin:12px 0;
+  position:relative;
+  border:1px solid var(--line);
+}
+.term-card::before{
+  content:"";
+  position:absolute;
+  top:12px;left:12px;
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--rose);
+}
+.term-card .term-name{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:12px;
+  color:var(--rose-deep);
+  letter-spacing:0.1em;
+  margin-bottom:5px;
+  padding-left:16px;
+}
+.term-card .term-def{
+  font-size:12.5px;
+  line-height:1.85;
+  color:var(--ink);
+}
+.callout{
+  background:linear-gradient(135deg, #fff 0%, var(--cream-2) 100%);
+  border-radius:14px;
+  padding:18px 20px;
+  margin:18px 0;
+  position:relative;
+  border:2px dashed var(--rose);
+}
+.callout::before{
+  content:"♡ Point";
+  position:absolute;
+  top:-11px;left:18px;
+  background:var(--rose);
+  color:#fff;
+  font-size:10px;
+  font-weight:600;
+  padding:3px 12px;
+  border-radius:11px;
+  letter-spacing:0.1em;
+}
+.callout p{font-size:12.5px;margin-bottom:5px;color:var(--ink)}
+.callout p:last-child{margin-bottom:0}
+.indicator-mini{
+  background:#fff;
+  border-radius:12px;
+  padding:14px 16px;
+  margin-bottom:10px;
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+}
+.indicator-mini .num{
+  flex-shrink:0;
+  width:28px;height:28px;
+  background:var(--blush);
+  color:var(--rose-deep);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-weight:600;
+  font-size:13px;
+}
+.indicator-mini .ind-name{
+  font-weight:600;
+  font-size:13px;
+  margin-bottom:3px;
+  color:var(--ink);
+}
+.indicator-mini .ind-desc{
+  font-size:12px;
+  color:var(--ink-soft);
+  line-height:1.75;
+}
+.pattern-card{
+  background:#fff;
+  border-radius:14px;
+  padding:18px 18px 20px;
+  margin:14px 0;
+  border:1px solid var(--line);
+  box-shadow:0 2px 8px rgba(201,126,126,0.04);
+}
+.pattern-card .pattern-name{
+  font-family:"Klee One",serif;
+  font-size:15px;
+  font-weight:600;
+  color:var(--ink);
+  margin-bottom:12px;
+  padding-left:16px;
+  position:relative;
+}
+.pattern-card .pattern-name::before{
+  content:"";
+  position:absolute;
+  top:8px;left:0;
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--rose);
+}
+.pattern-figure{
+  background:linear-gradient(135deg, #fdf8f3 0%, #faf2ec 100%);
+  border-radius:12px;
+  padding:12px 14px 8px;
+  margin-bottom:12px;
+  border:1px dashed var(--line);
+  overflow:hidden;
+}
+.pattern-figure svg{
+  width:100%;
+  height:auto;
+  display:block;
+}
+.pattern-figure-cap{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:11px;
+  text-align:center;
+  color:var(--rose-deep);
+  margin-top:5px;
+  letter-spacing:0.05em;
+}
+.pattern-card .pattern-def{
+  font-size:12.5px;
+  line-height:1.9;
+  color:var(--ink);
+}
+
+/* ============= BOTTOM NAV ============= */
+.bottom-nav{
+  position: fixed;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  background: rgba(253,248,243,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--line);
+  padding: 10px 16px 22px;
+  display: flex; justify-content: space-around;
+  z-index: 100;
+}
+.nav-item{
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px; font-weight: 500;
+  color: var(--ink-soft);
+  padding: 4px 8px;
+  letter-spacing: 0.04em;
+  min-width: 56px;
+  text-decoration: none;
+}
+.nav-item.active{ color: var(--rose-deep); }
+.nav-item.active .ico{ background: var(--blush); color: var(--rose-deep); }
+.nav-item .ico{
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-soft);
+}
+.nav-item .ico svg{ width: 16px; height: 16px; }
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.card-btn{animation:fadeIn 0.6s both}
+.card-btn.c1{animation-delay:0.05s}
+.card-btn.c2{animation-delay:0.08s}
+.card-btn.c3{animation-delay:0.11s}
+.card-btn.c4{animation-delay:0.14s}
+.card-btn.c5{animation-delay:0.17s}
+.card-btn.c6{animation-delay:0.20s}
+.card-btn.c7{animation-delay:0.23s}
+.card-btn.c8{animation-delay:0.26s}
+.card-btn.c9{animation-delay:0.29s}
+.card-btn.c10{animation-delay:0.32s}
+.card-btn.c11{animation-delay:0.35s}
+.card-btn.c12{animation-delay:0.38s}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- HEADER -->
+<header class="page-header">
+  <a class="back-btn" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  </a>
+  <div class="page-title">
+    FX基礎知識と手法
+    <span class="en">— Basics & Methods</span>
+  </div>
+  <div class="header-spacer"></div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-deco">a beginner's notebook</div>
+  <h1>はじめての<br><span class="accent">FX手帖</span></h1>
+  <div class="english">— for beginners, with love.</div>
+  <p class="lead">
+    むずかしそうに見えるFXを、ちいさく分けて、<br>
+    やさしく綴った12のお話。
+  </p>
+
+  <div class="hero-illust">
+    <svg viewBox="0 0 280 140" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 20 100 Q 60 80, 90 70 T 160 50 T 230 35 L 260 30"
+            stroke="#e8a5a5" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="20" cy="100" r="5" fill="#fff" stroke="#e8a5a5" stroke-width="2"/>
+      <circle cx="90" cy="70" r="5" fill="#fff" stroke="#e8a5a5" stroke-width="2"/>
+      <circle cx="160" cy="50" r="5" fill="#fff" stroke="#e8a5a5" stroke-width="2"/>
+      <circle cx="230" cy="35" r="5" fill="#fff" stroke="#e8a5a5" stroke-width="2"/>
+      <g transform="translate(260,30)">
+        <circle r="3" fill="#c97e7e"/>
+        <circle cx="-6" cy="-3" r="3" fill="#f5d9d3"/>
+        <circle cx="6" cy="-3" r="3" fill="#f5d9d3"/>
+        <circle cx="-4" cy="5" r="3" fill="#f5d9d3"/>
+        <circle cx="4" cy="5" r="3" fill="#f5d9d3"/>
+        <circle r="1.5" fill="#c9a87c"/>
+      </g>
+      <text x="40" y="125" fill="#e8a5a5" font-size="14">♡</text>
+      <text x="200" y="115" fill="#b8c5a8" font-size="12">❀</text>
+      <text x="120" y="120" fill="#c9a87c" font-size="10">✦</text>
+    </svg>
+  </div>
+</section>
+
+<!-- PART 01: CARDS -->
+<div class="part-head">
+  <div class="num">— Part 01 / Twelve Chapters —</div>
+  <h2>めくる、12の章</h2>
+  <p class="lead">各章をタップすると、お話が開きます。</p>
+</div>
+
+<section class="cards-section">
+  <div class="cards-grid">
+
+    <button class="card-btn c1" onclick="openChapter(1)">
+      <div class="card-num">— Ch. 01</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="28" r="22" fill="#f5d9d3"/>
+          <text x="28" y="36" text-anchor="middle" fill="#c97e7e" font-size="20" font-family="Cormorant Garamond" font-style="italic" font-weight="500">¥$</text>
+        </svg>
+      </div>
+      <div class="card-title">FXってなに?</div>
+      <div class="card-desc">そもそもの仕組みと、株式投資との違いから、やさしくはじめます。</div>
+      <div class="card-cta">読みはじめる →</div>
+    </button>
+
+    <button class="card-btn c2" onclick="openChapter(2)">
+      <div class="card-num">— Ch. 02</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="14" width="40" height="28" rx="4" fill="#f0e0d0"/>
+          <line x1="14" y1="22" x2="42" y2="22" stroke="#c9a87c" stroke-width="1.5"/>
+          <line x1="14" y1="28" x2="36" y2="28" stroke="#c9a87c" stroke-width="1.5"/>
+          <line x1="14" y1="34" x2="40" y2="34" stroke="#c9a87c" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="card-title">基礎用語のこと</div>
+      <div class="card-desc">通貨ペア、pips、ロット…はじめましての言葉たちを覚えましょう。</div>
+      <div class="card-cta">読みはじめる →</div>
+    </button>
+
+    <button class="card-btn c3" onclick="openChapter(3)">
+      <div class="card-num">— Ch. 03</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="10" width="40" height="36" rx="4" fill="#e8d8e0"/>
+          <line x1="18" y1="20" x2="18" y2="38" stroke="#7a8a6a" stroke-width="2"/>
+          <rect x="14" y="24" width="8" height="10" fill="#b8c5a8"/>
+          <line x1="32" y1="16" x2="32" y2="40" stroke="#c97e7e" stroke-width="2"/>
+          <rect x="28" y="22" width="8" height="14" fill="#e8a5a5"/>
+        </svg>
+      </div>
+      <div class="card-title">チャートの読み方</div>
+      <div class="card-desc">ローソク足って?トレンドって?絵を読むみたいに、お話します。</div>
+      <div class="card-cta">読みはじめる →</div>
+    </button>
+
+    <button class="card-btn c4" onclick="openChapter(4)">
+      <div class="card-num">— Ch. 04</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="28" r="22" fill="#d8e3d0"/>
+          <path d="M 12 32 Q 20 22, 28 26 T 44 18" stroke="#7a8a6a" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="44" cy="18" r="3" fill="#c97e7e"/>
+        </svg>
+      </div>
+      <div class="card-title">テクニカル分析</div>
+      <div class="card-desc">移動平均線、RSI、MACD…名前は難しいけれど、ちゃんとやさしく。</div>
+      <div class="card-cta">読みはじめる →</div>
+    </button>
+
+    <button class="card-btn c5" onclick="openChapter(5)">
+      <div class="card-num">— Ch. 05</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="28" r="22" fill="#e8dccf"/>
+          <circle cx="28" cy="28" r="14" fill="none" stroke="#c9a87c" stroke-width="1.5"/>
+          <circle cx="28" cy="28" r="6" fill="#c9a87c"/>
+          <line x1="28" y1="14" x2="28" y2="20" stroke="#c97e7e" stroke-width="2" stroke-linecap="round"/>
+          <line x1="42" y1="28" x2="36" y2="28" stroke="#c97e7e" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="card-title">経済のつながり</div>
+      <div class="card-desc">中央銀行や経済指標。世界の動きと為替のかかわりを見ていきます。</div>
+      <div class="card-cta">読みはじめる →</div>
+    </button>
+
+    <button class="card-btn c6" onclick="openChapter(6)">
+      <div class="card-num">— Ch. 06</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 28 12 L 44 22 L 44 36 Q 44 44, 28 48 Q 12 44, 12 36 L 12 22 Z" fill="#f3d3c8"/>
+          <path d="M 22 28 L 26 32 L 34 24" stroke="#c97e7e" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="card-title">こころと、リスク管理</div>
+      <div class="card-desc">勝つよりも、負けないこと。長く続けるための、いちばん大切なお話。</div>
+      <div class="card-cta">読みはじめる →</div>
+    </button>
+
+    <button class="card-btn c7" onclick="openChapter(7)">
+      <div class="card-num">— Ch. 07</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="28" r="22" fill="#dde6ec"/>
+          <ellipse cx="28" cy="28" rx="20" ry="8" fill="none" stroke="#8a9ba8" stroke-width="1.5"/>
+          <ellipse cx="28" cy="28" rx="8" ry="20" fill="none" stroke="#8a9ba8" stroke-width="1.5"/>
+          <circle cx="28" cy="28" r="3" fill="#c97e7e"/>
+        </svg>
+      </div>
+      <div class="card-title">世界の通貨ガイド</div>
+      <div class="card-desc">ドル、円、ユーロ、ポンド…それぞれの個性と表情を覗いてみましょう。</div>
+      <div class="card-cta">読みはじめる →</div>
+    </button>
+
+    <button class="card-btn c8" onclick="openChapter(8)">
+      <div class="card-num">— Ch. 08</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="10" width="40" height="36" rx="4" fill="#ecdde6"/>
+          <path d="M 14 30 L 20 22 L 26 32 L 32 20 L 38 30 L 44 24" stroke="#a87ea0" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="20" cy="22" r="2.5" fill="#c97e7e"/>
+          <circle cx="32" cy="20" r="2.5" fill="#c97e7e"/>
+        </svg>
+      </div>
+      <div class="card-title">チャートパターン集</div>
+      <div class="card-desc">ダブルトップ、三尊、フラッグ…相場が描く形には、意味があります。</div>
+      <div class="card-cta">読みはじめる →</div>
+    </button>
+
+    <button class="card-btn c9" onclick="openChapter(9)">
+      <div class="card-num">— Ch. 09</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="28" r="22" fill="#e6e0d4"/>
+          <path d="M 14 36 Q 22 28, 28 30 T 42 22" stroke="#a89770" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M 14 22 Q 22 30, 28 26 T 42 36" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="3 3"/>
+        </svg>
+      </div>
+      <div class="card-title">トレード手法のいろいろ</div>
+      <div class="card-desc">順張り、逆張り、ブレイクアウト。あなたに合うスタイルはどれ?</div>
+      <div class="card-cta">読みはじめる →</div>
+    </button>
+
+    <button class="card-btn c10" onclick="openChapter(10)">
+      <div class="card-num">— Ch. 10</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="28" r="22" fill="#dce6dc"/>
+          <path d="M 14 32 Q 24 22, 32 26 T 44 18" stroke="#7a9080" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="20" cy="28" r="3" fill="#7a9080"/>
+          <text x="14" y="22" fill="#7a9080" font-size="9" font-weight="600">IN</text>
+          <circle cx="40" cy="20" r="3" fill="#c97e7e"/>
+          <text x="42" y="16" fill="#c97e7e" font-size="9" font-weight="600">OUT</text>
+        </svg>
+      </div>
+      <div class="card-title">エントリーとエグジット</div>
+      <div class="card-desc">どこで入って、どこで出るか。タイミングの見極め方を学びます。</div>
+      <div class="card-cta">読みはじめる →</div>
+    </button>
+
+    <button class="card-btn c11" onclick="openChapter(11)">
+      <div class="card-num">— Ch. 11</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="8" width="40" height="14" rx="3" fill="#e8dccf"/>
+          <rect x="8" y="24" width="40" height="10" rx="2" fill="#f3d3c8"/>
+          <rect x="8" y="36" width="40" height="8" rx="2" fill="#f5d9d3"/>
+          <line x1="14" y1="15" x2="42" y2="15" stroke="#c9a87c" stroke-width="1.5"/>
+          <line x1="14" y1="29" x2="36" y2="29" stroke="#c97e7e" stroke-width="1.5"/>
+          <line x1="14" y1="40" x2="32" y2="40" stroke="#c97e7e" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="card-title">複数時間足分析(MTF)</div>
+      <div class="card-desc">大きな足と小さな足を組み合わせると、相場の地図が広がります。</div>
+      <div class="card-cta">読みはじめる →</div>
+    </button>
+
+    <button class="card-btn c12" onclick="openChapter(12)">
+      <div class="card-num">— Ch. 12</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="22" r="12" fill="#f5d9d3" opacity="0.85"/>
+          <circle cx="36" cy="34" r="12" fill="#dde6ec" opacity="0.85"/>
+          <circle cx="28" cy="28" r="3" fill="#c97e7e"/>
+        </svg>
+      </div>
+      <div class="card-title">相関関係を読む</div>
+      <div class="card-desc">通貨と通貨、株や金。世界はぜんぶつながっているお話です。</div>
+      <div class="card-cta">読みはじめる →</div>
+    </button>
+
+  </div>
+</section>
+
+<!-- MIO BRIDGE -->
+<div class="mio-message">
+  <img class="mio-face" src="data:image/jpeg;base64,data:image/jpeg;base64,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" alt="美桜Mio">
+  <div class="mio-body">
+    <div class="mio-head">
+      <div class="mio-name">美桜Mio</div>
+      <div class="mio-tag">Mio</div>
+    </div>
+    <div class="mio-msg">
+      基礎を学んだら、次は<span class="em">実践</span>です✨ 私が普段使っている分析の極意を5つの動画にまとめました。<span class="em">「基礎」と「資金管理」</span>こそ、本当に大切なんです。
+    </div>
+  </div>
+</div>
+
+<!-- PART 02 HEADER -->
+<div class="part-head" style="margin-top:14px;">
+  <div class="num">— Part 02 / Mio's Picks —</div>
+  <h2>FX必勝大全</h2>
+  <p class="lead">勝率を爆上げする、動画レッスン5本。</p>
+  <a class="source-link" href="https://note.com/mio61512/n/n4ed1a6adc088" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    noteで全文を読む
+  </a>
+</div>
+
+<!-- VIDEOS -->
+<div class="video-list">
+
+  <div class="video-item">
+    <div class="video-meta">
+      <div class="video-num">01</div>
+      <div class="video-info">
+        <div class="video-cat">FOUNDATION</div>
+        <div class="video-title">絶対に知っておきたい基礎中の基礎</div>
+      </div>
+    </div>
+    <div class="video-frame" data-vid="iWYvbVPhHxQ" onclick="playVideo(this)">
+      <img class="video-thumb" src="https://i.ytimg.com/vi/iWYvbVPhHxQ/hqdefault.jpg" alt="基礎中の基礎" loading="lazy">
+      <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+    </div>
+  </div>
+
+  <div class="video-item">
+    <div class="video-meta">
+      <div class="video-num">02</div>
+      <div class="video-info">
+        <div class="video-cat">RISK MANAGEMENT</div>
+        <div class="video-title">FX資金管理の極意</div>
+      </div>
+    </div>
+    <div class="video-frame" data-vid="oJvIXoOGSxw" onclick="playVideo(this)">
+      <img class="video-thumb" src="https://i.ytimg.com/vi/oJvIXoOGSxw/hqdefault.jpg" alt="FX資金管理の極意" loading="lazy">
+      <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+    </div>
+  </div>
+
+  <div class="video-item">
+    <div class="video-meta">
+      <div class="video-num">03</div>
+      <div class="video-info">
+        <div class="video-cat">TECHNICAL</div>
+        <div class="video-title">勝率を上げるテクニカル分析の極意</div>
+      </div>
+    </div>
+    <div class="video-frame" data-vid="o6lbKPwk1ms" onclick="playVideo(this)">
+      <img class="video-thumb" src="https://i.ytimg.com/vi/o6lbKPwk1ms/hqdefault.jpg" alt="テクニカル分析の極意" loading="lazy">
+      <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+    </div>
+  </div>
+
+  <div class="video-item">
+    <div class="video-meta">
+      <div class="video-num">04</div>
+      <div class="video-info">
+        <div class="video-cat">FUNDAMENTALS</div>
+        <div class="video-title">勝率を上げるファンダメンタルズ分析の極意</div>
+      </div>
+    </div>
+    <div class="video-frame" data-vid="0KnO3iAhYcI" onclick="playVideo(this)">
+      <img class="video-thumb" src="https://i.ytimg.com/vi/0KnO3iAhYcI/hqdefault.jpg" alt="ファンダメンタルズ分析の極意" loading="lazy">
+      <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+    </div>
+  </div>
+
+  <div class="video-item">
+    <div class="video-meta">
+      <div class="video-num">05</div>
+      <div class="video-info">
+        <div class="video-cat">CHART ANALYSIS</div>
+        <div class="video-title">FXのチャート分析の極意</div>
+      </div>
+    </div>
+    <div class="video-frame" data-vid="97PyM4tKwGc" onclick="playVideo(this)">
+      <img class="video-thumb" src="https://i.ytimg.com/vi/97PyM4tKwGc/hqdefault.jpg" alt="FXのチャート分析の極意" loading="lazy">
+      <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM CTA -->
+<section class="bottom-cta">
+  <div class="bottom-cta-eyebrow">Join the Community</div>
+  <div class="bottom-cta-title">学びを、実践に。<br>仲間と一緒に成長しよう。</div>
+  <a class="bottom-cta-btn" href="about.html">
+    コミュニティを見る
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </a>
+</section>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="nav-item" href="index.html">
+    <div class="ico">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
+    </div>
+    <div>HOME</div>
+  </a>
+  <a class="nav-item" href="profit.html">
+    <div class="ico">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 16l4-4 4 4 5-7"/></svg>
+    </div>
+    <div>PROFIT</div>
+  </a>
+  <a class="nav-item" href="chat.html">
+    <div class="ico">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+    </div>
+    <div>AI</div>
+  </a>
+  <a class="nav-item" href="calendar.html">
+    <div class="ico">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    </div>
+    <div>CAL</div>
+  </a>
+  <a class="nav-item" href="members.html">
+    <div class="ico">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    </div>
+    <div>MEMBER</div>
+  </a>
+</nav>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="overlay" onclick="closeOnOverlay(event)">
+  <div class="modal" id="modal">
+    <div class="modal-grip"></div>
+    <div class="modal-header">
+      <div class="modal-chapter" id="m-chapter"></div>
+      <button class="modal-close" onclick="closeChapter()" aria-label="閉じる">×</button>
+    </div>
+    <div class="modal-body" id="m-body"></div>
+  </div>
+</div>
+
+<script>
+const chapters = {
+  1: {
+    chapter:"— Chapter 01 —",
+    title:"FXってなに?",
+    english:"— On Foreign Exchange —",
+    iconColor:"#f5d9d3",
+    iconText:"¥$",
+    body:`
+      <p class="lead">FXは「外国為替証拠金取引」のこと。ある国のお金を、別の国のお金と交換して、その値動きから利益を生み出すしくみです。</p>
+      <p>たとえば、1ドル150円のときに1万ドルを買い、1ドル155円になったら売る。それだけで5万円の利益になります。逆に値下がりすれば、損をする——とてもシンプルな世界です。</p>
+      <p>世界の為替市場は、株式市場よりずっと大きな規模で動いています。各国の経済、政策、ニュース、災害…あらゆることが通貨の価値に影響して、わたしたちはその波に、ちょこんと乗ってみるイメージ。</p>
+
+      <h3>株式投資との違い</h3>
+      <p>株は「会社」を買うこと。FXは「国と国の力関係」を読むこと。倒産という概念はないけれど、為替は<strong>双方向</strong>——どちらが強くなるか、という相対的な視点で動きます。</p>
+
+      <h3>FXのいいところ</h3>
+      <ul>
+        <li><strong>24時間取引できる</strong>——平日なら、世界のどこかが開いています</li>
+        <li><strong>少額ではじめられる</strong>——数千円から始められる業者も</li>
+        <li><strong>レバレッジ</strong>——少ない資金で、大きな金額を動かせます</li>
+        <li><strong>下がっても利益のチャンス</strong>——「売り」から入ることも可能です</li>
+      </ul>
+
+      <div class="callout">
+        <p>レバレッジは、利益を大きくする魔法のように見えますが、損失も同じだけ大きくします。「少額で大きく動かせる」=「少額で大きく失える」も意味する、ということを最初に心にとめておいてくださいね。</p>
+      </div>
+
+      <h3>市場が動く時間帯</h3>
+      <p>主な市場は<strong>東京・ロンドン・ニューヨーク</strong>。日本時間の夕方から夜にかけてが、いちばんにぎやか。経済指標の発表もこの時間帯に多く集まります。</p>
+    `
+  },
+  2: {
+    chapter:"— Chapter 02 —",
+    title:"基礎用語のこと",
+    english:"— Vocabulary —",
+    iconColor:"#f0e0d0",
+    body:`
+      <p class="lead">FXの世界には、ちょっと特別な言葉たちがあります。最初に出会うものから、ひとつずつ仲良くなっていきましょう。</p>
+
+      <div class="term-card">
+        <div class="term-name">Currency Pair / 通貨ペア</div>
+        <div class="term-def"><code>USD/JPY</code> のように、左の通貨を右の通貨で買う・売るという関係を表します。USD/JPYが上がる=ドルが円より強くなる(=円安)。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Pips / ピプス</div>
+        <div class="term-def">為替の値動きの、いちばん小さい単位。USD/JPYなら<code>0.01円</code>=1pip。EUR/USDなら<code>0.0001ドル</code>=1pip。「10pips抜けた」とは、それだけ価格が動いた利益のこと。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Lot / ロット</div>
+        <div class="term-def">取引量の単位。日本では<code>1万通貨</code>=1ロットが一般的。最近は1000通貨単位の少額取引ができる業者も増えていて、はじめての方にはやさしい単位です。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Spread / スプレッド</div>
+        <div class="term-def">買値と売値の差。FX会社の実質的な手数料です。狭いほどお得で、ドル円なら0.2銭〜1銭くらいが一般的。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Leverage / レバレッジ</div>
+        <div class="term-def">てこの原理。日本では個人は最大<code>25倍</code>まで。10万円の証拠金で、250万円分の取引ができるという計算になります。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Long / Short</div>
+        <div class="term-def">「買い」がロング、「売り」がショート。値下がりすると思ったら、持っていない通貨を売ることもできます。これがFXで下落相場でも稼げる理由なんです。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Swap / スワップ</div>
+        <div class="term-def">通貨ペアの金利差から、毎日もらえる(or 払う)金額のこと。高金利通貨を買って低金利通貨を売れば、毎日少しずつスワップを受け取れます。</div>
+      </div>
+    `
+  },
+  3: {
+    chapter:"— Chapter 03 —",
+    title:"チャートの読み方",
+    english:"— Reading Charts —",
+    iconColor:"#e8d8e0",
+    body:`
+      <p class="lead">価格は、ただの数字の羅列ではありません。市場のひとたちの気持ちが描いた、絵のようなもの。チャートは、その絵を読む技術です。</p>
+
+      <h3>ローソク足</h3>
+      <p>日本生まれの表し方。一本のローソクが、一定時間内の<strong>始値・高値・安値・終値</strong>を教えてくれます。陽線(始値より終値が高い)は上昇、陰線は下落。長い影(ヒゲ)は、その時間に大きく動いたけれど、押し戻された印。</p>
+
+      <div class="pattern-figure">
+        <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <line x1="90" y1="30" x2="90" y2="180" stroke="#7a9080" stroke-width="2"/>
+            <rect x="76" y="65" width="28" height="80" fill="#7a9080"/>
+            <text x="90" y="195" text-anchor="middle" fill="#5a4a44" font-size="11" font-weight="700">陽線</text>
+            <text x="135" y="35" fill="#a89a92" font-size="10">高値</text>
+            <line x1="105" y1="32" x2="130" y2="33" stroke="#a89a92" stroke-width="0.8" stroke-dasharray="2 2"/>
+            <text x="135" y="69" fill="#7a9080" font-size="10" font-weight="600">終値</text>
+            <line x1="105" y1="65" x2="130" y2="68" stroke="#a89a92" stroke-width="0.8" stroke-dasharray="2 2"/>
+            <text x="135" y="149" fill="#7a9080" font-size="10" font-weight="600">始値</text>
+            <line x1="105" y1="145" x2="130" y2="148" stroke="#a89a92" stroke-width="0.8" stroke-dasharray="2 2"/>
+            <text x="135" y="183" fill="#a89a92" font-size="10">安値</text>
+            <line x1="105" y1="180" x2="130" y2="180" stroke="#a89a92" stroke-width="0.8" stroke-dasharray="2 2"/>
+          </g>
+          <g>
+            <line x1="240" y1="30" x2="240" y2="180" stroke="#c97e7e" stroke-width="2"/>
+            <rect x="226" y="65" width="28" height="80" fill="#c97e7e"/>
+            <text x="240" y="195" text-anchor="middle" fill="#5a4a44" font-size="11" font-weight="700">陰線</text>
+            <text x="260" y="69" fill="#c97e7e" font-size="10" font-weight="600">始値</text>
+            <text x="260" y="149" fill="#c97e7e" font-size="10" font-weight="600">終値</text>
+          </g>
+          <text x="20" y="22" fill="#5a4a44" font-family="Klee One" font-size="11" font-weight="700">ローソク1本の構造</text>
+        </svg>
+        <div class="pattern-figure-cap">陽線=上がった、陰線=下がった</div>
+      </div>
+
+      <h3>時間足</h3>
+      <p>1分足、5分足、1時間足、日足、週足。短い足ほどノイズが多く、長い足ほど大きな流れがわかります。<strong>長い足で全体を見て、短い足でタイミングをはかる</strong>のが基本です。</p>
+
+      <h3>トレンドとレンジ</h3>
+      <p>相場には2つのモードがあります。方向性がはっきりしている<strong>トレンド相場</strong>と、一定の幅で行ったり来たりする<strong>レンジ相場</strong>。今がどちらかを見極めるのが、最初の一歩。</p>
+
+      <div class="pattern-figure">
+        <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <text x="75" y="20" text-anchor="middle" fill="#7a9080" font-size="11" font-weight="700">上昇トレンド</text>
+            <path d="M 20 175 L 40 150 L 55 165 L 75 130 L 95 145 L 115 105 L 130 120 L 140 90" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <line x1="20" y1="175" x2="140" y2="100" stroke="#7a9080" stroke-width="1.2" stroke-dasharray="3 2"/>
+            <text x="75" y="195" text-anchor="middle" fill="#a89a92" font-size="9">高値・安値が切り上がる</text>
+          </g>
+          <g>
+            <text x="170" y="20" text-anchor="middle" fill="#c97e7e" font-size="11" font-weight="700">下降トレンド</text>
+            <path d="M 145 90 L 160 110 L 175 100 L 190 130 L 200 120 L 215 145 L 225 140 L 240 165" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <line x1="145" y1="90" x2="240" y2="155" stroke="#c97e7e" stroke-width="1.2" stroke-dasharray="3 2"/>
+            <text x="195" y="195" text-anchor="middle" fill="#a89a92" font-size="9">高値・安値が切り下がる</text>
+          </g>
+          <g>
+            <text x="285" y="20" text-anchor="middle" fill="#a87ea0" font-size="11" font-weight="700">レンジ</text>
+            <line x1="245" y1="80" x2="315" y2="80" stroke="#a87ea0" stroke-width="1.2" stroke-dasharray="3 2"/>
+            <line x1="245" y1="160" x2="315" y2="160" stroke="#a87ea0" stroke-width="1.2" stroke-dasharray="3 2"/>
+            <path d="M 250 120 L 260 80 L 270 160 L 285 80 L 300 160 L 310 120" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <text x="285" y="195" text-anchor="middle" fill="#a89a92" font-size="9">一定の幅で往復</text>
+          </g>
+        </svg>
+        <div class="pattern-figure-cap">3つのモードを見分けるのが、最初の一歩</div>
+      </div>
+
+      <h3>サポートとレジスタンス</h3>
+      <p>過去になんども止まった価格帯。下から支える線を<strong>サポート(支持線)</strong>、上から抑える線を<strong>レジスタンス(抵抗線)</strong>と呼びます。みんなが意識する価格は、未来でも意識される——心理の地図です。</p>
+
+      <div class="pattern-figure">
+        <svg viewBox="0 0 360 180" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="#f0e0e0" stroke-width="1">
+            <line x1="0" y1="45" x2="360" y2="45"/>
+            <line x1="0" y1="90" x2="360" y2="90"/>
+            <line x1="0" y1="135" x2="360" y2="135"/>
+          </g>
+          <line x1="20" y1="45" x2="280" y2="45" stroke="#a87ea0" stroke-width="2"/>
+          <text x="285" y="42" fill="#a87ea0" font-size="10" font-weight="700">レジスタンス</text>
+          <text x="285" y="54" fill="#a87ea0" font-size="9">(抵抗線)</text>
+          <line x1="20" y1="135" x2="280" y2="135" stroke="#7a9080" stroke-width="2"/>
+          <text x="285" y="132" fill="#7a9080" font-size="10" font-weight="700">サポート</text>
+          <text x="285" y="144" fill="#7a9080" font-size="9">(支持線)</text>
+          <path d="M 30 90 L 60 50 L 90 100 L 120 130 L 150 75 L 180 50 L 210 110 L 240 130 L 270 90" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="60" cy="50" r="5" fill="#a87ea0" stroke="#fff" stroke-width="2"/>
+          <circle cx="180" cy="50" r="5" fill="#a87ea0" stroke="#fff" stroke-width="2"/>
+          <circle cx="120" cy="130" r="5" fill="#7a9080" stroke="#fff" stroke-width="2"/>
+          <circle cx="240" cy="130" r="5" fill="#7a9080" stroke="#fff" stroke-width="2"/>
+        </svg>
+        <div class="pattern-figure-cap">何度も止まる価格には、意味がある</div>
+      </div>
+
+      <div class="callout">
+        <p>はじめのうちは、シンプルな日足のローソク足だけ見るので十分。たくさん指標を入れすぎると、かえって迷ってしまいます。慣れてから、ひとつずつ足していきましょう。</p>
+      </div>
+    `
+  },
+  4: {
+    chapter:"— Chapter 04 —",
+    title:"テクニカル分析",
+    english:"— Technical Analysis —",
+    iconColor:"#d8e3d0",
+    body:`
+      <p class="lead">過去の値動きから、未来をすこし覗いてみる。それがテクニカル分析。万能ではないけれど、知っているのと知らないのでは、見える世界がずいぶん違います。</p>
+
+      <h3>覚えておきたい基本指標</h3>
+
+      <div class="pattern-card">
+        <div class="pattern-name">① 移動平均線(MA)</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <path d="M 20 130 L 50 145 L 80 110 L 110 125 L 140 80 L 170 95 L 200 50 L 230 65 L 260 30 L 290 50" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M 20 135 Q 60 125, 90 115 T 150 90 T 220 60 T 290 45" stroke="#7a9080" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M 20 145 Q 70 140, 110 130 T 180 105 T 260 75 T 290 65" stroke="#a87ea0" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <circle cx="120" cy="123" r="7" fill="#fff" stroke="#c9a87c" stroke-width="2.5"/>
+            <text x="120" y="148" text-anchor="middle" fill="#c9a87c" font-size="9" font-weight="700">ゴールデン</text>
+            <text x="120" y="160" text-anchor="middle" fill="#c9a87c" font-size="9" font-weight="700">クロス</text>
+            <g transform="translate(170,15)">
+              <line x1="0" y1="5" x2="12" y2="5" stroke="#c97e7e" stroke-width="2"/>
+              <text x="16" y="9" fill="#5a4a44" font-size="9">価格</text>
+              <line x1="44" y1="5" x2="56" y2="5" stroke="#7a9080" stroke-width="2"/>
+              <text x="60" y="9" fill="#5a4a44" font-size="9">短期MA</text>
+              <line x1="98" y1="5" x2="110" y2="5" stroke="#a87ea0" stroke-width="2"/>
+              <text x="114" y="9" fill="#5a4a44" font-size="9">長期MA</text>
+            </g>
+          </svg>
+          <div class="pattern-figure-cap">短期線が長期線を上抜けたら買いサイン</div>
+        </div>
+        <div class="pattern-def">一定期間の終値の平均をつないだ線。価格が線の上=上昇傾向、下=下落傾向。25日線、75日線、200日線が定番です。短期線が長期線を上抜けるゴールデンクロスは、買いのサイン。</div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-name">② ボリンジャーバンド</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <path d="M 20 60 Q 70 55, 110 75 T 180 95 T 290 50 L 290 110 Q 240 130, 180 130 T 110 120 T 20 110 Z" fill="#a87ea0" opacity="0.12"/>
+            <path d="M 20 60 Q 70 55, 110 75 T 180 95 T 290 50" stroke="#a87ea0" stroke-width="1.5" fill="none" stroke-dasharray="3 2"/>
+            <path d="M 20 85 Q 70 80, 110 95 T 180 110 T 290 80" stroke="#7a9080" stroke-width="1.5" fill="none"/>
+            <path d="M 20 110 Q 70 105, 110 120 T 180 130 T 290 110" stroke="#a87ea0" stroke-width="1.5" fill="none" stroke-dasharray="3 2"/>
+            <path d="M 30 90 L 50 75 L 70 95 L 90 110 L 110 100 L 130 115 L 150 105 L 170 120 L 190 100 L 210 75 L 230 65 L 250 80 L 270 60" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <line x1="100" y1="75" x2="100" y2="120" stroke="#c9a87c" stroke-width="1" stroke-dasharray="2 2"/>
+            <text x="100" y="155" text-anchor="middle" fill="#c9a87c" font-size="9" font-weight="700">スクイーズ</text>
+            <text x="100" y="167" text-anchor="middle" fill="#c9a87c" font-size="8">(収縮)</text>
+            <text x="270" y="170" text-anchor="middle" fill="#c9a87c" font-size="9" font-weight="700">拡大→大きな動き</text>
+          </svg>
+          <div class="pattern-figure-cap">バンドが縮んだ後は、大きな動きの予兆</div>
+        </div>
+        <div class="pattern-def">移動平均線を中心に、上下にバンドを描いたもの。バンド内に価格が収まる確率が高いという統計を使います。バンドが収縮(スクイーズ)した後は、大きな動きの前触れ。</div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-name">③ RSI</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="30" width="240" height="140" fill="#fdf8f3" stroke="#e8d9cd" stroke-width="1"/>
+            <line x1="20" y1="60" x2="260" y2="60" stroke="#c97e7e" stroke-width="1.2" stroke-dasharray="3 2"/>
+            <text x="270" y="64" fill="#c97e7e" font-size="10" font-weight="700">70</text>
+            <line x1="20" y1="100" x2="260" y2="100" stroke="#a89a92" stroke-width="1" stroke-dasharray="2 2"/>
+            <text x="270" y="104" fill="#a89a92" font-size="9">50</text>
+            <line x1="20" y1="140" x2="260" y2="140" stroke="#7a9080" stroke-width="1.2" stroke-dasharray="3 2"/>
+            <text x="270" y="144" fill="#7a9080" font-size="10" font-weight="700">30</text>
+            <rect x="20" y="30" width="240" height="30" fill="#c97e7e" opacity="0.08"/>
+            <rect x="20" y="140" width="240" height="30" fill="#7a9080" opacity="0.08"/>
+            <path d="M 30 110 L 50 80 L 70 50 L 90 70 L 110 95 L 130 130 L 150 150 L 170 130 L 190 100 L 210 70 L 230 45 L 250 65" stroke="#a87ea0" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="70" cy="50" r="5" fill="#c97e7e" stroke="#fff" stroke-width="2"/>
+            <circle cx="150" cy="150" r="5" fill="#7a9080" stroke="#fff" stroke-width="2"/>
+            <circle cx="230" cy="45" r="5" fill="#c97e7e" stroke="#fff" stroke-width="2"/>
+            <text x="140" y="22" text-anchor="middle" fill="#c97e7e" font-size="10" font-weight="700">買われすぎ</text>
+            <text x="140" y="190" text-anchor="middle" fill="#7a9080" font-size="10" font-weight="700">売られすぎ</text>
+          </svg>
+          <div class="pattern-figure-cap">70超で売り、30割れで買いの目安</div>
+        </div>
+        <div class="pattern-def">0〜100の範囲で「買われすぎ・売られすぎ」を教えてくれる指標。70より上で買われすぎ、30より下で売られすぎが目安。レンジ相場で特に頼りになります。</div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-name">④ MACD</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="30" width="240" height="150" fill="#fdf8f3" stroke="#e8d9cd" stroke-width="1"/>
+            <line x1="20" y1="105" x2="260" y2="105" stroke="#5a4a44" stroke-width="1.2"/>
+            <text x="270" y="109" fill="#5a4a44" font-size="10" font-weight="700">0</text>
+            <g>
+              <rect x="35" y="105" width="10" height="30" fill="#c97e7e" opacity="0.7"/>
+              <rect x="50" y="105" width="10" height="20" fill="#c97e7e" opacity="0.7"/>
+              <rect x="65" y="105" width="10" height="10" fill="#c97e7e" opacity="0.5"/>
+              <rect x="80" y="100" width="10" height="5" fill="#7a9080" opacity="0.5"/>
+              <rect x="95" y="90" width="10" height="15" fill="#7a9080" opacity="0.7"/>
+              <rect x="110" y="75" width="10" height="30" fill="#7a9080" opacity="0.85"/>
+              <rect x="125" y="60" width="10" height="45" fill="#7a9080"/>
+              <rect x="140" y="65" width="10" height="40" fill="#7a9080" opacity="0.85"/>
+              <rect x="155" y="80" width="10" height="25" fill="#7a9080" opacity="0.7"/>
+              <rect x="170" y="95" width="10" height="10" fill="#7a9080" opacity="0.5"/>
+              <rect x="185" y="105" width="10" height="10" fill="#c97e7e" opacity="0.5"/>
+              <rect x="200" y="105" width="10" height="20" fill="#c97e7e" opacity="0.7"/>
+              <rect x="215" y="105" width="10" height="35" fill="#c97e7e"/>
+              <rect x="230" y="105" width="10" height="30" fill="#c97e7e" opacity="0.85"/>
+              <rect x="245" y="105" width="10" height="20" fill="#c97e7e" opacity="0.7"/>
+              <rect x="260" y="105" width="10" height="10" fill="#c97e7e" opacity="0.5"/>
+            </g>
+            <path d="M 30 130 L 60 120 L 90 100 L 120 65 L 150 70 L 180 100 L 210 130 L 240 130 L 270 110" stroke="#a87ea0" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M 30 125 L 60 125 L 90 115 L 120 90 L 150 80 L 180 90 L 210 115 L 240 125 L 270 120" stroke="#c9a87c" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 2"/>
+            <text x="125" y="22" text-anchor="middle" fill="#7a9080" font-size="10" font-weight="700">勢い増(買い優勢)</text>
+            <text x="225" y="195" text-anchor="middle" fill="#c97e7e" font-size="10" font-weight="700">勢い減(売り優勢)</text>
+          </svg>
+          <div class="pattern-figure-cap">ゼロラインのクロスでトレンド転換</div>
+        </div>
+        <div class="pattern-def">2本の移動平均線の差から、トレンドの勢いを読む指標。ヒストグラムが大きく広がれば勢いあり、縮めば勢いなし。ゼロラインのクロスがトレンド転換の合図です。</div>
+      </div>
+
+      <h3>ダウ理論——すべての基本</h3>
+      <p>19世紀末、チャールズ・ダウさんが体系化した相場の原則。ひとことで言うと<strong>「トレンドは続く。はっきりした転換のサインが出るまでは」</strong>。<br>
+      高値と安値が切り上がっていれば上昇、切り下がっていれば下降。直近の高値・安値が更新された瞬間が、トレンド転換のサインになります。</p>
+
+      <div class="pattern-figure">
+        <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="#f0e0e0" stroke-width="1">
+            <line x1="0" y1="45" x2="320" y2="45"/>
+            <line x1="0" y1="90" x2="320" y2="90"/>
+            <line x1="0" y1="135" x2="320" y2="135"/>
+          </g>
+          <path d="M 15 150 L 40 110 L 60 130 L 90 80 L 110 100 L 140 50 L 165 75 L 190 110 L 220 95 L 250 130 L 280 145" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="40" cy="110" r="4" fill="#7a9080"/>
+          <circle cx="90" cy="80" r="4" fill="#7a9080"/>
+          <circle cx="140" cy="50" r="5" fill="#7a9080" stroke="#fff" stroke-width="2"/>
+          <text x="40" y="103" text-anchor="middle" fill="#7a9080" font-size="9" font-weight="700">HH</text>
+          <text x="90" y="73" text-anchor="middle" fill="#7a9080" font-size="9" font-weight="700">HH</text>
+          <text x="140" y="40" text-anchor="middle" fill="#7a9080" font-size="9" font-weight="700">HH</text>
+          <circle cx="60" cy="130" r="4" fill="#7a9080"/>
+          <circle cx="110" cy="100" r="4" fill="#7a9080"/>
+          <text x="60" y="148" text-anchor="middle" fill="#7a9080" font-size="9" font-weight="700">HL</text>
+          <text x="110" y="118" text-anchor="middle" fill="#7a9080" font-size="9" font-weight="700">HL</text>
+          <line x1="110" y1="100" x2="240" y2="100" stroke="#c9a87c" stroke-width="1.2" stroke-dasharray="3 2"/>
+          <circle cx="220" cy="95" r="6" fill="#fff" stroke="#c9a87c" stroke-width="2.5"/>
+          <text x="270" y="92" text-anchor="middle" fill="#c9a87c" font-size="10" font-weight="700">トレンド</text>
+          <text x="270" y="104" text-anchor="middle" fill="#c9a87c" font-size="10" font-weight="700">転換</text>
+          <text x="160" y="20" text-anchor="middle" fill="#5a4a44" font-family="Klee One" font-size="11" font-weight="700">高値・安値の切り上げが続く=上昇トレンド</text>
+        </svg>
+        <div class="pattern-figure-cap">HH=高値の切り上げ / HL=安値の切り上げ</div>
+      </div>
+
+      <div class="callout">
+        <p>テクニカル指標は、過去のデータの加工にすぎません。未来を保証するものではなくて、確率をすこしこちら側に傾けるための道具。ひとつの指標に頼りきらず、複数を組み合わせて見るのがコツです。</p>
+      </div>
+    `
+  },
+  5: {
+    chapter:"— Chapter 05 —",
+    title:"経済のつながり",
+    english:"— Fundamentals —",
+    iconColor:"#e8dccf",
+    body:`
+      <p class="lead">通貨の価値を最終的に決めているのは、その国の経済の体力。チャートの裏側で動いている、もうひとつのレイヤーをのぞいてみましょう。</p>
+
+      <h3>注目したい経済指標</h3>
+      <p>毎月、各国からたくさんの指標が発表されます。なかでも為替を大きく動かすのは、こちら。</p>
+      <ul>
+        <li><strong>米雇用統計</strong>——毎月第1金曜日。世界中が息をのむ瞬間です</li>
+        <li><strong>消費者物価指数(CPI)</strong>——インフレの体温計</li>
+        <li><strong>政策金利の発表</strong>——FOMC、日銀会合、ECB理事会</li>
+        <li><strong>GDP速報値</strong>——国の経済の総合健康診断</li>
+        <li><strong>小売売上高・PMI</strong>——景気の先行指標</li>
+      </ul>
+
+      <h3>中央銀行のしごと</h3>
+      <p>各国の中央銀行は、<strong>金利を操作することで自国通貨の価値を調整</strong>しています。金利を上げればその通貨は買われやすく、下げれば売られやすくなる——これが為替のいちばん根っこの力学です。</p>
+
+      <div class="pattern-figure">
+        <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <rect x="20" y="30" width="120" height="60" rx="10" fill="#7a9080" opacity="0.15"/>
+            <text x="80" y="55" text-anchor="middle" fill="#7a9080" font-size="12" font-weight="700">金利を上げる</text>
+            <text x="80" y="75" text-anchor="middle" fill="#7a9080" font-size="14" font-weight="700">↑</text>
+            <path d="M 80 95 L 80 115" stroke="#7a9080" stroke-width="2" marker-end="url(#arrR1)"/>
+            <defs>
+              <marker id="arrR1" markerWidth="8" markerHeight="8" refX="4" refY="7" orient="auto">
+                <path d="M 0 0 L 4 8 L 8 0 Z" fill="#7a9080"/>
+              </marker>
+            </defs>
+            <rect x="20" y="120" width="120" height="55" rx="10" fill="#7a9080" opacity="0.25"/>
+            <text x="80" y="142" text-anchor="middle" fill="#5a4a44" font-size="11" font-weight="700">その通貨が</text>
+            <text x="80" y="160" text-anchor="middle" fill="#7a9080" font-size="13" font-weight="700">買われる(上昇)</text>
+          </g>
+          <g>
+            <rect x="180" y="30" width="120" height="60" rx="10" fill="#c97e7e" opacity="0.15"/>
+            <text x="240" y="55" text-anchor="middle" fill="#c97e7e" font-size="12" font-weight="700">金利を下げる</text>
+            <text x="240" y="75" text-anchor="middle" fill="#c97e7e" font-size="14" font-weight="700">↓</text>
+            <path d="M 240 95 L 240 115" stroke="#c97e7e" stroke-width="2" marker-end="url(#arrR2)"/>
+            <defs>
+              <marker id="arrR2" markerWidth="8" markerHeight="8" refX="4" refY="7" orient="auto">
+                <path d="M 0 0 L 4 8 L 8 0 Z" fill="#c97e7e"/>
+              </marker>
+            </defs>
+            <rect x="180" y="120" width="120" height="55" rx="10" fill="#c97e7e" opacity="0.25"/>
+            <text x="240" y="142" text-anchor="middle" fill="#5a4a44" font-size="11" font-weight="700">その通貨が</text>
+            <text x="240" y="160" text-anchor="middle" fill="#c97e7e" font-size="13" font-weight="700">売られる(下落)</text>
+          </g>
+          <text x="160" y="195" text-anchor="middle" fill="#a89a92" font-size="9" font-style="italic">高い金利のお金は、世界中から集まってくる</text>
+        </svg>
+        <div class="pattern-figure-cap">金利と通貨の関係は、シンプルなルール</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">FRB / 米連邦準備制度</div>
+        <div class="term-def">アメリカの中央銀行制度。世界の基軸通貨ドルを司る、いちばん影響力のある存在。FOMCの声明文の言葉ひとつで、為替が大きく動きます。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">日本銀行 / BoJ</div>
+        <div class="term-def">長らく超低金利を続けてきた日銀。政策のちいさな変化が、ドル円相場を激しく動かす要因になります。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">ECB / 欧州中央銀行</div>
+        <div class="term-def">ユーロ圏各国の金融政策を担当。複数の国の事情をまとめる難しさが、ユーロ独特の値動きを生みます。</div>
+      </div>
+
+      <h3>世界の出来事と為替</h3>
+      <p>戦争、選挙、政変、災害——突発的な出来事は、テクニカルを超えた動きを生みます。<strong>有事のドル買い</strong>、<strong>リスクオフの円買い</strong>といった経験則を覚えておくと、混乱の中でも進路が見えやすくなります。</p>
+    `
+  },
+  6: {
+    chapter:"— Chapter 06 —",
+    title:"こころと、リスク管理",
+    english:"— Risk & Mind —",
+    iconColor:"#f3d3c8",
+    body:`
+      <p class="lead">勝ち続けるトレーダーが共通して語るのは、勝つ技術ではなく、<strong>負け方の技術</strong>。生き残ること——それが、この世界の最終目的です。</p>
+
+      <h3>損切りの原則</h3>
+      <p>取引を始める前に「ここまで逆行したら撤退する」という線を決めておく。これが<strong>損切り(ストップロス)</strong>。守れないひとほど、ちいさな含み損が、やがて取り返しのつかない傷になります。</p>
+
+      <h3>利確の原則</h3>
+      <p>「もう少し」が、せっかくの利益を消してしまいます。あらかじめ決めた水準で利益を確定する、または値動きに合わせて損切りラインを切り上げていく(トレーリングストップ)など、自分なりのルールを持ちましょう。</p>
+
+      <h3>2%ルール</h3>
+      <p><strong>1回の取引で失っていい金額は、総資金の2%まで</strong>——これは多くのプロが守る黄金律。10万円の資金なら、1回の損失は2,000円まで。これを守れば、10連敗しても資金は8割以上残ります。</p>
+
+      <div class="pattern-figure">
+        <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+          <text x="160" y="20" text-anchor="middle" fill="#5a4a44" font-family="Klee One" font-size="11" font-weight="700">10連敗したらどうなる?</text>
+          <g>
+            <text x="80" y="42" text-anchor="middle" fill="#7a9080" font-size="11" font-weight="700">2%ルールあり</text>
+            <rect x="40" y="55" width="80" height="120" fill="#e8d9cd" rx="6"/>
+            <rect x="40" y="79" width="80" height="96" fill="#7a9080" rx="6"/>
+            <text x="80" y="120" text-anchor="middle" fill="#fff" font-size="22" font-weight="700">80%</text>
+            <text x="80" y="140" text-anchor="middle" fill="#fff" font-size="9">資金が残る</text>
+            <text x="80" y="190" text-anchor="middle" fill="#7a9080" font-size="9" font-weight="700">→ 続けられる</text>
+          </g>
+          <line x1="160" y1="55" x2="160" y2="180" stroke="#e8d9cd" stroke-width="1" stroke-dasharray="4 3"/>
+          <text x="160" y="120" text-anchor="middle" fill="#a89a92" font-size="11" font-weight="700">VS</text>
+          <g>
+            <text x="240" y="42" text-anchor="middle" fill="#c97e7e" font-size="11" font-weight="700">1回10%損失だと</text>
+            <rect x="200" y="55" width="80" height="120" fill="#e8d9cd" rx="6"/>
+            <rect x="200" y="137" width="80" height="38" fill="#c97e7e" rx="6"/>
+            <text x="240" y="120" text-anchor="middle" fill="#a89a92" font-size="22" font-weight="700">35%</text>
+            <text x="240" y="190" text-anchor="middle" fill="#c97e7e" font-size="9" font-weight="700">→ 取り返すのが大変</text>
+          </g>
+        </svg>
+        <div class="pattern-figure-cap">小さく負けて、長く続けるのが大切</div>
+      </div>
+
+      <h3>こころの整え方</h3>
+      <p>FXの最大の敵は、相場ではなく<strong>自分自身</strong>です。利益が出れば欲が、損失が出れば取り返したい衝動が湧く。これを「ポジポジ病」「リベンジトレード」と呼んで、ほとんどの破産はここから始まります。</p>
+      <p>ルールを<strong>取引する前に</strong>決めて、感情が動いている瞬間には判断しない。記録をつけて、自分の癖を客観的に見る。これが、長く続けるためのいちばん大切な姿勢です。</p>
+
+      <div class="callout">
+        <p>初心者によくある失敗:</p>
+        <p>① 損切りを置かない / ずらしてしまう</p>
+        <p>② レバレッジをかけすぎる</p>
+        <p>③ 根拠のないナンピンで傷を広げる</p>
+        <p>④ 経済指標発表の直前に飛び込む</p>
+        <p>⑤ 連勝で気が大きくなり、ルールを破る</p>
+      </div>
+
+      <h3>さいごに</h3>
+      <p>FXは、一夜で資産を築く魔法ではないし、ただの賭博でもありません。仕組みを理解して、確率を味方につけて、感情を整えたひとだけが、市場と長く付き合っていけます。<br>
+      あなたのこれからの旅が、長く、おだやかなものでありますように。</p>
+    `
+  },
+  7: {
+    chapter:"— Chapter 07 —",
+    title:"世界の通貨ガイド",
+    english:"— World Currencies —",
+    iconColor:"#dde6ec",
+    body:`
+      <p class="lead">通貨にも、ひとつひとつ性格があります。それぞれの「らしさ」を知っておくと、ニュースを見たときの解像度がぐっと上がりますよ。</p>
+
+      <div class="term-card">
+        <div class="term-name">USD / 米ドル</div>
+        <div class="term-def">世界の<strong>基軸通貨</strong>。原油や金などの取引もドル建てで行われ、世界中の中央銀行が外貨準備として保有しています。「有事のドル買い」と言われるように、不安が広がるとドルが買われやすい性質も。FXのほとんどの通貨ペアにドルが絡みます。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">JPY / 日本円</div>
+        <div class="term-def">代表的な<strong>安全通貨(セーフヘイブン)</strong>。世界が混乱すると円が買われやすくなる傾向があります。長く超低金利が続いてきたため、円を売って高金利通貨を買う「円キャリートレード」の対象にもなりやすい通貨です。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">EUR / ユーロ</div>
+        <div class="term-def">19カ国が共有する単一通貨。ドルに次ぐ取引量を誇ります。複数の国をまとめているぶん、加盟国の経済格差や政治リスクの影響を受けやすく、独特の値動きをします。EUR/USDは世界でいちばん取引されている通貨ペア。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">GBP / 英ポンド</div>
+        <div class="term-def">通称「<strong>殺し屋通貨</strong>」と呼ばれるほど、値動きが激しめ。1日で数百pips動くことも珍しくありません。リターンも大きいけれど、それだけリスクも大きい——上級者向きの通貨です。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">AUD / 豪ドル</div>
+        <div class="term-def">資源国通貨の代表格。鉄鉱石や石炭の輸出が経済を支えており、<strong>商品市況や中国の景気に連動</strong>しやすい性質があります。比較的高金利で、スワップ狙いの長期保有でも人気。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">CHF / スイスフラン</div>
+        <div class="term-def">円と並ぶ安全通貨。永世中立国スイスの政治的安定と、伝統的な金融の信頼性が背景。地政学リスクが高まると買われる傾向があります。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">NZD / ニュージーランドドル</div>
+        <div class="term-def">「キウイ」の愛称で親しまれる通貨。豪ドルと似た値動きをすることが多く、酪農品の輸出に経済が支えられている資源国通貨です。</div>
+      </div>
+
+      <div class="callout">
+        <p>はじめのうちは、値動きが穏やかでスプレッドも狭い<strong>USD/JPY</strong>からスタートするのがおすすめ。慣れてきたら、EUR/USDなど他の通貨ペアにも広げていきましょう。</p>
+      </div>
+    `
+  },
+  8: {
+    chapter:"— Chapter 08 —",
+    title:"チャートパターン集",
+    english:"— Chart Patterns —",
+    iconColor:"#ecdde6",
+    body:`
+      <p class="lead">相場が描く形には、ちゃんと意味があります。「またこの形だ」と気づけるようになると、相場が少しずつおしゃべりに感じられてきますよ。</p>
+
+      <h3>反転パターン(トレンドの終わり)</h3>
+
+      <div class="pattern-card">
+        <div class="pattern-name">ダブルトップ / ダブルボトム</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <path d="M 20 130 Q 40 110, 60 80 Q 80 40, 100 50 Q 110 60, 120 90 Q 140 105, 150 95 Q 165 70, 180 50 Q 195 40, 210 70 Q 225 95, 240 110 L 280 145" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <circle cx="100" cy="50" r="5" fill="#fff" stroke="#c97e7e" stroke-width="2"/>
+            <circle cx="180" cy="50" r="5" fill="#fff" stroke="#c97e7e" stroke-width="2"/>
+            <text x="100" y="36" text-anchor="middle" fill="#c97e7e" font-size="11" font-weight="600">①</text>
+            <text x="180" y="36" text-anchor="middle" fill="#c97e7e" font-size="11" font-weight="600">②</text>
+            <line x1="80" y1="95" x2="240" y2="95" stroke="#7a8a6a" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text x="244" y="99" fill="#7a8a6a" font-size="10" font-weight="600">ネックライン</text>
+            <path d="M 240 110 L 265 138" stroke="#a87ea0" stroke-width="2" fill="none" stroke-linecap="round" marker-end="url(#arrowdt)"/>
+            <defs>
+              <marker id="arrowdt" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M 0 0 L 8 4 L 0 8 Z" fill="#a87ea0"/>
+              </marker>
+            </defs>
+            <text x="280" y="155" text-anchor="middle" fill="#a87ea0" font-size="10" font-weight="600">下落</text>
+            <text x="140" y="22" text-anchor="middle" fill="#c97e7e" font-size="20" font-style="italic" font-family="Cormorant Garamond" opacity="0.4">M</text>
+          </svg>
+          <div class="pattern-figure-cap">M字型 = ダブルトップ(下降転換)</div>
+        </div>
+        <div class="pattern-def">同じくらいの高さの山が2つ並ぶ「M字」が<strong>ダブルトップ</strong>(上昇トレンドの終わり)。逆に「W字」になるのが<strong>ダブルボトム</strong>(下降トレンドの終わり)。間の谷(ネックライン)を割ったら、シグナル成立。</div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-name">三尊(ヘッド&ショルダー)</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <path d="M 15 140 Q 30 120, 50 80 Q 65 55, 80 65 Q 95 90, 110 100 Q 125 90, 140 55 Q 160 25, 175 35 Q 195 80, 210 100 Q 225 90, 240 65 Q 250 55, 265 75 Q 280 110, 300 140" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <circle cx="80" cy="65" r="5" fill="#fff" stroke="#c97e7e" stroke-width="2"/>
+            <circle cx="175" cy="35" r="6" fill="#c97e7e"/>
+            <circle cx="265" cy="75" r="5" fill="#fff" stroke="#c97e7e" stroke-width="2"/>
+            <text x="80" y="55" text-anchor="middle" fill="#c97e7e" font-size="9" font-weight="600">左肩</text>
+            <text x="175" y="22" text-anchor="middle" fill="#c97e7e" font-size="10" font-weight="700">頭</text>
+            <text x="265" y="65" text-anchor="middle" fill="#c97e7e" font-size="9" font-weight="600">右肩</text>
+            <line x1="100" y1="100" x2="240" y2="100" stroke="#7a8a6a" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text x="244" y="104" fill="#7a8a6a" font-size="10" font-weight="600">ネックライン</text>
+            <path d="M 280 110 L 305 145" stroke="#a87ea0" stroke-width="2" fill="none" stroke-linecap="round" marker-end="url(#arrowsanson)"/>
+            <defs>
+              <marker id="arrowsanson" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M 0 0 L 8 4 L 0 8 Z" fill="#a87ea0"/>
+              </marker>
+            </defs>
+          </svg>
+          <div class="pattern-figure-cap">真ん中が一番高い3つの山(下降転換)</div>
+        </div>
+        <div class="pattern-def">3つの山が並び、真ん中がいちばん高い形。仏像の三尊像に似ていることから命名されました。トップでよく見られる、信頼性の高い反転パターン。逆さにした<strong>逆三尊</strong>はボトムのサイン。</div>
+      </div>
+
+      <h3>継続パターン(トレンドが続くサイン)</h3>
+
+      <div class="pattern-card">
+        <div class="pattern-name">フラッグ / ペナント</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <path d="M 20 145 L 70 30" stroke="#7a8a6a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <text x="35" y="100" fill="#7a8a6a" font-size="10" font-weight="600" transform="rotate(-67 35 100)">急上昇(ポール)</text>
+            <path d="M 70 30 L 90 60 L 110 50 L 130 75 L 150 65 L 170 90" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <line x1="70" y1="30" x2="170" y2="70" stroke="#c97e7e" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>
+            <line x1="90" y1="60" x2="190" y2="100" stroke="#c97e7e" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>
+            <text x="125" y="42" text-anchor="middle" fill="#c97e7e" font-size="10" font-weight="600" opacity="0.85">フラッグ</text>
+            <path d="M 170 90 L 200 50 L 230 30 L 260 15" stroke="#7a8a6a" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <circle cx="170" cy="90" r="5" fill="#fff" stroke="#7a8a6a" stroke-width="2"/>
+            <text x="170" y="110" text-anchor="middle" fill="#7a8a6a" font-size="10" font-weight="600">ブレイク</text>
+            <path d="M 240 25 L 265 7" stroke="#7a8a6a" stroke-width="2" fill="none" stroke-linecap="round" marker-end="url(#arrowflag)"/>
+            <defs>
+              <marker id="arrowflag" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M 0 0 L 8 4 L 0 8 Z" fill="#7a8a6a"/>
+              </marker>
+            </defs>
+            <text x="280" y="22" text-anchor="middle" fill="#7a8a6a" font-size="10" font-weight="600">続伸</text>
+          </svg>
+          <div class="pattern-figure-cap">急騰のあと、ひと息ついてから再上昇</div>
+        </div>
+        <div class="pattern-def">急騰や急落のあと、小休止のように細い値幅で揉み合う形。<strong>旗</strong>のように平行に動くのがフラッグ、<strong>三角形</strong>のように収束していくのがペナント。トレンドが再開する前のひと息、と覚えてみて。</div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-name">三角持ち合い(トライアングル)</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <path d="M 20 50 L 50 130 L 80 60 L 110 120 L 140 75 L 170 105 L 200 85 L 220 95 L 240 88" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <line x1="20" y1="50" x2="240" y2="88" stroke="#a87ea0" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <line x1="50" y1="130" x2="240" y2="92" stroke="#a87ea0" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text x="130" y="40" text-anchor="middle" fill="#a87ea0" font-size="10" font-weight="600">高値が切り下がる</text>
+            <text x="130" y="148" text-anchor="middle" fill="#a87ea0" font-size="10" font-weight="600">安値が切り上がる</text>
+            <path d="M 240 88 L 275 55" stroke="#7a8a6a" stroke-width="2" fill="none" stroke-linecap="round" marker-end="url(#arrowtri)"/>
+            <defs>
+              <marker id="arrowtri" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M 0 0 L 8 4 L 0 8 Z" fill="#7a8a6a"/>
+              </marker>
+            </defs>
+            <text x="285" y="58" text-anchor="middle" fill="#7a8a6a" font-size="10" font-weight="600">どちらかに</text>
+            <text x="285" y="71" text-anchor="middle" fill="#7a8a6a" font-size="10" font-weight="600">ブレイク</text>
+          </svg>
+          <div class="pattern-figure-cap">徐々に値幅が狭まり、やがて大きく抜ける</div>
+        </div>
+        <div class="pattern-def">高値と安値が徐々に収束していく形。やがてどちらかに大きく抜ける(ブレイク)のが特徴。上値が水平・下値が切り上がる「上昇トライアングル」、上値が切り下がる「下降トライアングル」、両方が収束する「対称トライアングル」があります。</div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-name">ボックス(レンジ)</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <rect x="40" y="55" width="200" height="80" fill="#fdf0f0" stroke="#c97e7e" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.6"/>
+            <path d="M 20 95 L 50 60 L 80 130 L 110 60 L 140 130 L 170 60 L 200 130 L 230 60 L 260 130" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <text x="250" y="58" fill="#a87ea0" font-size="10" font-weight="600">レジスタンス</text>
+            <text x="250" y="138" fill="#7a8a6a" font-size="10" font-weight="600">サポート</text>
+            <text x="50" y="50" text-anchor="middle" fill="#c97e7e" font-size="14">↓</text>
+            <text x="80" y="148" text-anchor="middle" fill="#c97e7e" font-size="14">↑</text>
+            <text x="110" y="50" text-anchor="middle" fill="#c97e7e" font-size="14">↓</text>
+            <text x="140" y="148" text-anchor="middle" fill="#c97e7e" font-size="14">↑</text>
+          </svg>
+          <div class="pattern-figure-cap">一定の幅で行ったり来たりを繰り返す</div>
+        </div>
+        <div class="pattern-def">一定の幅で行ったり来たりを繰り返す形。<strong>箱の中で値が往復している</strong>イメージ。上限で売って下限で買う「逆張り」が機能しやすい場面ですが、抜けた瞬間に大きく動く準備をしておきましょう。</div>
+      </div>
+
+      <h3>パターン認識のコツ</h3>
+      <ul>
+        <li>形が完成するまで、決めつけずに待つ</li>
+        <li>大きな時間足ほど、パターンの信頼度が上がる</li>
+        <li>ネックライン抜けやブレイクなど「<strong>シグナル成立の瞬間</strong>」を待ってから動く</li>
+        <li>パターンに固執せず、ダマシ(失敗)も想定しておく</li>
+      </ul>
+
+      <div class="callout">
+        <p>パターンは「絶対に当たる予言」ではなく、<strong>確率を傾けるためのヒント</strong>。形が見えても損切りの準備は必ずセットで。形ばかりに集中して、損切りを忘れないように気をつけてくださいね。</p>
+      </div>
+    `
+  },
+  9: {
+    chapter:"— Chapter 09 —",
+    title:"トレード手法のいろいろ",
+    english:"— Trading Approaches —",
+    iconColor:"#e6e0d4",
+    body:`
+      <p class="lead">「正解の手法」はありません。あなたの性格や生活リズムに合うかどうかが、いちばん大事です。代表的な手法を、ひとつずつ見ていきましょう。</p>
+
+      <h3>方向性で選ぶ</h3>
+
+      <div class="pattern-card">
+        <div class="pattern-name">① 順張り(トレンドフォロー)</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <path d="M 20 145 L 50 110 L 70 125 L 100 80 L 125 95 L 160 50 L 185 65 L 220 25 L 250 40 L 280 15" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="20" y1="145" x2="290" y2="35" stroke="#7a8a6a" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.7"/>
+            <circle cx="70" cy="125" r="6" fill="#7a8a6a" stroke="#fff" stroke-width="2"/>
+            <circle cx="125" cy="95" r="6" fill="#7a8a6a" stroke="#fff" stroke-width="2"/>
+            <circle cx="185" cy="65" r="6" fill="#7a8a6a" stroke="#fff" stroke-width="2"/>
+            <text x="70" y="148" text-anchor="middle" fill="#7a8a6a" font-size="10" font-weight="600">押し目買い</text>
+            <text x="125" y="118" text-anchor="middle" fill="#7a8a6a" font-size="10" font-weight="600">押し目買い</text>
+            <text x="185" y="88" text-anchor="middle" fill="#7a8a6a" font-size="10" font-weight="600">押し目買い</text>
+            <path d="M 270 25 L 295 5" stroke="#7a8a6a" stroke-width="2" fill="none" stroke-linecap="round" marker-end="url(#arrJun)"/>
+            <defs>
+              <marker id="arrJun" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M 0 0 L 8 4 L 0 8 Z" fill="#7a8a6a"/>
+              </marker>
+            </defs>
+          </svg>
+          <div class="pattern-figure-cap">トレンドの方向に、押し目で乗る</div>
+        </div>
+        <div class="pattern-def">流れに乗っかる手法。上昇しているところで買い、下降しているところで売る。「友達はトレンド」というFX界の格言通り、もっとも素直で再現性の高いやり方です。<strong>初心者はまずここから</strong>。</div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-name">② 逆張り(カウンター)</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <path d="M 20 90 L 50 55 L 80 130 L 110 55 L 140 130 L 170 55 L 200 130 L 230 55 L 260 130 L 285 90" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="20" y1="55" x2="270" y2="55" stroke="#a87ea0" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <line x1="20" y1="130" x2="270" y2="130" stroke="#7a8a6a" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text x="278" y="58" fill="#a87ea0" font-size="9" font-weight="600">高値</text>
+            <text x="278" y="133" fill="#7a8a6a" font-size="9" font-weight="600">安値</text>
+            <circle cx="50" cy="55" r="6" fill="#a87ea0" stroke="#fff" stroke-width="2"/>
+            <circle cx="110" cy="55" r="6" fill="#a87ea0" stroke="#fff" stroke-width="2"/>
+            <text x="80" y="42" text-anchor="middle" fill="#a87ea0" font-size="10" font-weight="600">高値で「売り」</text>
+            <circle cx="80" cy="130" r="6" fill="#7a8a6a" stroke="#fff" stroke-width="2"/>
+            <circle cx="140" cy="130" r="6" fill="#7a8a6a" stroke="#fff" stroke-width="2"/>
+            <text x="110" y="153" text-anchor="middle" fill="#7a8a6a" font-size="10" font-weight="600">安値で「買い」</text>
+          </svg>
+          <div class="pattern-figure-cap">行き過ぎた価格は、戻ってくる</div>
+        </div>
+        <div class="pattern-def">行き過ぎた価格が戻ってくる、という想定で逆方向にエントリーする手法。サポート・レジスタンスやRSIを使うことが多いです。レンジ相場では強いけれど、強いトレンドに逆らうと一気にやられるので、上級者向き。</div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-name">③ ブレイクアウト</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <rect x="20" y="70" width="170" height="60" fill="#fdf0f0" opacity="0.6"/>
+            <path d="M 20 100 L 40 75 L 60 125 L 90 75 L 120 125 L 150 75 L 180 125 L 200 70 L 220 40 L 250 25 L 280 15" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="20" y1="70" x2="200" y2="70" stroke="#a87ea0" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <line x1="20" y1="130" x2="200" y2="130" stroke="#a87ea0" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text x="105" y="105" text-anchor="middle" fill="#a87ea0" font-size="10" font-weight="600" opacity="0.85">レンジ(揉み合い)</text>
+            <circle cx="200" cy="70" r="7" fill="#7a8a6a" stroke="#fff" stroke-width="2.5"/>
+            <text x="225" y="65" fill="#7a8a6a" font-size="10" font-weight="600">ここで買い</text>
+            <text x="225" y="78" fill="#7a8a6a" font-size="9">(ブレイク)</text>
+            <path d="M 270 25 L 295 5" stroke="#7a8a6a" stroke-width="2" fill="none" stroke-linecap="round" marker-end="url(#arrBrk)"/>
+            <defs>
+              <marker id="arrBrk" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M 0 0 L 8 4 L 0 8 Z" fill="#7a8a6a"/>
+              </marker>
+            </defs>
+          </svg>
+          <div class="pattern-figure-cap">レンジを抜けた瞬間に、流れに乗る</div>
+        </div>
+        <div class="pattern-def">レンジを抜けた瞬間に乗る手法。レンジの上抜けで買い、下抜けで売り。動きが出やすい反面、抜けたと見せかけて戻る「ダマシ」も多いので、エントリー後の損切り設定が大切です。</div>
+      </div>
+
+      <h3>時間軸で選ぶ</h3>
+
+      <div class="pattern-figure" style="margin:18px 0 24px">
+        <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+          <line x1="40" y1="190" x2="300" y2="190" stroke="#c9a87c" stroke-width="1.5"/>
+          <text x="40" y="208" fill="#a89a92" font-size="9" font-weight="600">短期</text>
+          <text x="300" y="208" text-anchor="end" fill="#a89a92" font-size="9" font-weight="600">長期</text>
+          <g>
+            <rect x="40" y="40" width="55" height="55" rx="10" fill="#f5d9d3"/>
+            <text x="67" y="62" text-anchor="middle" fill="#c97e7e" font-size="10" font-weight="700">スキャル</text>
+            <text x="67" y="78" text-anchor="middle" fill="#c97e7e" font-size="9">ピング</text>
+            <text x="67" y="105" text-anchor="middle" fill="#7d6e68" font-size="9" font-weight="600">数秒〜分</text>
+            <line x1="67" y1="115" x2="67" y2="190" stroke="#c97e7e" stroke-width="1" stroke-dasharray="2 2"/>
+            <circle cx="67" cy="190" r="4" fill="#c97e7e"/>
+            <text x="67" y="125" text-anchor="middle" fill="#c97e7e" font-size="8">↓</text>
+          </g>
+          <g>
+            <rect x="115" y="40" width="55" height="55" rx="10" fill="#e8d8e0"/>
+            <text x="142" y="65" text-anchor="middle" fill="#a87ea0" font-size="10" font-weight="700">デイトレ</text>
+            <text x="142" y="78" text-anchor="middle" fill="#a87ea0" font-size="9">ード</text>
+            <text x="142" y="105" text-anchor="middle" fill="#7d6e68" font-size="9" font-weight="600">数分〜時間</text>
+            <line x1="142" y1="115" x2="142" y2="190" stroke="#a87ea0" stroke-width="1" stroke-dasharray="2 2"/>
+            <circle cx="142" cy="190" r="4" fill="#a87ea0"/>
+            <text x="142" y="125" text-anchor="middle" fill="#a87ea0" font-size="8">↓</text>
+          </g>
+          <g>
+            <rect x="190" y="40" width="55" height="55" rx="10" fill="#d8e3d0"/>
+            <text x="217" y="65" text-anchor="middle" fill="#7a9080" font-size="10" font-weight="700">スイング</text>
+            <text x="217" y="78" text-anchor="middle" fill="#7a9080" font-size="9">トレード</text>
+            <text x="217" y="105" text-anchor="middle" fill="#7d6e68" font-size="9" font-weight="600">数日〜週間</text>
+            <line x1="217" y1="115" x2="217" y2="190" stroke="#7a9080" stroke-width="1" stroke-dasharray="2 2"/>
+            <circle cx="217" cy="190" r="4" fill="#7a9080"/>
+            <text x="217" y="125" text-anchor="middle" fill="#7a9080" font-size="8">↓</text>
+          </g>
+          <g>
+            <rect x="265" y="40" width="55" height="55" rx="10" fill="#e8dccf"/>
+            <text x="292" y="65" text-anchor="middle" fill="#a89770" font-size="10" font-weight="700">長期</text>
+            <text x="292" y="78" text-anchor="middle" fill="#a89770" font-size="9">投資</text>
+            <text x="292" y="105" text-anchor="middle" fill="#7d6e68" font-size="9" font-weight="600">月〜年</text>
+            <line x1="292" y1="115" x2="292" y2="190" stroke="#a89770" stroke-width="1" stroke-dasharray="2 2"/>
+            <circle cx="292" cy="190" r="4" fill="#a89770"/>
+            <text x="292" y="125" text-anchor="middle" fill="#a89770" font-size="8">↓</text>
+          </g>
+          <text x="160" y="22" text-anchor="middle" fill="#5a4a44" font-family="Klee One" font-size="12" font-weight="700">保有時間で選ぶ4つのスタイル</text>
+          <text x="67" y="145" text-anchor="middle" fill="#7d6e68" font-size="8">1日数十回</text>
+          <text x="142" y="145" text-anchor="middle" fill="#7d6e68" font-size="8">1日数回</text>
+          <text x="217" y="145" text-anchor="middle" fill="#7d6e68" font-size="8">週に数回</text>
+          <text x="292" y="145" text-anchor="middle" fill="#7d6e68" font-size="8">月に数回</text>
+          <text x="67" y="160" text-anchor="middle" fill="#a89a92" font-size="7">取引頻度</text>
+          <text x="142" y="160" text-anchor="middle" fill="#a89a92" font-size="7">取引頻度</text>
+          <text x="217" y="160" text-anchor="middle" fill="#a89a92" font-size="7">取引頻度</text>
+          <text x="292" y="160" text-anchor="middle" fill="#a89a92" font-size="7">取引頻度</text>
+        </svg>
+        <div class="pattern-figure-cap">保有時間が長いほど、取引回数は少なめに</div>
+      </div>
+
+      <div class="indicator-mini">
+        <div class="num">A</div>
+        <div>
+          <div class="ind-name">スキャルピング</div>
+          <div class="ind-desc">数秒〜数分で数pipsを抜く超短期売買。<strong>1日に何十回も取引</strong>することも。集中力と判断スピードが要求され、スプレッドの狭い業者と高速回線が必須。生活への影響も大きい手法です。</div>
+        </div>
+      </div>
+
+      <div class="indicator-mini">
+        <div class="num">B</div>
+        <div>
+          <div class="ind-name">デイトレード</div>
+          <div class="ind-desc">数十分〜数時間で完結させ、その日のうちにポジションを閉じるスタイル。寝ている間のリスクがなく、相場と程よい距離感で付き合える人気の手法。<strong>会社員にも続けやすい</strong>定番。</div>
+        </div>
+      </div>
+
+      <div class="indicator-mini">
+        <div class="num">C</div>
+        <div>
+          <div class="ind-name">スイングトレード</div>
+          <div class="ind-desc">数日〜数週間ポジションを持つ手法。チャートを毎分見る必要がなく、本業のあるひとに向きます。1回の利益も損失も大きくなりがちなので、資金管理が重要。</div>
+        </div>
+      </div>
+
+      <div class="indicator-mini">
+        <div class="num">D</div>
+        <div>
+          <div class="ind-name">長期投資(ポジショントレード)</div>
+          <div class="ind-desc">数ヶ月〜数年単位で保有。スワップポイントを積み重ねていく戦略にも使われます。日々の値動きより、<strong>金利差や経済の大きな流れ</strong>を見るスタイル。</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p>自分のライフスタイルと、性格(せっかちか、じっくり派か)に合わせて選ぶのがいちばん。最初から「これ一本」と決めず、デモトレードでいくつか試してから自分の型を見つけていきましょう。</p>
+      </div>
+    `
+  },
+  10: {
+    chapter:"— Chapter 10 —",
+    title:"エントリーとエグジット",
+    english:"— Entry & Exit —",
+    iconColor:"#dce6dc",
+    body:`
+      <p class="lead">「どこで入るか」と同じくらい、いえそれ以上に「<strong>どこで出るか</strong>」が大切。トレードは入る瞬間より、出る瞬間のほうがずっと難しいんです。</p>
+
+      <div class="pattern-figure" style="margin:18px 0 28px">
+        <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="#f0e0e0" stroke-width="1">
+            <line x1="0" y1="45" x2="320" y2="45"/>
+            <line x1="0" y1="90" x2="320" y2="90"/>
+            <line x1="0" y1="135" x2="320" y2="135"/>
+          </g>
+          <path d="M 20 130 L 50 100 L 75 115 L 105 90 L 140 60 L 175 75 L 210 35 L 245 50 L 285 25" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="105" cy="90" r="8" fill="#7a9080" stroke="#fff" stroke-width="3"/>
+          <text x="105" y="115" text-anchor="middle" fill="#7a9080" font-size="11" font-weight="700">IN</text>
+          <text x="105" y="128" text-anchor="middle" fill="#7a9080" font-size="9">エントリー</text>
+          <circle cx="245" cy="50" r="8" fill="#c97e7e" stroke="#fff" stroke-width="3"/>
+          <text x="245" y="38" text-anchor="middle" fill="#c97e7e" font-size="11" font-weight="700">OUT</text>
+          <text x="245" y="22" text-anchor="middle" fill="#c97e7e" font-size="9">エグジット</text>
+          <line x1="105" y1="90" x2="245" y2="90" stroke="#a89a92" stroke-width="1" stroke-dasharray="2 2" opacity="0.5"/>
+          <line x1="245" y1="50" x2="245" y2="90" stroke="#a89a92" stroke-width="1" stroke-dasharray="2 2" opacity="0.5"/>
+          <text x="265" y="73" fill="#7a9080" font-size="11" font-weight="700">+利益</text>
+        </svg>
+        <div class="pattern-figure-cap">入って、伸ばして、出る。これがトレード</div>
+      </div>
+
+      <h3>エントリーの考え方</h3>
+      <p>エントリーとは「ポジションを持つ」こと。なんとなく入るのではなく、<strong>「なぜここで入るのか」を言葉にできる場所</strong>でだけ入る、というのが基本姿勢。</p>
+
+      <div class="term-card">
+        <div class="term-name">よく使われるエントリーの根拠</div>
+        <div class="term-def">
+          ・移動平均線のクロス(ゴールデン/デッドクロス)<br>
+          ・サポート・レジスタンスへのタッチ&反発<br>
+          ・トレンドラインのブレイク<br>
+          ・チャートパターンの完成(三尊・ダブルトップなど)<br>
+          ・上位足の方向と下位足のシグナルが一致したとき
+        </div>
+      </div>
+
+      <h3>エグジットの考え方</h3>
+      <p>エグジットには2種類あります。<strong>利確(利益確定)</strong>と<strong>損切り(損失確定)</strong>。両方とも、エントリーする<strong>前に</strong>決めておくのが鉄則です。</p>
+
+      <h3>3つの出口戦略</h3>
+
+      <div class="pattern-card">
+        <div class="pattern-name">① 固定の値幅(リスクリワード)</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <line x1="20" y1="90" x2="240" y2="90" stroke="#5a4a44" stroke-width="1.5"/>
+            <text x="14" y="94" text-anchor="end" fill="#5a4a44" font-size="9" font-weight="700">IN</text>
+            <line x1="20" y1="40" x2="240" y2="40" stroke="#7a9080" stroke-width="1.5" stroke-dasharray="5 3"/>
+            <text x="14" y="44" text-anchor="end" fill="#7a9080" font-size="9" font-weight="700">利確</text>
+            <text x="246" y="44" fill="#7a9080" font-size="10" font-weight="600">+40 pips</text>
+            <line x1="20" y1="115" x2="240" y2="115" stroke="#c97e7e" stroke-width="1.5" stroke-dasharray="5 3"/>
+            <text x="14" y="119" text-anchor="end" fill="#c97e7e" font-size="9" font-weight="700">損切り</text>
+            <text x="246" y="119" fill="#c97e7e" font-size="10" font-weight="600">−20 pips</text>
+            <path d="M 80 40 L 75 40 L 75 90 L 80 90" stroke="#7a9080" stroke-width="1.5" fill="none"/>
+            <text x="68" y="68" text-anchor="end" fill="#7a9080" font-size="11" font-weight="700">2</text>
+            <path d="M 80 90 L 75 90 L 75 115 L 80 115" stroke="#c97e7e" stroke-width="1.5" fill="none"/>
+            <text x="68" y="106" text-anchor="end" fill="#c97e7e" font-size="11" font-weight="700">1</text>
+            <path d="M 90 90 L 120 95 L 150 75 L 180 80 L 210 55 L 240 60 L 260 40" stroke="#a87ea0" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="90" cy="90" r="5" fill="#5a4a44"/>
+            <circle cx="260" cy="40" r="5" fill="#7a9080"/>
+            <text x="160" y="160" text-anchor="middle" fill="#5a4a44" font-size="11" font-weight="700">リスクリワード比 1:2</text>
+          </svg>
+          <div class="pattern-figure-cap">損切りの2倍を狙えば、勝率4割でも利益が出る</div>
+        </div>
+        <div class="pattern-def">「損切り20pips、利確40pips」のように、最初から金額を決めておく方法。<strong>リスクリワード比1:2</strong>を目安にすると、勝率が4割でもトータルでプラスになる計算。シンプルで再現性が高いやり方です。</div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-name">② 節目で利確・損切り</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <line x1="20" y1="40" x2="240" y2="40" stroke="#7a9080" stroke-width="2"/>
+            <text x="248" y="36" fill="#7a9080" font-size="10" font-weight="700">レジスタンス</text>
+            <text x="248" y="48" fill="#7a9080" font-size="9">(利確の節目)</text>
+            <line x1="20" y1="135" x2="240" y2="135" stroke="#c97e7e" stroke-width="2"/>
+            <text x="248" y="131" fill="#c97e7e" font-size="10" font-weight="700">サポート</text>
+            <text x="248" y="143" fill="#c97e7e" font-size="9">(損切りの節目)</text>
+            <circle cx="80" cy="40" r="4" fill="#7a9080" opacity="0.5"/>
+            <circle cx="160" cy="40" r="4" fill="#7a9080" opacity="0.5"/>
+            <circle cx="60" cy="135" r="4" fill="#c97e7e" opacity="0.5"/>
+            <circle cx="140" cy="135" r="4" fill="#c97e7e" opacity="0.5"/>
+            <path d="M 50 110 L 80 50 L 110 90 L 140 130 L 170 50 L 200 95 L 230 60 L 260 45" stroke="#a87ea0" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="200" cy="95" r="6" fill="#5a4a44" stroke="#fff" stroke-width="2"/>
+            <text x="200" y="115" text-anchor="middle" fill="#5a4a44" font-size="9" font-weight="700">IN</text>
+            <circle cx="260" cy="45" r="6" fill="#7a9080" stroke="#fff" stroke-width="2"/>
+            <text x="260" y="32" text-anchor="middle" fill="#7a9080" font-size="9" font-weight="700">利確</text>
+          </svg>
+          <div class="pattern-figure-cap">みんなが意識する価格 = 反応しやすい場所</div>
+        </div>
+        <div class="pattern-def">サポート・レジスタンス、移動平均線、フィボナッチなど、<strong>意識される価格</strong>を出口にする方法。市場参加者が反応しやすい場所なので、機能しやすいのが特徴です。</div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-name">③ トレーリングストップ</div>
+        <div class="pattern-figure">
+          <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="0" y1="45" x2="320" y2="45"/>
+              <line x1="0" y1="90" x2="320" y2="90"/>
+              <line x1="0" y1="135" x2="320" y2="135"/>
+            </g>
+            <path d="M 20 145 L 50 130 L 80 115 L 110 95 L 140 80 L 170 60 L 200 50 L 230 40 L 260 65" stroke="#c97e7e" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 20 165 L 50 150 L 50 135 L 80 135 L 80 115 L 110 115 L 110 100 L 140 100 L 140 80 L 170 80 L 170 65 L 200 65 L 200 55 L 230 55 L 230 60 L 260 60" stroke="#7a9080" stroke-width="1.8" fill="none" stroke-dasharray="4 2" stroke-linejoin="round"/>
+            <circle cx="50" cy="130" r="6" fill="#5a4a44" stroke="#fff" stroke-width="2"/>
+            <text x="50" y="120" text-anchor="middle" fill="#5a4a44" font-size="9" font-weight="700">IN</text>
+            <circle cx="260" cy="60" r="6" fill="#7a9080" stroke="#fff" stroke-width="2"/>
+            <text x="265" y="48" fill="#7a9080" font-size="9" font-weight="700">利確</text>
+            <text x="80" y="148" text-anchor="middle" fill="#7a9080" font-size="11">↑</text>
+            <text x="140" y="115" text-anchor="middle" fill="#7a9080" font-size="11">↑</text>
+            <text x="200" y="80" text-anchor="middle" fill="#7a9080" font-size="11">↑</text>
+            <text x="290" y="170" text-anchor="end" fill="#7a9080" font-size="9" font-weight="600">━━ 損切りライン</text>
+            <text x="290" y="158" text-anchor="end" fill="#c97e7e" font-size="9" font-weight="600">━━ 価格</text>
+          </svg>
+          <div class="pattern-figure-cap">価格が伸びるたび、損切り線も切り上がる</div>
+        </div>
+        <div class="pattern-def">価格が伸びていくのに合わせて、損切りラインも切り上げていく方法。<strong>利益を伸ばしながら、利益を守る</strong>賢いやり方。決まった値幅で動かすルール型と、節目ごとに動かす裁量型があります。</div>
+      </div>
+
+      <div class="callout">
+        <p>エントリーの根拠が崩れたら、利益でも損失でも<strong>すぐ撤退</strong>。「もう少し見てみよう」が、ほとんどの大きな損失の入り口になります。出口を決めずに入らない、これだけ守れたら大丈夫。</p>
+      </div>
+
+      <h3>記録と振り返り</h3>
+      <p>エントリーとエグジットの理由を、毎回ノートに書き残すこと。「ここで入って、ここで出た。なぜそうしたか」。<strong>続けるうちに、自分の癖や勝ちパターンが見えてきます</strong>。これが、いちばん地味で、いちばん効く上達法です。</p>
+    `
+  },
+  11: {
+    chapter:"— Chapter 11 —",
+    title:"複数時間足分析(MTF)",
+    english:"— Multi Time Frame —",
+    iconColor:"#f5e3d3",
+    body:`
+      <p class="lead">ひとつの時間足だけで相場を見ていると、迷子になりやすいんです。地図を縮尺を変えて見るように、複数の時間足を組み合わせる——これがMTF分析。</p>
+
+      <h3>なぜ複数の時間足を見るの?</h3>
+      <p>5分足では「下落しているように見える」相場も、日足で見ると「大きな上昇トレンドのなかの小さな調整」にすぎないことがよくあります。<strong>短い足だけで判断すると、大きな流れに逆らったポジションを取ってしまう</strong>——MTF分析は、これを防ぐためのものなんです。</p>
+
+      <div class="pattern-figure">
+        <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+          <text x="160" y="18" text-anchor="middle" fill="#5a4a44" font-family="Klee One" font-size="11" font-weight="700">同じ相場でも、見る足で景色が変わる</text>
+          <g>
+            <text x="60" y="38" text-anchor="middle" fill="#7a9080" font-size="10" font-weight="700">日足</text>
+            <rect x="20" y="44" width="80" height="60" fill="#fdf8f3" stroke="#e8d9cd" stroke-width="1" rx="4"/>
+            <path d="M 25 95 L 35 85 L 45 90 L 55 75 L 65 80 L 75 65 L 85 70 L 95 55" stroke="#7a9080" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <text x="60" y="120" text-anchor="middle" fill="#7a9080" font-size="9" font-weight="700">↑ 上昇中</text>
+          </g>
+          <text x="125" y="80" fill="#a89a92" font-size="14">→</text>
+          <g>
+            <text x="180" y="38" text-anchor="middle" fill="#c9a87c" font-size="10" font-weight="700">1時間足</text>
+            <rect x="140" y="44" width="80" height="60" fill="#fdf8f3" stroke="#e8d9cd" stroke-width="1" rx="4"/>
+            <path d="M 145 60 L 155 65 L 165 75 L 175 70 L 185 80 L 195 75 L 205 85 L 215 80" stroke="#c9a87c" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <text x="180" y="120" text-anchor="middle" fill="#c9a87c" font-size="9" font-weight="700">調整中(押し目)</text>
+          </g>
+          <text x="245" y="80" fill="#a89a92" font-size="14">→</text>
+          <g>
+            <text x="270" y="38" text-anchor="middle" fill="#c97e7e" font-size="10" font-weight="700">5分足</text>
+            <rect x="240" y="44" width="60" height="60" fill="#fdf8f3" stroke="#e8d9cd" stroke-width="1" rx="4"/>
+            <path d="M 245 70 L 253 80 L 261 90 L 269 75 L 277 65 L 285 55 L 293 50" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="269" cy="75" r="4" fill="#c97e7e" stroke="#fff" stroke-width="2"/>
+            <text x="270" y="120" text-anchor="middle" fill="#c97e7e" font-size="9" font-weight="700">反発でIN!</text>
+          </g>
+          <rect x="20" y="145" width="280" height="55" rx="10" fill="#f5e3d3" opacity="0.5"/>
+          <text x="160" y="165" text-anchor="middle" fill="#5a4a44" font-size="10" font-weight="700">大きな流れを確認 → 押し目を探す → 反発でエントリー</text>
+          <text x="60" y="185" text-anchor="middle" fill="#7a9080" font-size="9" font-weight="700">方向性</text>
+          <text x="160" y="185" text-anchor="middle" fill="#c9a87c" font-size="9" font-weight="700">戦略</text>
+          <text x="280" y="185" text-anchor="middle" fill="#c97e7e" font-size="9" font-weight="700">タイミング</text>
+        </svg>
+        <div class="pattern-figure-cap">大→中→小の順で見ると、迷いが消える</div>
+      </div>
+
+      <h3>基本の組み合わせ方</h3>
+
+      <div class="indicator-mini">
+        <div class="num">大</div>
+        <div>
+          <div class="ind-name">上位足(環境認識)</div>
+          <div class="ind-desc">日足や4時間足で、<strong>大きな流れ</strong>を確認します。今は上昇トレンド?下降トレンド?それともレンジ?重要なサポート・レジスタンスはどこ?ここで「進むべき方向」を決めます。</div>
+        </div>
+      </div>
+
+      <div class="indicator-mini">
+        <div class="num">中</div>
+        <div>
+          <div class="ind-name">中位足(戦略立案)</div>
+          <div class="ind-desc">1時間足や30分足で、エントリーの根拠を探します。上位足で決めた方向に対して、押し目や戻りはどこにありそうか?<strong>「どこで」入るか</strong>のシナリオを描く時間です。</div>
+        </div>
+      </div>
+
+      <div class="indicator-mini">
+        <div class="num">小</div>
+        <div>
+          <div class="ind-name">下位足(エントリー)</div>
+          <div class="ind-desc">5分足や15分足で、実際のタイミングを計ります。中位足で狙ったポイントに価格が来たら、下位足の反発サインを確認してエントリー。<strong>「いつ」入るか</strong>を決める時間です。</div>
+        </div>
+      </div>
+
+      <h3>「3倍ルール」</h3>
+      <p>時間足の組み合わせは、<strong>4倍〜6倍ずつ離す</strong>のが目安。たとえば「日足 → 4時間足 → 1時間足」「4時間足 → 1時間足 → 15分足」のように。近すぎる時間足だと情報がかぶり、離れすぎるとつながりが見えなくなります。</p>
+
+      <div class="pattern-figure">
+        <svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg">
+          <text x="160" y="18" text-anchor="middle" fill="#5a4a44" font-family="Klee One" font-size="11" font-weight="700">時間足の組み合わせ例</text>
+          <g>
+            <rect x="10" y="35" width="55" height="32" rx="8" fill="#7a9080"/>
+            <text x="37" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">日足</text>
+            <text x="73" y="55" fill="#a89a92" font-size="11">→</text>
+            <rect x="88" y="35" width="65" height="32" rx="8" fill="#c9a87c"/>
+            <text x="120" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">4時間足</text>
+            <text x="161" y="55" fill="#a89a92" font-size="11">→</text>
+            <rect x="176" y="35" width="65" height="32" rx="8" fill="#c97e7e"/>
+            <text x="208" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">1時間足</text>
+            <text x="251" y="55" fill="#a89a92" font-size="9">スイング向き</text>
+          </g>
+          <g>
+            <rect x="10" y="80" width="65" height="32" rx="8" fill="#7a9080"/>
+            <text x="42" y="100" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">4時間足</text>
+            <text x="83" y="100" fill="#a89a92" font-size="11">→</text>
+            <rect x="98" y="80" width="65" height="32" rx="8" fill="#c9a87c"/>
+            <text x="130" y="100" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">1時間足</text>
+            <text x="171" y="100" fill="#a89a92" font-size="11">→</text>
+            <rect x="186" y="80" width="60" height="32" rx="8" fill="#c97e7e"/>
+            <text x="216" y="100" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">15分足</text>
+            <text x="256" y="100" fill="#a89a92" font-size="9">デイトレ向き</text>
+          </g>
+        </svg>
+        <div class="pattern-figure-cap">4倍〜6倍離して、3つを組み合わせる</div>
+      </div>
+
+      <div class="callout">
+        <p>大切なのは、<strong>上位足の流れに逆らわない</strong>こと。下位足で買いシグナルが出ても、上位足が下降トレンドなら見送る勇気を持ちましょう。「大きな流れには勝てない」——これがMTF分析のいちばんの教えです。</p>
+      </div>
+
+      <h3>まずは2つから</h3>
+      <p>はじめから3つの時間足を見るのは大変。まずは「<strong>4時間足と15分足</strong>」など2つの組み合わせから。慣れてきたら3つに増やしていけば大丈夫です。チャートを開いたら、まず上位足から見るクセをつけましょう。</p>
+    `
+  },
+  12: {
+    chapter:"— Chapter 12 —",
+    title:"相関関係を読む",
+    english:"— Correlations —",
+    iconColor:"#e3d8e8",
+    body:`
+      <p class="lead">通貨は、それ単独で動いているわけではありません。世界中の市場とつながりあって、影響しあっています。そのつながりを知ると、相場が立体的に見えてきますよ。</p>
+
+      <h3>通貨ペア同士の相関</h3>
+
+      <div class="pattern-figure">
+        <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <text x="80" y="20" text-anchor="middle" fill="#7a9080" font-size="11" font-weight="700">正の相関</text>
+            <text x="80" y="35" text-anchor="middle" fill="#a89a92" font-size="9">同じ方向に動く</text>
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="20" y1="60" x2="140" y2="60"/>
+              <line x1="20" y1="105" x2="140" y2="105"/>
+              <line x1="20" y1="150" x2="140" y2="150"/>
+            </g>
+            <path d="M 25 145 L 45 130 L 65 100 L 85 110 L 105 75 L 125 60" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M 25 130 L 45 115 L 65 90 L 85 100 L 105 65 L 125 50" stroke="#a87ea0" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 2"/>
+            <text x="80" y="178" text-anchor="middle" fill="#5a4a44" font-size="9" font-weight="700">EUR/USD と GBP/USD</text>
+            <text x="80" y="190" text-anchor="middle" fill="#a89a92" font-size="8" font-style="italic">2つ持つとリスク2倍に</text>
+          </g>
+          <line x1="160" y1="50" x2="160" y2="160" stroke="#e8d9cd" stroke-width="1" stroke-dasharray="3 2"/>
+          <g>
+            <text x="240" y="20" text-anchor="middle" fill="#c9a87c" font-size="11" font-weight="700">負の相関</text>
+            <text x="240" y="35" text-anchor="middle" fill="#a89a92" font-size="9">逆方向に動く</text>
+            <g stroke="#f0e0e0" stroke-width="1">
+              <line x1="180" y1="60" x2="300" y2="60"/>
+              <line x1="180" y1="105" x2="300" y2="105"/>
+              <line x1="180" y1="150" x2="300" y2="150"/>
+            </g>
+            <path d="M 185 145 L 205 130 L 225 100 L 245 110 L 265 75 L 285 60" stroke="#c97e7e" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M 185 65 L 205 80 L 225 110 L 245 100 L 265 135 L 285 150" stroke="#a87ea0" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 2"/>
+            <text x="240" y="178" text-anchor="middle" fill="#5a4a44" font-size="9" font-weight="700">EUR/USD と USD/CHF</text>
+            <text x="240" y="190" text-anchor="middle" fill="#a89a92" font-size="8" font-style="italic">リスク分散に使える</text>
+          </g>
+        </svg>
+        <div class="pattern-figure-cap">通貨ペアにも、仲良し と 反対側がある</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">正の相関(同じ方向に動く)</div>
+        <div class="term-def">EUR/USDとGBP/USDは、どちらも「対ドル」で動くため、似た値動きをします。豪ドル/円とNZドル/円も同じ方向に動きやすい組み合わせ。<strong>同方向のペアを2つ持つと、リスクが2倍になる</strong>ので注意。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">負の相関(逆方向に動く)</div>
+        <div class="term-def">EUR/USDとUSD/CHFは、ほぼ正反対の動きをします。ドルが強くなれば、EUR/USDは下がり、USD/CHFは上がる。<strong>逆相関のペアを使えばリスク分散</strong>になります。</div>
+      </div>
+
+      <h3>ドル指数(DXY)</h3>
+      <p>米ドルの総合的な強さを示す指標。ユーロ、円、ポンドなど6つの主要通貨に対するドルの価値を表しています。<strong>ドル指数が上がっていれば、ドルがほぼ全通貨に対して強い</strong>ということ。USD/JPYだけ見ていると気づけない、ドル全体の流れを掴めます。</p>
+
+      <h3>株価と為替</h3>
+
+      <div class="pattern-figure">
+        <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+          <text x="160" y="18" text-anchor="middle" fill="#5a4a44" font-family="Klee One" font-size="11" font-weight="700">市場の気分でお金が流れる</text>
+          <g>
+            <rect x="20" y="35" width="130" height="55" rx="10" fill="#7a9080" opacity="0.15"/>
+            <text x="85" y="55" text-anchor="middle" fill="#7a9080" font-size="11" font-weight="700">リスクオン(楽観)</text>
+            <text x="85" y="75" text-anchor="middle" fill="#5a4a44" font-size="9">株が買われる →</text>
+            <text x="85" y="86" text-anchor="middle" fill="#7a9080" font-size="9" font-weight="700">円が売られる(円安)</text>
+          </g>
+          <g>
+            <rect x="170" y="35" width="130" height="55" rx="10" fill="#c97e7e" opacity="0.15"/>
+            <text x="235" y="55" text-anchor="middle" fill="#c97e7e" font-size="11" font-weight="700">リスクオフ(不安)</text>
+            <text x="235" y="75" text-anchor="middle" fill="#5a4a44" font-size="9">株が売られる →</text>
+            <text x="235" y="86" text-anchor="middle" fill="#c97e7e" font-size="9" font-weight="700">円が買われる(円高)</text>
+          </g>
+          <text x="160" y="115" text-anchor="middle" fill="#5a4a44" font-size="10" font-weight="700">日経平均 と USD/JPY は同じ方向に動きやすい</text>
+          <g>
+            <text x="80" y="135" text-anchor="middle" fill="#7a9080" font-size="9" font-weight="700">日経平均</text>
+            <path d="M 30 165 L 50 158 L 70 150 L 90 145 L 110 138 L 130 130" stroke="#7a9080" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </g>
+          <text x="160" y="155" text-anchor="middle" fill="#a89a92" font-size="14" font-weight="700">≒</text>
+          <g>
+            <text x="240" y="135" text-anchor="middle" fill="#c9a87c" font-size="9" font-weight="700">USD/JPY</text>
+            <path d="M 190 165 L 210 158 L 230 150 L 250 145 L 270 138 L 290 130" stroke="#c9a87c" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <div class="pattern-figure-cap">市場の空気を読むと、為替も読みやすくなる</div>
+      </div>
+
+      <ul>
+        <li><strong>米国株 ↑ → リスクオン → 円が売られやすい</strong>(USD/JPY上昇)</li>
+        <li><strong>米国株 ↓ → リスクオフ → 円が買われやすい</strong>(USD/JPY下落)</li>
+        <li>日経平均とドル円は、同じ方向に動くことが多い(円安=日本株高)</li>
+      </ul>
+
+      <h3>商品市場との関係</h3>
+
+      <div class="term-card">
+        <div class="term-name">原油 と カナダドル</div>
+        <div class="term-def">カナダは産油国。原油価格が上がるとカナダドルも買われやすくなります。USD/CAD(米ドル/カナダドル)は原油価格と逆の動きをすることが多いです。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">金(ゴールド) と 米ドル</div>
+        <div class="term-def">金とドルは、伝統的に逆相関の関係。ドルが強くなれば金は下がり、ドルが弱くなれば金が上がる傾向。<strong>不安が高まる場面では、ドルも金も同時に買われる</strong>こともあるので、状況によって関係性が変わります。</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">鉄鉱石 と 豪ドル</div>
+        <div class="term-def">オーストラリアは資源輸出国。中国向けの鉄鉱石需要が多いため、<strong>中国の景気と豪ドル</strong>は連動しやすい関係です。中国の経済指標が出る日は、豪ドルも要チェック。</div>
+      </div>
+
+      <div class="callout">
+        <p>相関は「いつも同じ」ではなく、時期によって強まったり弱まったりします。「最近どう動いているか」を確認しながら使うのが大切。<strong>絶対の法則ではなく、相場を立体的に見るためのレンズ</strong>と思っておきましょう。</p>
+      </div>
+
+      <h3>使い方のヒント</h3>
+      <p>相関を知っていると、こんな使い方ができます。<br>
+      ・USD/JPYのトレード前に、ドル指数で「ドル全体の流れ」を確認<br>
+      ・米国株の動きから、リスクオン/オフの空気を読む<br>
+      ・同方向の通貨ペアを複数持って、<strong>うっかり過剰リスク</strong>になるのを防ぐ</p>
+    `
+  }
+};
+
+
+const overlay = document.getElementById("overlay");
+const mChapter = document.getElementById("m-chapter");
+const mBody = document.getElementById("m-body");
+const modal = document.getElementById("modal");
+
+function openChapter(n){
+  const data = chapters[n];
+  const numLabel = n < 10 ? `Ch.0${n}` : `Ch.${n}`;
+  mChapter.textContent = data.chapter;
+  mBody.innerHTML = `
+    <div class="modal-cover">
+      <div class="icon-large">
+        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="40" r="34" fill="${data.iconColor}"/>
+          <text x="40" y="49" text-anchor="middle" fill="#c97e7e" font-size="13" font-family="Cormorant Garamond" font-style="italic" font-weight="500">${numLabel}</text>
+        </svg>
+      </div>
+      <h2>${data.title}</h2>
+      <div class="english">${data.english}</div>
+    </div>
+    ${data.body}
+  `;
+  overlay.classList.add("active");
+  modal.scrollTop = 0;
+  document.body.style.overflow = "hidden";
+}
+function closeChapter(){
+  overlay.classList.remove("active");
+  document.body.style.overflow = "";
+}
+function closeOnOverlay(e){
+  if(e.target === overlay) closeChapter();
+}
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape") closeChapter();
+});
+
+function playVideo(el){
+  if(el.classList.contains('playing')) return;
+  const vid = el.getAttribute('data-vid');
+  // Detect file:// protocol — YouTube iframe doesn't work there
+  if(location.protocol === 'file:'){
+    window.open('https://www.youtube.com/watch?v=' + vid, '_blank');
+    return;
+  }
+  const iframe = document.createElement('iframe');
+  iframe.src = 'https://www.youtube.com/embed/' + vid + '?autoplay=1&rel=0&playsinline=1';
+  iframe.title = 'YouTube video';
+  iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+  iframe.setAttribute('allowfullscreen', '');
+  iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0;z-index:5;';
+  el.appendChild(iframe);
+  el.classList.add('playing');
+}
+</script>
+
+</body>
+</html>

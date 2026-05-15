@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ニュース 管理 — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: #F7F2EA;
+  --bg-soft: #EFE7DA;
+  --bg-card: #FFFEFB;
+  --ink: #3A2E2A;
+  --ink-mid: #6B5D57;
+  --ink-soft: #998B83;
+  --rose: #C98B95;
+  --rose-soft: #E8D0D2;
+  --sage: #9BB59C;
+  --sage-soft: #D5DFCE;
+  --honey: #D4B677;
+  --honey-soft: #ECDDB8;
+  --mauve: #A89BB0;
+  --mauve-soft: #DCD3DC;
+  --terra: #C28D6F;
+  --terra-soft: #E8D5C5;
+  --line: rgba(58,46,42,0.08);
+  --line-strong: rgba(58,46,42,0.14);
+  --shadow-sm: 0 2px 8px rgba(58,46,42,0.04);
+  --shadow-md: 0 8px 24px rgba(58,46,42,0.06);
+  --r-lg: 20px;
+  --r-md: 16px;
+  --r-sm: 12px;
+}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0; padding:0;}
+body{
+  font-family: 'Noto Sans JP', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  overflow-x: hidden;
+  font-feature-settings: "palt";
+}
+
+.app{
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  padding-bottom: 40px;
+  overflow: hidden;
+}
+.app::before{
+  content:''; position: absolute;
+  top: -80px; right: -120px;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(201,139,149,0.08), transparent 70%);
+  border-radius: 50%;
+  z-index: 0; pointer-events: none;
+}
+
+/* HEADER */
+.page-header{
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(247,242,234,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.back-btn{
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  color: var(--ink-mid); text-decoration: none;
+}
+.back-btn svg{ width: 16px; height: 16px; }
+.title-wrap{ flex: 1; min-width: 0; }
+.page-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px; font-weight: 700;
+  letter-spacing: 0.04em; line-height: 1.1;
+}
+.page-sub{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--ink-soft);
+  font-weight: 500;
+  margin-top: 3px;
+  letter-spacing: 0.04em;
+}
+.admin-badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  color: var(--rose);
+  background: var(--rose-soft);
+  padding: 3px 7px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* NOTICE */
+.notice{
+  position: relative; z-index: 5;
+  margin: 14px 18px 14px;
+  padding: 12px 14px;
+  background: var(--honey-soft);
+  border: 1px solid rgba(212,182,119,0.4);
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  line-height: 1.6;
+  color: #6F5520;
+}
+.notice strong{ font-weight: 700; }
+
+/* FORM CARD */
+.form-card{
+  position: relative; z-index: 5;
+  margin: 0 18px 20px;
+  padding: 18px 18px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+.form-card-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.form-card-title svg{ width: 16px; height: 16px; color: var(--rose); }
+
+.field{
+  margin-bottom: 12px;
+}
+.field-label{
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px;
+  color: var(--ink-mid);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.field-label .required{ color: var(--rose); margin-left: 3px; }
+.field input,
+.field textarea,
+.field select{
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.field input:focus,
+.field textarea:focus,
+.field select:focus{
+  border-color: var(--rose);
+  background: var(--bg-card);
+}
+.field textarea{
+  resize: vertical;
+  min-height: 60px;
+  line-height: 1.6;
+  font-family: inherit;
+}
+.field-row{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.field-hint{
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.form-actions{
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.btn{
+  flex: 1;
+  padding: 11px 16px;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.15s;
+}
+.btn:active{ transform: scale(0.98); }
+.btn-primary{
+  background: var(--ink);
+  color: var(--bg);
+}
+.btn-secondary{
+  background: var(--bg-card);
+  color: var(--ink-mid);
+  border: 1px solid var(--line-strong);
+}
+
+/* SECTION TITLE */
+.section-title{
+  position: relative; z-index: 5;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 4px 22px 12px;
+  margin-top: 6px;
+}
+.section-title h2{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+.section-title .meta{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--ink-soft);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+/* NEWS CARDS */
+.news-list{
+  position: relative; z-index: 5;
+  padding: 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.news-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+}
+.news-card-head{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.news-cat-chip{
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.chip-us{ background: var(--mauve-soft); color: #6E5F7E; }
+.chip-jp{ background: var(--rose-soft); color: #8B5A65; }
+.chip-policy{ background: var(--honey-soft); color: #8B7036; }
+.chip-other{ background: var(--sage-soft); color: #5E7A60; }
+.news-card-time{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--ink-soft);
+  font-weight: 500;
+  margin-left: auto;
+}
+.news-card-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.55;
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+.news-card-url{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--ink-soft);
+  word-break: break-all;
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+.news-card-comment{
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--ink-mid);
+  background: var(--bg);
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-weight: 400;
+}
+.news-card-actions{
+  display: flex;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.btn-mini{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-card);
+  color: var(--ink-mid);
+  letter-spacing: 0.05em;
+}
+.btn-mini.edit{ color: var(--ink); }
+.btn-mini.delete{
+  color: var(--rose);
+  border-color: var(--rose-soft);
+}
+
+/* EMPTY */
+.empty-state{
+  text-align: center;
+  padding: 48px 24px;
+}
+.empty-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  color: var(--ink-mid);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.empty-desc{
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+/* TOAST */
+.toast{
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--bg);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(58,46,42,0.25);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  letter-spacing: 0.04em;
+}
+.toast.show{
+  opacity: 1;
+  transform: translateX(-50%) translateY(-8px);
+}
+.toast.error{ background: #B07474; }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <a class="back-btn" href="news.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="title-wrap">
+      <div class="page-title">ニュース 管理</div>
+      <div class="page-sub">
+        <span class="admin-badge">ADMIN</span>
+        <span style="margin-left:6px;">記事の追加・編集・削除</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- NOTICE -->
+  <div class="notice">
+    <strong>💡 使い方</strong><br>
+    Bloombergなどのニュースサイトから記事URLをコピーし、タイトル・カテゴリ・mioの一言コメントを入力して保存。記事本文はサイトに転載せず、リンクと要点だけを共有します(著作権的に安全)。
+  </div>
+
+  <!-- FORM -->
+  <section class="form-card">
+    <div class="form-card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span id="form-title">新規ニュースを追加</span>
+    </div>
+
+    <div class="field">
+      <label class="field-label">記事タイトル<span class="required">*</span></label>
+      <input type="text" id="f-title" placeholder="例: 米国株が小幅安で始まる、停戦に懐疑的な見方">
+      <div class="field-hint">記事の見出しをコピペ。短く要点が分かるものに編集してもOK</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">記事URL<span class="required">*</span></label>
+      <input type="url" id="f-url" placeholder="https://www.bloomberg.com/jp/news/...">
+      <div class="field-hint">タップで元記事に飛びます</div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">カテゴリ</label>
+        <select id="f-category">
+          <option value="us">米国市況</option>
+          <option value="jp">日本市況</option>
+          <option value="policy">経済政策</option>
+          <option value="other">その他</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">媒体名</label>
+        <input type="text" id="f-source" placeholder="例: Bloomberg">
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">日付</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="field">
+        <label class="field-label">時刻</label>
+        <input type="time" id="f-time">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">mioの一言コメント(任意)</label>
+      <textarea id="f-comment" placeholder="例: ドル円159円台の動きに注目、来週のFOMC前に押し目を確認" rows="3"></textarea>
+      <div class="field-hint">記事の要点や、コミュニティへの示唆を短く。空欄でもOK</div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-secondary" id="btn-cancel" style="display:none;">キャンセル</button>
+      <button class="btn btn-primary" id="btn-save">保存</button>
+    </div>
+  </section>
+
+  <!-- NEWS LIST -->
+  <div class="section-title">
+    <h2>登録済みの記事</h2>
+    <span class="meta" id="news-count">0件</span>
+  </div>
+
+  <div class="news-list" id="news-list">
+    <div class="empty-state">
+      <div class="empty-title">まだニュースがありません</div>
+      <div class="empty-desc">上のフォームから追加してください</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CAT_LABELS = { us: '米国市況', jp: '日本市況', policy: '経済政策', other: 'その他' };
+const CAT_CLASSES = { us: 'chip-us', jp: 'chip-jp', policy: 'chip-policy', other: 'chip-other' };
+
+let news = [];
+let editingId = null;
+
+function genId() {
+  return 'n_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+async function load() {
+  try {
+    const result = await window.storage.get('news-items', true);
+    if (result && result.value) {
+      news = JSON.parse(result.value);
+    } else {
+      news = [];
+    }
+  } catch (err) {
+    news = [];
+  }
+  render();
+}
+
+async function save() {
+  try {
+    await window.storage.set('news-items', JSON.stringify(news), true);
+    return true;
+  } catch (err) {
+    showToast('保存に失敗しました', true);
+    return false;
+  }
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+function formatDateTime(iso) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function getDomain(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch (e) {
+    return '';
+  }
+}
+
+function getFormValues() {
+  const title = document.getElementById('f-title').value.trim();
+  const url = document.getElementById('f-url').value.trim();
+  const category = document.getElementById('f-category').value;
+  let source = document.getElementById('f-source').value.trim();
+  const date = document.getElementById('f-date').value;
+  const time = document.getElementById('f-time').value;
+  const comment = document.getElementById('f-comment').value.trim();
+
+  if (!title) { showToast('タイトルを入力してください', true); return null; }
+  if (!url) { showToast('URLを入力してください', true); return null; }
+  try { new URL(url); } catch (e) {
+    showToast('URLの形式が正しくありません', true); return null;
+  }
+
+  if (!source) source = getDomain(url);
+
+  let timestamp;
+  if (date && time) {
+    timestamp = new Date(`${date}T${time}:00`).toISOString();
+  } else if (date) {
+    timestamp = new Date(`${date}T12:00:00`).toISOString();
+  } else {
+    timestamp = new Date().toISOString();
+  }
+
+  return { title, url, category, source, timestamp, comment };
+}
+
+function clearForm() {
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-url').value = '';
+  document.getElementById('f-category').value = 'us';
+  document.getElementById('f-source').value = 'Bloomberg';
+  document.getElementById('f-comment').value = '';
+  const now = new Date();
+  const tzOffset = now.getTimezoneOffset() * 60000;
+  const local = new Date(now.getTime() - tzOffset).toISOString().slice(0, 16);
+  document.getElementById('f-date').value = local.slice(0, 10);
+  document.getElementById('f-time').value = local.slice(11, 16);
+  editingId = null;
+  document.getElementById('form-title').textContent = '新規ニュースを追加';
+  document.getElementById('btn-cancel').style.display = 'none';
+  document.getElementById('btn-save').textContent = '保存';
+}
+
+document.getElementById('btn-save').addEventListener('click', async () => {
+  const data = getFormValues();
+  if (!data) return;
+
+  if (editingId) {
+    const idx = news.findIndex(n => n.id === editingId);
+    if (idx !== -1) news[idx] = { ...news[idx], ...data };
+  } else {
+    news.push({ id: genId(), ...data });
+  }
+
+  if (await save()) {
+    showToast(editingId ? '更新しました' : '追加しました');
+    clearForm();
+    render();
+  }
+});
+
+document.getElementById('btn-cancel').addEventListener('click', clearForm);
+
+function startEdit(id) {
+  const n = news.find(x => x.id === id);
+  if (!n) return;
+  editingId = id;
+  document.getElementById('f-title').value = n.title;
+  document.getElementById('f-url').value = n.url;
+  document.getElementById('f-category').value = n.category || 'us';
+  document.getElementById('f-source').value = n.source || '';
+  document.getElementById('f-comment').value = n.comment || '';
+  const d = new Date(n.timestamp);
+  const tzOffset = d.getTimezoneOffset() * 60000;
+  const local = new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
+  document.getElementById('f-date').value = local.slice(0, 10);
+  document.getElementById('f-time').value = local.slice(11, 16);
+  document.getElementById('form-title').textContent = '記事を編集';
+  document.getElementById('btn-cancel').style.display = 'block';
+  document.getElementById('btn-save').textContent = '更新';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function deleteNews(id) {
+  if (!confirm('この記事を削除しますか?')) return;
+  news = news.filter(n => n.id !== id);
+  if (await save()) {
+    showToast('削除しました');
+    if (editingId === id) clearForm();
+    render();
+  }
+}
+
+function render() {
+  const list = document.getElementById('news-list');
+  document.getElementById('news-count').textContent = `${news.length}件`;
+
+  if (news.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-title">まだニュースがありません</div>
+        <div class="empty-desc">上のフォームから追加してください</div>
+      </div>
+    `;
+    return;
+  }
+
+  const sorted = [...news].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  list.innerHTML = sorted.map(n => {
+    const cat = n.category || 'other';
+    const catLabel = CAT_LABELS[cat] || 'その他';
+    const catClass = CAT_CLASSES[cat] || 'chip-other';
+    return `
+      <div class="news-card">
+        <div class="news-card-head">
+          <span class="news-cat-chip ${catClass}">${catLabel}</span>
+          <span class="news-card-time">${formatDateTime(n.timestamp)}</span>
+        </div>
+        <div class="news-card-title">${escapeHtml(n.title)}</div>
+        <div class="news-card-url">${escapeHtml(n.source ? `${n.source} · ` : '')}${escapeHtml(n.url)}</div>
+        ${n.comment ? `<div class="news-card-comment">${escapeHtml(n.comment)}</div>` : ''}
+        <div class="news-card-actions">
+          <button class="btn-mini edit" data-action="edit" data-id="${n.id}">編集</button>
+          <button class="btn-mini delete" data-action="delete" data-id="${n.id}">削除</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  list.querySelectorAll('[data-action="edit"]').forEach(btn => {
+    btn.addEventListener('click', () => startEdit(btn.dataset.id));
+  });
+  list.querySelectorAll('[data-action="delete"]').forEach(btn => {
+    btn.addEventListener('click', () => deleteNews(btn.dataset.id));
+  });
+}
+
+clearForm();
+load();
+</script>
+
+</body>
+</html>

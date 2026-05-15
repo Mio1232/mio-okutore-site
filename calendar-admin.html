@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>カレンダー見解管理 — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: #F7F2EA;
+  --bg-soft: #EFE7DA;
+  --bg-card: #FFFEFB;
+  --ink: #3A2E2A;
+  --ink-mid: #6B5D57;
+  --ink-soft: #998B83;
+  --rose: #C98B95;
+  --rose-soft: #E8D0D2;
+  --rose-deep: #B06B75;
+  --sage: #9BB59C;
+  --honey: #D4B677;
+  --line: rgba(58,46,42,0.08);
+  --line-strong: rgba(58,46,42,0.14);
+  --shadow-md: 0 8px 24px rgba(58,46,42,0.06);
+  --r-lg: 20px;
+  --r-md: 16px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0; padding:0;}
+body{
+  font-family: 'Noto Sans JP', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+.app{
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 60px;
+}
+.page-header{
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(247,242,234,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.back-btn{
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none;
+  color: var(--ink-mid);
+}
+.back-btn svg{ width: 16px; height: 16px; }
+.page-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px; font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.page-title .en{
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 10px;
+  color: var(--rose-deep);
+}
+.intro{
+  padding: 22px 22px 8px;
+}
+.intro h2{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+.intro p{
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  margin: 0;
+}
+form{
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.field-label{
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--rose-deep);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+textarea{
+  width: 100%;
+  min-height: 180px;
+  padding: 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  font-family: inherit;
+  font-size: 13.5px;
+  line-height: 1.85;
+  color: var(--ink);
+  resize: vertical;
+}
+textarea:focus{
+  outline: none;
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px var(--rose-soft);
+}
+.hint{
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin-top: 4px;
+  padding-left: 6px;
+  border-left: 2px solid var(--honey);
+}
+.preview{
+  margin-top: 4px;
+  padding: 16px;
+  background: linear-gradient(135deg, #F5EFE5 0%, #EBE0D0 100%);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+}
+.preview-label{
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--rose-deep);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.preview-text{
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink);
+}
+.preview-text .em{
+  color: var(--rose-deep);
+  font-weight: 600;
+}
+.btn-row{
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+.btn{
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.btn:active{ transform: scale(0.97); }
+.btn-primary{
+  background: var(--ink);
+  color: var(--bg);
+}
+.btn-secondary{
+  background: var(--bg-card);
+  color: var(--ink-mid);
+  border: 1px solid var(--line-strong);
+}
+.status{
+  padding: 12px 16px;
+  margin: 0 22px;
+  border-radius: var(--r-md);
+  font-size: 12px;
+  text-align: center;
+  display: none;
+}
+.status.show{ display: block; }
+.status.success{
+  background: rgba(155,181,156,0.18);
+  color: #5A7A5F;
+  border: 1px solid rgba(155,181,156,0.5);
+}
+.status.error{
+  background: rgba(201,126,126,0.15);
+  color: #8A5050;
+  border: 1px solid rgba(201,126,126,0.4);
+}
+.tip-box{
+  margin: 0 22px 14px;
+  padding: 14px;
+  background: var(--bg-card);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-md);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+.tip-box strong{ color: var(--ink); font-weight: 600; }
+.tip-box code{
+  background: var(--bg-soft);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Inter', monospace;
+  font-size: 10px;
+  color: var(--rose-deep);
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="page-header">
+    <a class="back-btn" href="calendar.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="page-title">
+      カレンダー見解管理
+      <span class="en">— Hinata's Comment</span>
+    </div>
+  </header>
+
+  <section class="intro">
+    <h2>今週の見解を更新</h2>
+    <p>ひなたが書く「今週の見解」を編集できます。<br>HTMLタグも一部使えます。</p>
+  </section>
+
+  <div class="tip-box">
+    <strong>📝 書き方のヒント</strong><br>
+    強調したい単語は <code>&lt;span class="em"&gt;...&lt;/span&gt;</code> で囲むと色が変わります。<br>
+    例:今週は<code>&lt;span class="em"&gt;米CPI&lt;/span&gt;</code>に注目です
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <form id="comment-form">
+    <div>
+      <div class="field-label">Comment Text</div>
+      <textarea id="comment-input" placeholder="今週は米CPIとFOMC議事録に注目です。木曜の指標前後はドル円のボラが上がりやすいので、ポジション量に注意しましょう📈"></textarea>
+      <div class="hint">💡 全角・絵文字OK。改行はそのまま反映されます</div>
+    </div>
+
+    <div>
+      <div class="field-label">Live Preview</div>
+      <div class="preview">
+        <div class="preview-label">— PROVIDED BY HINATA</div>
+        <div class="preview-text" id="preview-text">今週は<span class="em">米CPI</span>と<span class="em">FOMC議事録</span>に注目です。木曜の指標前後はドル円のボラが上がりやすいので、ポジション量に注意しましょう📈</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn btn-secondary" onclick="loadCurrent()">📥 現在の値を読込</button>
+      <button type="submit" class="btn btn-primary">💾 保存して反映</button>
+    </div>
+  </form>
+
+</div>
+
+<script>
+const input = document.getElementById('comment-input');
+const preview = document.getElementById('preview-text');
+const status = document.getElementById('status');
+
+// Live preview
+input.addEventListener('input', () => {
+  preview.innerHTML = input.value || preview.dataset.placeholder;
+});
+
+// Load current value
+async function loadCurrent() {
+  try {
+    if (!window.storage) {
+      showStatus('ローカルプレビューでは保存できません(本番環境で動作します)', 'error');
+      return;
+    }
+    const result = await window.storage.get('calendar-comment', true);
+    if (result && result.value) {
+      const data = JSON.parse(result.value);
+      input.value = data.comment || '';
+      preview.innerHTML = data.comment || '';
+      showStatus('現在の値を読み込みました', 'success');
+    } else {
+      showStatus('保存された見解はまだありません', 'success');
+    }
+  } catch(e) {
+    showStatus('読み込みエラー: ' + e.message, 'error');
+  }
+}
+
+// Save
+document.getElementById('comment-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const comment = input.value.trim();
+  if (!comment) {
+    showStatus('コメントを入力してください', 'error');
+    return;
+  }
+  try {
+    if (!window.storage) {
+      showStatus('プレビューモードでは保存できません(本番で動作)', 'error');
+      return;
+    }
+    const data = { comment, updated: new Date().toISOString() };
+    await window.storage.set('calendar-comment', JSON.stringify(data), true);
+    showStatus('✓ 保存しました。カレンダーページで反映されます', 'success');
+  } catch(err) {
+    showStatus('保存エラー: ' + err.message, 'error');
+  }
+});
+
+function showStatus(msg, type) {
+  status.textContent = msg;
+  status.className = 'status show ' + type;
+  setTimeout(() => status.classList.remove('show'), 4000);
+}
+
+// Auto-load on open
+loadCurrent();
+</script>
+
+</body>
+</html>
