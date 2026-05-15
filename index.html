@@ -1167,12 +1167,7 @@ async function renderProfit() {
   tl.innerHTML = latest.map(p => {
     const persona = (p.author || p.persona || 'mio').toLowerCase();
     const name = PERSONA_NAMES[persona] || p.author || 'mio';
-    const av = AVATARS[persona] || AVATARS.mio;
     const pair = PAIR_LABEL[p.pair] || p.pair || '';
-    const pnl = Number(p.pnl || 0);
-    const pnlClass = pnl >= 0 ? 'plus' : 'minus';
-    const pnlSign = pnl >= 0 ? '+' : '−';
-    const pnlAbs = Math.abs(pnl).toLocaleString('ja-JP');
     const text = (p.comment || p.text || '').slice(0, 80);
     return `<div class="profit-tl-item">
       <div class="ptl-body">
@@ -1182,7 +1177,6 @@ async function renderProfit() {
           <span class="ptl-when">${timeAgo(p.timestamp || p.date)}</span>
         </div>
         ${text ? `<div class="ptl-text">${text}</div>` : ''}
-        <div class="ptl-pnl ${pnlClass}">${pnlSign}¥${pnlAbs}</div>
       </div>
     </div>`;
   }).join('');
@@ -1245,13 +1239,11 @@ async function renderActivity() {
   profits.slice(0, 3).forEach(p => {
     const persona = (p.author || p.persona || 'mio').toLowerCase();
     const name = PERSONA_NAMES[persona] || 'mio';
-    const pnl = Number(p.pnl || 0);
-    const sign = pnl >= 0 ? '+' : '−';
-    const abs = Math.abs(pnl).toLocaleString('ja-JP');
+    const pair = PAIR_LABEL[p.pair] || p.pair || '';
     items.push({
       kind: 'PROFIT',
       time: new Date(p.timestamp || p.date || 0),
-      title: `${name} ${sign}¥${abs} (${PAIR_LABEL[p.pair] || p.pair || ''})`,
+      title: pair ? `${name} の収支報告 (${pair})` : `${name} の収支報告`,
       author: persona,
       comment: (p.comment || '').slice(0, 50)
     });
