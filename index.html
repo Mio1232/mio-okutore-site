@@ -750,6 +750,12 @@ body{
 }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = "https://iupkaxzesrximmfkipzd.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
 </head>
 <body>
 
@@ -1061,12 +1067,59 @@ function fmtDateTime(iso) {
 
 async function loadStorage(key) {
   try {
-    if (!window.storage) return [];
-    const result = await window.storage.get(key, true);
-    if (!result) return [];
-    const parsed = JSON.parse(result.value);
-    return Array.isArray(parsed) ? parsed : [];
+    // Map storage keys to Supabase tables
+    const tableMap = {
+      'profit-posts': { table: 'profit_posts', orderBy: 'timestamp' },
+      'news-items': { table: 'news_items', orderBy: 'timestamp' },
+      'discord-events': { table: 'discord_events', orderBy: 'datetime' }
+    };
+    const config = tableMap[key];
+    if (!config) return [];
+
+    const { data, error } = await supabase
+      .from(config.table)
+      .select('*')
+      .order(config.orderBy, { ascending: false });
+    if (error) throw error;
+    if (!data) return [];
+
+    // Map fields to match what index.html expects
+    if (key === 'profit-posts') {
+      return data.map(row => ({
+        id: row.id,
+        author: row.author,
+        userName: row.author,
+        comment: row.comment || '',
+        content: row.comment || '',
+        timestamp: row.timestamp,
+        pair: row.pair,
+        pnl: row.pnl,
+        reactions: row.reactions ? JSON.parse(row.reactions) : []
+      }));
+    } else if (key === 'news-items') {
+      return data.map(row => ({
+        id: row.id,
+        title: row.title,
+        url: row.url,
+        comment: row.comment || '',
+        timestamp: row.timestamp,
+        category: row.category || 'us',
+        author: row.author || 'mio'
+      }));
+    } else if (key === 'discord-events') {
+      return data.map(row => ({
+        id: row.id,
+        title: row.title,
+        datetime: row.datetime,
+        startTime: row.datetime,
+        host: row.host || 'mio',
+        hostId: row.host || 'mio',
+        type: row.type || 'regular'
+      }));
+    }
+    return data;
   } catch(e) {
+    console.error('Load error for', key, ':', e);
     return [];
   }
 }

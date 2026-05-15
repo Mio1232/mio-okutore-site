@@ -386,6 +386,12 @@ body{
 .toast.error{ background: #B07474; }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = "https://iupkaxzesrximmfkipzd.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
 </head>
 <body>
 
@@ -509,24 +515,71 @@ function showToast(msg, isError) {
 
 async function load() {
   try {
-    const result = await window.storage.get('discord-events', true);
-    if (result && result.value) {
-      events = JSON.parse(result.value);
-    } else {
-      events = [];
-    }
+    const { data, error } = await supabase
+      .from('discord_events')
+      .select('*')
+      .order('datetime', { ascending: true });
+    if (error) throw error;
+    events = (data || []).map(row => ({
+      id: row.id,
+      title: row.title,
+      startTime: row.datetime,
+      hostId: row.host || 'mio',
+      type: row.type || 'regular',
+      duration: row.duration || 60,
+      description: row.description || ''
+    }));
   } catch (err) {
+    console.error('Load error:', err);
     events = [];
+    showToast('読み込みエラー: ' + err.message, true);
   }
   render();
 }
 
-async function save() {
+async function insertEvent(data) {
   try {
-    await window.storage.set('discord-events', JSON.stringify(events), true);
+    const { error } = await supabase.from('discord_events').insert({
+      title: data.title,
+      datetime: data.startTime,
+      host: data.hostId,
+      type: data.type,
+      duration: data.duration,
+      description: data.description
+    });
+    if (error) throw error;
     return true;
   } catch (err) {
-    showToast('保存に失敗しました', true);
+    showToast('保存失敗: ' + err.message, true);
+    return false;
+  }
+}
+
+async function updateEvent(id, data) {
+  try {
+    const { error } = await supabase.from('discord_events').update({
+      title: data.title,
+      datetime: data.startTime,
+      host: data.hostId,
+      type: data.type,
+      duration: data.duration,
+      description: data.description
+    }).eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    showToast('更新失敗: ' + err.message, true);
+    return false;
+  }
+}
+
+async function removeEvent(id) {
+  try {
+    const { error } = await supabase.from('discord_events').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    showToast('削除失敗: ' + err.message, true);
     return false;
   }
 }
@@ -582,17 +635,14 @@ document.getElementById('btn-save').addEventListener('click', async () => {
   const data = getFormValues();
   if (!data) return;
 
-  if (editingId) {
-    const idx = events.findIndex(e => e.id === editingId);
-    if (idx !== -1) events[idx] = { ...events[idx], ...data };
-  } else {
-    events.push({ id: genId(), ...data });
-  }
+  const success = editingId
+    ? await updateEvent(editingId, data)
+    : await insertEvent(data);
 
-  if (await save()) {
+  if (success) {
     showToast(editingId ? '更新しました' : '追加しました');
     clearForm();
-    render();
+    await load();
   }
 });
 
@@ -620,11 +670,10 @@ function startEdit(id) {
 
 async function deleteEvent(id) {
   if (!confirm('この配信を削除しますか?')) return;
-  events = events.filter(e => e.id !== id);
-  if (await save()) {
+  if (await removeEvent(id)) {
     showToast('削除しました');
     if (editingId === id) clearForm();
-    render();
+    await load();
   }
 }
 

@@ -464,6 +464,12 @@ body{
 }
 .nav-item .ico svg{ width: 16px; height: 16px; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = "https://iupkaxzesrximmfkipzd.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
 </head>
 <body>
 
@@ -649,12 +655,22 @@ async function loadAndRender() {
 
   let posts = [];
   try {
-    const result = await window.storage.get('profit-posts', true); // shared = true
-    if (result && result.value) {
-      posts = JSON.parse(result.value);
-    }
+    const { data, error } = await supabase
+      .from('profit_posts')
+      .select('*')
+      .order('timestamp', { ascending: false });
+    if (error) throw error;
+    posts = (data || []).map(row => ({
+      id: row.id,
+      userName: row.author,
+      content: row.comment || '',
+      timestamp: row.timestamp,
+      reactions: row.reactions ? JSON.parse(row.reactions) : [],
+      pair: row.pair,
+      pnl: row.pnl
+    }));
   } catch (err) {
-    // No data yet — treat as empty
+    console.error('Load error:', err);
     posts = [];
   }
 

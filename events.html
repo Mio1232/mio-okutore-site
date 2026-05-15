@@ -459,6 +459,12 @@ body{
 .nav-item .ico svg{ width: 16px; height: 16px; }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = "https://iupkaxzesrximmfkipzd.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
 </head>
 <body>
 
@@ -700,9 +706,22 @@ function render() {
 async function load() {
   let events = [];
   try {
-    const result = await window.storage.get('discord-events', true);
-    if (result && result.value) events = JSON.parse(result.value);
+    const { data, error } = await supabase
+      .from('discord_events')
+      .select('*')
+      .order('datetime', { ascending: true });
+    if (error) throw error;
+    events = (data || []).map(row => ({
+      id: row.id,
+      title: row.title,
+      startTime: row.datetime,
+      hostId: row.host || 'mio',
+      type: row.type || 'regular',
+      duration: row.duration || 60,
+      description: row.description || ''
+    }));
   } catch (err) {
+    console.error('Load error:', err);
     events = [];
   }
   allEvents = events;

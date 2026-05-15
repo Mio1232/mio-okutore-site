@@ -377,6 +377,12 @@ body{
 .toast.error{ background: #B07474; }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = "https://iupkaxzesrximmfkipzd.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
 </head>
 <body>
 
@@ -479,24 +485,71 @@ function showToast(msg, isError) {
 
 async function load() {
   try {
-    const result = await window.storage.get('profit-posts', true);
-    if (result && result.value) {
-      posts = JSON.parse(result.value);
-    } else {
-      posts = [];
-    }
+    const { data, error } = await supabase
+      .from('profit_posts')
+      .select('*')
+      .order('timestamp', { ascending: false });
+    if (error) throw error;
+    posts = (data || []).map(row => ({
+      id: row.id,
+      userName: row.author,
+      content: row.comment || '',
+      timestamp: row.timestamp,
+      reactions: row.reactions ? JSON.parse(row.reactions) : [],
+      pair: row.pair,
+      pnl: row.pnl
+    }));
   } catch (err) {
+    console.error('Load error:', err);
     posts = [];
+    showToast('読み込みエラー: ' + err.message, true);
   }
   render();
 }
 
-async function save() {
+async function insertPost(data) {
   try {
-    await window.storage.set('profit-posts', JSON.stringify(posts), true);
+    const { error } = await supabase.from('profit_posts').insert({
+      author: data.userName,
+      comment: data.content,
+      timestamp: data.timestamp,
+      reactions: JSON.stringify(data.reactions || []),
+      pair: data.pair || 'USDJPY',
+      pnl: data.pnl || 0
+    });
+    if (error) throw error;
     return true;
   } catch (err) {
-    showToast('保存に失敗しました', true);
+    showToast('保存失敗: ' + err.message, true);
+    return false;
+  }
+}
+
+async function updatePost(id, data) {
+  try {
+    const { error } = await supabase.from('profit_posts').update({
+      author: data.userName,
+      comment: data.content,
+      timestamp: data.timestamp,
+      reactions: JSON.stringify(data.reactions || []),
+      pair: data.pair || 'USDJPY',
+      pnl: data.pnl || 0
+    }).eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    showToast('更新失敗: ' + err.message, true);
+    return false;
+  }
+}
+
+async function removePost(id) {
+  try {
+    const { error } = await supabase.from('profit_posts').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    showToast('削除失敗: ' + err.message, true);
     return false;
   }
 }
@@ -567,19 +620,17 @@ document.getElementById('btn-save').addEventListener('click', async () => {
   const data = getFormValues();
   if (!data) return;
 
+  let success;
   if (editingId) {
-    const idx = posts.findIndex(p => p.id === editingId);
-    if (idx !== -1) {
-      posts[idx] = { ...posts[idx], ...data };
-    }
+    success = await updatePost(editingId, data);
   } else {
-    posts.push({ id: genId(), ...data });
+    success = await insertPost(data);
   }
 
-  if (await save()) {
+  if (success) {
     showToast(editingId ? '更新しました' : '追加しました');
     clearForm();
-    render();
+    await load();
   }
 });
 
@@ -607,11 +658,10 @@ function startEdit(id) {
 
 async function deletePost(id) {
   if (!confirm('この投稿を削除しますか?')) return;
-  posts = posts.filter(p => p.id !== id);
-  if (await save()) {
+  if (await removePost(id)) {
     showToast('削除しました');
     if (editingId === id) clearForm();
-    render();
+    await load();
   }
 }
 

@@ -639,6 +639,12 @@ body{
 .nav-item .ico svg{ width: 16px; height: 16px; }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = "https://iupkaxzesrximmfkipzd.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
 </head>
 <body>
 
@@ -724,16 +730,17 @@ body{
 </div>
 
 <script>
-// Load hinata's weekly comment from storage
+// Load hinata's weekly comment from Supabase
 async function loadHinataComment() {
   try {
-    if (!window.storage) return;
-    const result = await window.storage.get('calendar-comment', true);
-    if (result && result.value) {
-      const data = JSON.parse(result.value);
-      if (data.comment) {
-        document.getElementById('hinata-msg').innerHTML = data.comment;
-      }
+    const { data, error } = await supabase
+      .from('calendar_comment')
+      .select('*')
+      .order('updated', { ascending: false })
+      .limit(1);
+    if (error) throw error;
+    if (data && data.length > 0 && data[0].comment) {
+      document.getElementById('hinata-msg').innerHTML = data[0].comment;
     }
   } catch(e) { /* keep default text */ }
 }

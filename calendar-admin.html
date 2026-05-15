@@ -216,6 +216,12 @@ textarea:focus{
   color: var(--rose-deep);
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = "https://iupkaxzesrximmfkipzd.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
 </head>
 <body>
 
@@ -280,15 +286,15 @@ input.addEventListener('input', () => {
 // Load current value
 async function loadCurrent() {
   try {
-    if (!window.storage) {
-      showStatus('ローカルプレビューでは保存できません(本番環境で動作します)', 'error');
-      return;
-    }
-    const result = await window.storage.get('calendar-comment', true);
-    if (result && result.value) {
-      const data = JSON.parse(result.value);
-      input.value = data.comment || '';
-      preview.innerHTML = data.comment || '';
+    const { data, error } = await supabase
+      .from('calendar_comment')
+      .select('*')
+      .order('updated', { ascending: false })
+      .limit(1);
+    if (error) throw error;
+    if (data && data.length > 0) {
+      input.value = data[0].comment || '';
+      preview.innerHTML = data[0].comment || '';
       showStatus('現在の値を読み込みました', 'success');
     } else {
       showStatus('保存された見解はまだありません', 'success');
@@ -307,12 +313,13 @@ document.getElementById('comment-form').addEventListener('submit', async (e) => 
     return;
   }
   try {
-    if (!window.storage) {
-      showStatus('プレビューモードでは保存できません(本番で動作)', 'error');
-      return;
-    }
-    const data = { comment, updated: new Date().toISOString() };
-    await window.storage.set('calendar-comment', JSON.stringify(data), true);
+    // Delete all existing rows then insert new one (keeps only latest)
+    await supabase.from('calendar_comment').delete().gte('id', 0);
+    const { error } = await supabase.from('calendar_comment').insert({
+      comment: comment,
+      updated: new Date().toISOString()
+    });
+    if (error) throw error;
     showStatus('✓ 保存しました。カレンダーページで反映されます', 'success');
   } catch(err) {
     showStatus('保存エラー: ' + err.message, 'error');
