@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5D9D3"/>
+      <stop offset="100%" stop-color="#C98B95"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <text x="32" y="44" text-anchor="middle"
+        font-family="Georgia, 'Noto Serif JP', serif"
+        font-size="36" font-weight="600"
+        font-style="italic" fill="#FFFEFB"
+        letter-spacing="-1">M</text>
+</svg>
