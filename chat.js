@@ -1,4 +1,4 @@
-// Netlify Function: AI Chat (mio's persona)
+// Netlify Function: AI Chat (mio's persona) - rebuild 20260516
 // Supports text and image input (chart analysis)
 // API key is stored in Netlify environment variables, never exposed to browser.
 
