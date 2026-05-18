@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>マイページ — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/favicon-192.png">
+<meta name="theme-color" content="#F7F2EA">
+<style>
+:root{
+  --bg: #F7F2EA;
+  --bg-soft: #EFE7DA;
+  --bg-card: #FFFEFB;
+  --ink: #3A2E2A;
+  --ink-mid: #6B5D57;
+  --ink-soft: #998B83;
+  --rose: #C98B95;
+  --rose-soft: #E8D0D2;
+  --rose-deep: #B06B75;
+  --sage: #9BB59C;
+  --sage-soft: #C9DACA;
+  --honey: #D4B677;
+  --line: rgba(58,46,42,0.08);
+  --line-strong: rgba(58,46,42,0.14);
+  --plus: #5A8E73;
+  --minus: #B06B75;
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+html, body{ width: 100%; min-height: 100vh; }
+body{
+  font-family: 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.app{
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  position: relative;
+}
+
+/* HEADER */
+.page-header{
+  position: sticky;
+  top: 0;
+  background: rgba(247,242,234,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  z-index: 10;
+}
+.brand{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  color: var(--rose-deep);
+  text-transform: uppercase;
+  flex: 1;
+}
+.icon-btn{
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  color: var(--ink-mid);
+}
+.icon-btn svg{ width: 16px; height: 16px; }
+.icon-btn:hover{ background: var(--rose-soft); color: var(--rose-deep); }
+
+/* HERO */
+.hero{
+  padding: 32px 24px 24px;
+}
+.greeting{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.greeting-en{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--rose-deep);
+}
+.plan-badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 4px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+.plan-badge.free{ color: var(--ink-mid); }
+.plan-badge.basic{ background: var(--sage-soft); color: #2D5F4F; border-color: var(--sage); }
+.plan-badge.pro{ background: var(--rose-soft); color: var(--rose-deep); border-color: var(--rose); }
+
+/* SUMMARY CARD */
+.section{
+  padding: 0 24px;
+  margin-bottom: 24px;
+}
+.section-title{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 12px;
+}
+.summary-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px;
+}
+.summary-month{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+}
+.summary-amount{
+  font-family: 'Inter', sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-bottom: 16px;
+}
+.summary-amount.plus{ color: var(--plus); }
+.summary-amount.minus{ color: var(--minus); }
+.summary-amount.zero{ color: var(--ink-soft); }
+.summary-stats{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.stat-item{
+  text-align: center;
+}
+.stat-label{
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+.stat-value{
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* GOAL PROGRESS */
+.goal-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.goal-row{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.goal-label{
+  font-size: 12px;
+  color: var(--ink-mid);
+  font-weight: 500;
+}
+.goal-percent{
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rose-deep);
+}
+.goal-bar{
+  height: 6px;
+  background: var(--bg-soft);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.goal-fill{
+  height: 100%;
+  background: linear-gradient(90deg, var(--rose) 0%, var(--rose-deep) 100%);
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+.goal-text{
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+/* MINI CHART */
+.chart-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+}
+.chart-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.chart-title{
+  font-size: 12px;
+  color: var(--ink-mid);
+  font-weight: 500;
+}
+.chart-link{
+  font-size: 11px;
+  color: var(--rose-deep);
+  text-decoration: none;
+}
+.chart-wrap{
+  height: 120px;
+  position: relative;
+}
+.chart-empty{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  text-align: center;
+  padding: 0 24px;
+  line-height: 1.7;
+}
+
+/* ACTION BUTTONS */
+.actions{
+  padding: 0 24px;
+  margin-bottom: 24px;
+}
+.action-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.action-btn{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.action-btn:hover{
+  background: var(--rose-soft);
+  border-color: var(--rose);
+  transform: translateY(-1px);
+}
+.action-icon{
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.action-btn.primary .action-icon{
+  background: var(--rose-soft);
+}
+.action-label{
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+.action-en{
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 10px;
+  color: var(--ink-soft);
+  letter-spacing: 0.08em;
+}
+
+/* RECENT TRADES */
+.recent-list{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.recent-item{
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.recent-item:last-child{ border-bottom: none; }
+.recent-info{ flex: 1; }
+.recent-pair{
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.recent-date{
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.recent-pl{
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+.recent-pl.plus{ color: var(--plus); }
+.recent-pl.minus{ color: var(--minus); }
+.empty-state{
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+/* SETTINGS LINKS */
+.settings-list{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.settings-item{
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.settings-item:last-child{ border-bottom: none; }
+.settings-item:hover{ background: var(--bg-soft); }
+.settings-icon{
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+.settings-text{ flex: 1; }
+.settings-label{
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.settings-sub{
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.settings-arrow{
+  color: var(--ink-soft);
+  font-size: 16px;
+}
+
+/* FOOTER */
+.footer{
+  padding: 32px 24px;
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+}
+.footer a{
+  color: var(--rose-deep);
+  text-decoration: none;
+  font-weight: 500;
+}
+.logout-btn{
+  display: inline-block;
+  margin-top: 16px;
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  color: var(--ink-mid);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+.logout-btn:hover{
+  border-color: var(--rose);
+  color: var(--rose-deep);
+}
+
+/* LOADING */
+.loading{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+.loading-mark{
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--rose-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  color: var(--rose-deep);
+  font-weight: 600;
+  animation: pulse 1.8s ease-in-out infinite;
+  margin-bottom: 12px;
+}
+@keyframes pulse{
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.95); }
+}
+.loading-text{
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.16em;
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading" class="loading">
+  <div class="loading-mark">m</div>
+  <div class="loading-text">— loading —</div>
+</div>
+
+<!-- MAIN -->
+<div class="app" id="app" style="display: none;">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <div class="brand">mio okutore</div>
+    <a class="icon-btn" href="settings.html" aria-label="設定">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </a>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1 class="greeting" id="greeting">こんにちは 🌸</h1>
+    <div class="greeting-en">Welcome back</div>
+    <div class="plan-badge free" id="planBadge">
+      <span>FREE</span>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="section">
+    <div class="section-title">This Month</div>
+    <div class="summary-card">
+      <div class="summary-month" id="currentMonth">2026年5月</div>
+      <div class="summary-amount zero" id="monthlyPL">¥0</div>
+      <div class="summary-stats">
+        <div class="stat-item">
+          <div class="stat-label">取引回数</div>
+          <div class="stat-value" id="tradeCount">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">勝率</div>
+          <div class="stat-value" id="winRate">--</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">最大利益</div>
+          <div class="stat-value" id="maxProfit">¥0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOAL PROGRESS -->
+  <div class="section" id="goalSection">
+    <div class="section-title">Monthly Goal</div>
+    <div class="goal-card">
+      <div class="goal-row">
+        <span class="goal-label">月間目標達成率</span>
+        <span class="goal-percent" id="goalPercent">--</span>
+      </div>
+      <div class="goal-bar">
+        <div class="goal-fill" id="goalFill" style="width: 0%;"></div>
+      </div>
+      <div class="goal-text" id="goalText">プロフィールで目標金額を設定してください</div>
+    </div>
+  </div>
+
+  <!-- MINI CHART -->
+  <div class="section">
+    <div class="section-title">Recent 5 Days</div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">直近の損益推移</span>
+        <a class="chart-link" href="stats.html">詳細を見る →</a>
+      </div>
+      <div class="chart-wrap" id="chartWrap">
+        <div class="chart-empty">
+          まだトレード記録がありません<br>
+          記録をつけ始めると、ここにグラフが表示されます🌸
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <div class="section-title" style="padding-left: 0; margin-bottom: 12px;">Actions</div>
+    <div class="action-grid">
+      <a class="action-btn primary" href="record.html">
+        <div class="action-icon">📝</div>
+        <div class="action-label">トレード記録</div>
+        <div class="action-en">Record</div>
+      </a>
+      <a class="action-btn primary" href="chat.html">
+        <div class="action-icon">💬</div>
+        <div class="action-label">mio AIに相談</div>
+        <div class="action-en">Ask AI</div>
+      </a>
+      <a class="action-btn" href="notes.html">
+        <div class="action-icon">📚</div>
+        <div class="action-label">学びノート</div>
+        <div class="action-en">Notes</div>
+      </a>
+      <a class="action-btn" href="stats.html">
+        <div class="action-icon">📈</div>
+        <div class="action-label">月次レポート</div>
+        <div class="action-en">Report</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- RECENT TRADES -->
+  <div class="section">
+    <div class="section-title">Recent Trades</div>
+    <div class="recent-list" id="recentList">
+      <div class="empty-state">
+        まだトレード記録がありません<br>
+        <a href="record.html" style="color: var(--rose-deep); text-decoration: none; font-weight: 500;">記録を始める →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS LINKS -->
+  <div class="section">
+    <div class="section-title">Settings</div>
+    <div class="settings-list">
+      <a class="settings-item" href="profile.html">
+        <div class="settings-icon">👤</div>
+        <div class="settings-text">
+          <div class="settings-label">プロフィール編集</div>
+          <div class="settings-sub">表示名・目標金額の設定</div>
+        </div>
+        <div class="settings-arrow">›</div>
+      </a>
+      <a class="settings-item" href="notifications.html">
+        <div class="settings-icon">🔔</div>
+        <div class="settings-text">
+          <div class="settings-label">通知設定</div>
+          <div class="settings-sub">LINE通知・メール通知</div>
+        </div>
+        <div class="settings-arrow">›</div>
+      </a>
+      <a class="settings-item" href="plan.html">
+        <div class="settings-icon">💎</div>
+        <div class="settings-text">
+          <div class="settings-label">プラン管理</div>
+          <div class="settings-sub" id="planSub">現在:無料プラン</div>
+        </div>
+        <div class="settings-arrow">›</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <a href="index.html">— back to home —</a>
+    <br>
+    <button class="logout-btn" id="logoutBtn">ログアウト</button>
+  </div>
+
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// 認証チェック
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
+  window.location.href = 'login.html';
+  throw new Error('Not authenticated');
+}
+
+const user = session.user;
+
+// プロフィール取得
+const { data: profile } = await supabase
+  .from('profiles')
+  .select('*')
+  .eq('id', user.id)
+  .single();
+
+// 表示名設定
+const displayName = profile?.display_name || user.email.split('@')[0];
+document.getElementById('greeting').textContent = `こんにちは、${displayName}さん 🌸`;
+
+// プラン表示
+const plan = profile?.plan || 'free';
+const planBadge = document.getElementById('planBadge');
+const planSub = document.getElementById('planSub');
+const planLabels = {
+  free: { label: 'FREE', text: '無料プラン', class: 'free' },
+  basic: { label: 'BASIC', text: 'ベーシック ¥500/月', class: 'basic' },
+  pro: { label: 'PRO', text: 'プロ ¥1,500/月', class: 'pro' }
+};
+const p = planLabels[plan] || planLabels.free;
+planBadge.className = `plan-badge ${p.class}`;
+planBadge.innerHTML = `<span>${p.label}</span>`;
+planSub.textContent = `現在:${p.text}`;
+
+// 現在の月表示
+const now = new Date();
+const month = now.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
+document.getElementById('currentMonth').textContent = month;
+
+// 今月のトレード取得
+const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+const { data: trades, error } = await supabase
+  .from('trades')
+  .select('*')
+  .eq('user_id', user.id)
+  .gte('trade_date', startOfMonth)
+  .order('trade_date', { ascending: false });
+
+if (trades && trades.length > 0) {
+  // 月間サマリー計算
+  const totalPL = trades.reduce((sum, t) => sum + t.profit_loss, 0);
+  const winTrades = trades.filter(t => t.profit_loss > 0).length;
+  const winRate = Math.round((winTrades / trades.length) * 100);
+  const maxProfit = Math.max(...trades.map(t => t.profit_loss));
+
+  // 月間PL表示
+  const plEl = document.getElementById('monthlyPL');
+  plEl.textContent = (totalPL >= 0 ? '+' : '') + '¥' + Math.abs(totalPL).toLocaleString('ja-JP');
+  plEl.className = 'summary-amount ' + (totalPL > 0 ? 'plus' : totalPL < 0 ? 'minus' : 'zero');
+
+  document.getElementById('tradeCount').textContent = trades.length + '回';
+  document.getElementById('winRate').textContent = winRate + '%';
+  document.getElementById('maxProfit').textContent = '¥' + maxProfit.toLocaleString('ja-JP');
+
+  // 目標達成率
+  if (profile?.target_monthly && profile.target_monthly > 0) {
+    const percent = Math.round((totalPL / profile.target_monthly) * 100);
+    document.getElementById('goalPercent').textContent = percent + '%';
+    document.getElementById('goalFill').style.width = Math.min(percent, 100) + '%';
+    document.getElementById('goalText').textContent = 
+      `目標 ¥${profile.target_monthly.toLocaleString('ja-JP')} / 現在 ¥${totalPL.toLocaleString('ja-JP')}`;
+  }
+
+  // 直近5件
+  const recentTrades = trades.slice(0, 5);
+  const recentHTML = recentTrades.map(t => {
+    const pl = t.profit_loss;
+    const cls = pl >= 0 ? 'plus' : 'minus';
+    const sign = pl >= 0 ? '+' : '';
+    const date = new Date(t.trade_date).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+    return `
+      <div class="recent-item">
+        <div class="recent-info">
+          <div class="recent-pair">${t.pair}</div>
+          <div class="recent-date">${date}</div>
+        </div>
+        <div class="recent-pl ${cls}">${sign}¥${Math.abs(pl).toLocaleString('ja-JP')}</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('recentList').innerHTML = recentHTML;
+
+  // ミニチャート(直近5日)
+  drawMiniChart(trades);
+}
+
+// ミニチャート描画
+function drawMiniChart(trades) {
+  const wrap = document.getElementById('chartWrap');
+  const last5 = [...trades].reverse().slice(-5);
+  
+  if (last5.length === 0) return;
+
+  let cumulative = 0;
+  const points = last5.map((t) => {
+    cumulative += t.profit_loss;
+    return cumulative;
+  });
+
+  const max = Math.max(...points, 0);
+  const min = Math.min(...points, 0);
+  const range = max - min || 1;
+  const width = 100;
+  const height = 80;
+
+  const pathData = points.map((p, i) => {
+    const x = (i / (points.length - 1 || 1)) * width;
+    const y = height - ((p - min) / range) * height;
+    return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+  }).join(' ');
+
+  const isPositive = cumulative >= 0;
+  const color = isPositive ? '#5A8E73' : '#B06B75';
+  const fillColor = isPositive ? 'rgba(90,142,115,0.1)' : 'rgba(176,107,117,0.1)';
+
+  wrap.innerHTML = `
+    <svg viewBox="0 0 100 80" preserveAspectRatio="none" style="width: 100%; height: 100%;">
+      <path d="${pathData} L ${width} ${height} L 0 ${height} Z" fill="${fillColor}"/>
+      <path d="${pathData}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `;
+}
+
+// ログアウト
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (confirm('ログアウトしますか?')) {
+    await supabase.auth.signOut();
+    window.location.href = 'index.html';
+  }
+});
+
+// ローディング完了
+document.getElementById('loading').style.display = 'none';
+document.getElementById('app').style.display = 'block';
+</script>
+
+</body>
+</html>
