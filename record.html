@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>トレード記録 — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="theme-color" content="#F7F2EA">
+<style>
+:root{
+  --bg: #F7F2EA;
+  --bg-soft: #EFE7DA;
+  --bg-card: #FFFEFB;
+  --ink: #3A2E2A;
+  --ink-mid: #6B5D57;
+  --ink-soft: #998B83;
+  --rose: #C98B95;
+  --rose-soft: #E8D0D2;
+  --rose-deep: #B06B75;
+  --sage: #9BB59C;
+  --sage-soft: #C9DACA;
+  --honey: #D4B677;
+  --line: rgba(58,46,42,0.08);
+  --line-strong: rgba(58,46,42,0.14);
+  --plus: #5A8E73;
+  --minus: #B06B75;
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+html, body{ width: 100%; min-height: 100vh; }
+body{
+  font-family: 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.app{
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  position: relative;
+  padding-bottom: 40px;
+}
+
+/* HEADER */
+.page-header{
+  position: sticky;
+  top: 0;
+  background: rgba(247,242,234,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  z-index: 10;
+}
+.back-btn{
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  color: var(--ink-mid); text-decoration: none;
+}
+.back-btn svg{ width: 16px; height: 16px; }
+.title-area{ flex: 1; }
+.title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px; font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.title-en{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--rose-deep);
+}
+
+/* SECTION */
+.section{ padding: 24px; }
+.section-title{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 16px;
+}
+
+/* TABS */
+.tabs{
+  display: flex;
+  gap: 4px;
+  padding: 0 24px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.tab{
+  flex: 1;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.04em;
+}
+.tab.active{
+  color: var(--rose-deep);
+  border-bottom-color: var(--rose);
+}
+.tab-content{ display: none; }
+.tab-content.active{ display: block; }
+
+/* FORM */
+.form-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+}
+.field{ margin-bottom: 14px; }
+.field:last-child{ margin-bottom: 0; }
+.label{
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-mid);
+  margin-bottom: 6px;
+  letter-spacing: 0.06em;
+}
+.label .required{
+  color: var(--rose-deep);
+  font-size: 10px;
+  margin-left: 2px;
+}
+.input, .select, .textarea{
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  transition: border-color 0.2s;
+}
+.input:focus, .select:focus, .textarea:focus{
+  outline: none;
+  border-color: var(--rose);
+  background: var(--bg-card);
+}
+.textarea{
+  min-height: 80px;
+  resize: vertical;
+}
+.row{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* DIRECTION TOGGLE */
+.direction-group{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.direction-btn{
+  padding: 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-mid);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.direction-btn.active.buy{
+  background: rgba(90,142,115,0.12);
+  border-color: var(--plus);
+  color: var(--plus);
+}
+.direction-btn.active.sell{
+  background: rgba(176,107,117,0.12);
+  border-color: var(--minus);
+  color: var(--minus);
+}
+
+/* SUBMIT */
+.submit-btn{
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 10px;
+  background: var(--rose);
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+.submit-btn:hover{ background: var(--rose-deep); }
+.submit-btn:disabled{ opacity: 0.5; cursor: not-allowed; }
+
+/* MESSAGE */
+.message{
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-bottom: 16px;
+  display: none;
+  text-align: center;
+}
+.message.success{ background: rgba(90,142,115,0.12); color: var(--plus); }
+.message.error{ background: rgba(176,107,117,0.12); color: var(--minus); }
+.message.show{ display: block; }
+
+/* HISTORY */
+.history-filter{
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.filter-chip{
+  padding: 6px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--ink-mid);
+}
+.filter-chip.active{
+  background: var(--rose-soft);
+  border-color: var(--rose);
+  color: var(--rose-deep);
+  font-weight: 500;
+}
+
+.month-stats{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+.month-stat-label{
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+}
+.month-stat-value{
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.history-list{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.trade-item{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.trade-item:hover{
+  border-color: var(--rose);
+}
+.trade-row1{
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.trade-pair{
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.trade-pl{
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+}
+.trade-pl.plus{ color: var(--plus); }
+.trade-pl.minus{ color: var(--minus); }
+.trade-row2{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.trade-direction{
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  margin-right: 8px;
+}
+.trade-direction.buy{
+  background: rgba(90,142,115,0.12);
+  color: var(--plus);
+}
+.trade-direction.sell{
+  background: rgba(176,107,117,0.12);
+  color: var(--minus);
+}
+.trade-memo{
+  font-size: 11px;
+  color: var(--ink-mid);
+  margin-top: 6px;
+  line-height: 1.5;
+  border-top: 1px dashed var(--line);
+  padding-top: 6px;
+}
+
+.empty-state{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+/* MODAL */
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(58,46,42,0.5);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.show{ display: flex; }
+.modal{
+  background: var(--bg-card);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  width: 100%;
+  max-width: 430px;
+  padding: 24px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-handle{
+  width: 40px; height: 4px;
+  background: var(--line-strong);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.modal-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.modal-row{
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.modal-row:last-of-type{ border-bottom: none; }
+.modal-row-label{ color: var(--ink-mid); }
+.modal-actions{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 16px;
+}
+.btn-secondary{
+  padding: 12px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--ink-mid);
+}
+.btn-danger{
+  padding: 12px;
+  border: 1px solid var(--minus);
+  background: rgba(176,107,117,0.08);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--minus);
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <a class="back-btn" href="dashboard.html" aria-label="戻る">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="title-area">
+      <div class="title">トレード記録</div>
+      <div class="title-en">Trade Record</div>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" data-tab="record" onclick="switchTab('record')">新しい記録</button>
+    <button class="tab" data-tab="history" onclick="switchTab('history')">履歴</button>
+  </div>
+
+  <!-- TAB 1: 記録フォーム -->
+  <div class="tab-content active" id="tab-record">
+    <div class="section">
+      <div class="message" id="message"></div>
+
+      <div class="form-card">
+        <form id="tradeForm">
+          
+          <div class="row">
+            <div class="field">
+              <label class="label">日付<span class="required">*</span></label>
+              <input type="date" id="tradeDate" class="input" required>
+            </div>
+            <div class="field">
+              <label class="label">時刻</label>
+              <input type="time" id="tradeTime" class="input">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">通貨ペア<span class="required">*</span></label>
+            <select id="pair" class="select" required>
+              <option value="">選択してください</option>
+              <option value="USD/JPY">USD/JPY(ドル円)</option>
+              <option value="EUR/JPY">EUR/JPY(ユーロ円)</option>
+              <option value="GBP/JPY">GBP/JPY(ポンド円)</option>
+              <option value="AUD/JPY">AUD/JPY(オージー円)</option>
+              <option value="EUR/USD">EUR/USD(ユーロドル)</option>
+              <option value="GBP/USD">GBP/USD(ポンドドル)</option>
+              <option value="XAU/USD">XAU/USD(ゴールド)</option>
+              <option value="BTC/USD">BTC/USD(ビットコイン)</option>
+              <option value="ETH/USD">ETH/USD(イーサリアム)</option>
+              <option value="その他">その他</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="label">方向<span class="required">*</span></label>
+            <div class="direction-group">
+              <button type="button" class="direction-btn buy" data-direction="buy" onclick="selectDirection('buy')">買い</button>
+              <button type="button" class="direction-btn sell" data-direction="sell" onclick="selectDirection('sell')">売り</button>
+            </div>
+            <input type="hidden" id="direction">
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label class="label">ロット数</label>
+              <input type="number" id="lotSize" class="input" placeholder="0.1" step="0.01" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label class="label">取引時間(分)</label>
+              <input type="number" id="duration" class="input" placeholder="30" inputmode="numeric">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label class="label">エントリー</label>
+              <input type="number" id="entryPrice" class="input" placeholder="156.50" step="0.0001" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label class="label">決済価格</label>
+              <input type="number" id="exitPrice" class="input" placeholder="156.85" step="0.0001" inputmode="decimal">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">損益(円)<span class="required">*</span></label>
+            <input type="number" id="profitLoss" class="input" placeholder="+12500 または -3200" required inputmode="numeric">
+          </div>
+
+          <div class="field">
+            <label class="label">メモ・気づき</label>
+            <textarea id="memo" class="textarea" placeholder="ボリバン+2σで反転狙い、想定通り..."></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">記録する</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: 履歴 -->
+  <div class="tab-content" id="tab-history">
+    <div class="section">
+
+      <div class="month-stats" id="monthStats">
+        <div>
+          <div class="month-stat-label">今月の収支</div>
+          <div class="month-stat-value" id="historyPL">¥0</div>
+        </div>
+        <div>
+          <div class="month-stat-label">取引数</div>
+          <div class="month-stat-value" id="historyCount">0</div>
+        </div>
+        <div>
+          <div class="month-stat-label">勝率</div>
+          <div class="month-stat-value" id="historyWinRate">--</div>
+        </div>
+      </div>
+
+      <div class="history-filter">
+        <button class="filter-chip active" data-filter="all" onclick="filterHistory('all')">すべて</button>
+        <button class="filter-chip" data-filter="USD/JPY" onclick="filterHistory('USD/JPY')">USD/JPY</button>
+        <button class="filter-chip" data-filter="XAU/USD" onclick="filterHistory('XAU/USD')">GOLD</button>
+        <button class="filter-chip" data-filter="BTC/USD" onclick="filterHistory('BTC/USD')">BTC</button>
+        <button class="filter-chip" data-filter="win" onclick="filterHistory('win')">勝ち</button>
+        <button class="filter-chip" data-filter="loss" onclick="filterHistory('loss')">負け</button>
+      </div>
+
+      <div class="history-list" id="historyList">
+        <div class="empty-state">
+          まだトレード記録がありません<br>
+          「新しい記録」タブから登録してください 🌸
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TRADE DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">トレード詳細</div>
+    <div id="modalContent"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">閉じる</button>
+      <button class="btn-danger" id="deleteBtn">削除する</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// 認証チェック
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
+  window.location.href = 'login.html';
+  throw new Error('Not authenticated');
+}
+const user = session.user;
+
+// 今日の日付をデフォルトに
+document.getElementById('tradeDate').value = new Date().toISOString().split('T')[0];
+
+let allTrades = [];
+let currentFilter = 'all';
+
+// タブ切り替え
+window.switchTab = function(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab));
+  if (tab === 'history') loadHistory();
+};
+
+// 方向選択
+window.selectDirection = function(dir) {
+  document.querySelectorAll('.direction-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.direction-btn[data-direction="${dir}"]`).classList.add('active');
+  document.getElementById('direction').value = dir;
+};
+
+// メッセージ表示
+function showMessage(text, type = 'success') {
+  const msg = document.getElementById('message');
+  msg.textContent = text;
+  msg.className = 'message show ' + type;
+  setTimeout(() => msg.classList.remove('show'), 3000);
+}
+
+// 記録送信
+document.getElementById('tradeForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = '記録中...';
+
+  const tradeData = {
+    user_id: user.id,
+    trade_date: document.getElementById('tradeDate').value,
+    trade_time: document.getElementById('tradeTime').value || null,
+    pair: document.getElementById('pair').value,
+    direction: document.getElementById('direction').value || null,
+    lot_size: parseFloat(document.getElementById('lotSize').value) || null,
+    entry_price: parseFloat(document.getElementById('entryPrice').value) || null,
+    exit_price: parseFloat(document.getElementById('exitPrice').value) || null,
+    profit_loss: parseInt(document.getElementById('profitLoss').value),
+    duration_minutes: parseInt(document.getElementById('duration').value) || null,
+    memo: document.getElementById('memo').value || null
+  };
+
+  const { error } = await supabase.from('trades').insert(tradeData);
+
+  if (error) {
+    showMessage('記録に失敗しました', 'error');
+    console.error(error);
+    submitBtn.disabled = false;
+    submitBtn.textContent = '記録する';
+    return;
+  }
+
+  showMessage('記録しました 🌸', 'success');
+  
+  // フォームリセット(日付以外)
+  document.getElementById('pair').value = '';
+  document.getElementById('direction').value = '';
+  document.querySelectorAll('.direction-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('lotSize').value = '';
+  document.getElementById('duration').value = '';
+  document.getElementById('entryPrice').value = '';
+  document.getElementById('exitPrice').value = '';
+  document.getElementById('profitLoss').value = '';
+  document.getElementById('memo').value = '';
+  document.getElementById('tradeTime').value = '';
+
+  submitBtn.disabled = false;
+  submitBtn.textContent = '記録する';
+});
+
+// 履歴読み込み
+async function loadHistory() {
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+
+  const { data, error } = await supabase
+    .from('trades')
+    .select('*')
+    .eq('user_id', user.id)
+    .gte('trade_date', startOfMonth)
+    .order('trade_date', { ascending: false })
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  allTrades = data || [];
+  renderHistory();
+  updateMonthStats();
+}
+
+// 月間統計更新
+function updateMonthStats() {
+  if (allTrades.length === 0) {
+    document.getElementById('historyPL').textContent = '¥0';
+    document.getElementById('historyCount').textContent = '0';
+    document.getElementById('historyWinRate').textContent = '--';
+    return;
+  }
+
+  const totalPL = allTrades.reduce((sum, t) => sum + t.profit_loss, 0);
+  const winTrades = allTrades.filter(t => t.profit_loss > 0).length;
+  const winRate = Math.round((winTrades / allTrades.length) * 100);
+
+  const plEl = document.getElementById('historyPL');
+  plEl.textContent = (totalPL >= 0 ? '+' : '') + '¥' + Math.abs(totalPL).toLocaleString('ja-JP');
+  plEl.style.color = totalPL > 0 ? 'var(--plus)' : totalPL < 0 ? 'var(--minus)' : 'var(--ink)';
+
+  document.getElementById('historyCount').textContent = allTrades.length;
+  document.getElementById('historyWinRate').textContent = winRate + '%';
+}
+
+// フィルタ
+window.filterHistory = function(filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.filter === filter));
+  renderHistory();
+};
+
+// 履歴表示
+function renderHistory() {
+  let filtered = allTrades;
+  if (currentFilter === 'win') {
+    filtered = allTrades.filter(t => t.profit_loss > 0);
+  } else if (currentFilter === 'loss') {
+    filtered = allTrades.filter(t => t.profit_loss < 0);
+  } else if (currentFilter !== 'all') {
+    filtered = allTrades.filter(t => t.pair === currentFilter);
+  }
+
+  const list = document.getElementById('historyList');
+  
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state">該当する記録がありません 🌸</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(t => {
+    const pl = t.profit_loss;
+    const cls = pl >= 0 ? 'plus' : 'minus';
+    const sign = pl >= 0 ? '+' : '';
+    const date = new Date(t.trade_date).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric', weekday: 'short' });
+    const dirLabel = t.direction === 'buy' ? '買い' : t.direction === 'sell' ? '売り' : '';
+    const dirCls = t.direction || '';
+    
+    return `
+      <div class="trade-item" onclick='showTradeDetail(${JSON.stringify(t).replace(/'/g, "&apos;")})'>
+        <div class="trade-row1">
+          <div class="trade-pair">${t.pair}</div>
+          <div class="trade-pl ${cls}">${sign}¥${Math.abs(pl).toLocaleString('ja-JP')}</div>
+        </div>
+        <div class="trade-row2">
+          <div>
+            ${dirLabel ? `<span class="trade-direction ${dirCls}">${dirLabel}</span>` : ''}
+            ${date}
+            ${t.lot_size ? ` · ${t.lot_size}lot` : ''}
+          </div>
+          ${t.duration_minutes ? `<div>${t.duration_minutes}分</div>` : ''}
+        </div>
+        ${t.memo ? `<div class="trade-memo">${escapeHtml(t.memo)}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// 詳細表示
+window.showTradeDetail = function(trade) {
+  const modal = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  
+  const pl = trade.profit_loss;
+  const sign = pl >= 0 ? '+' : '';
+  const cls = pl >= 0 ? 'var(--plus)' : 'var(--minus)';
+
+  content.innerHTML = `
+    <div class="modal-row">
+      <span class="modal-row-label">通貨ペア</span>
+      <strong>${trade.pair}</strong>
+    </div>
+    <div class="modal-row">
+      <span class="modal-row-label">損益</span>
+      <strong style="color:${cls}">${sign}¥${Math.abs(pl).toLocaleString('ja-JP')}</strong>
+    </div>
+    <div class="modal-row">
+      <span class="modal-row-label">日付</span>
+      <span>${new Date(trade.trade_date).toLocaleDateString('ja-JP')} ${trade.trade_time || ''}</span>
+    </div>
+    ${trade.direction ? `<div class="modal-row"><span class="modal-row-label">方向</span><span>${trade.direction === 'buy' ? '買い' : '売り'}</span></div>` : ''}
+    ${trade.lot_size ? `<div class="modal-row"><span class="modal-row-label">ロット</span><span>${trade.lot_size}</span></div>` : ''}
+    ${trade.entry_price ? `<div class="modal-row"><span class="modal-row-label">エントリー</span><span>${trade.entry_price}</span></div>` : ''}
+    ${trade.exit_price ? `<div class="modal-row"><span class="modal-row-label">決済</span><span>${trade.exit_price}</span></div>` : ''}
+    ${trade.duration_minutes ? `<div class="modal-row"><span class="modal-row-label">取引時間</span><span>${trade.duration_minutes}分</span></div>` : ''}
+    ${trade.memo ? `<div style="margin-top: 16px; padding: 12px; background: var(--bg-soft); border-radius: 8px; font-size: 12px; line-height: 1.7;">${escapeHtml(trade.memo)}</div>` : ''}
+  `;
+
+  document.getElementById('deleteBtn').onclick = () => deleteTrade(trade.id);
+  modal.classList.add('show');
+};
+
+window.closeModal = function(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('modalOverlay').classList.remove('show');
+};
+
+async function deleteTrade(id) {
+  if (!confirm('この記録を削除しますか?')) return;
+  
+  const { error } = await supabase.from('trades').delete().eq('id', id);
+  if (error) {
+    alert('削除に失敗しました');
+    return;
+  }
+  
+  document.getElementById('modalOverlay').classList.remove('show');
+  loadHistory();
+}
+</script>
+
+</body>
+</html>
