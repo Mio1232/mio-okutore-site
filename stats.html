@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>月次レポート — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="theme-color" content="#F7F2EA">
+<style>
+:root{
+  --bg: #F7F2EA;
+  --bg-soft: #EFE7DA;
+  --bg-card: #FFFEFB;
+  --ink: #3A2E2A;
+  --ink-mid: #6B5D57;
+  --ink-soft: #998B83;
+  --rose: #C98B95;
+  --rose-soft: #E8D0D2;
+  --rose-deep: #B06B75;
+  --sage: #9BB59C;
+  --sage-soft: #C9DACA;
+  --honey: #D4B677;
+  --honey-soft: #F0E1B8;
+  --mauve: #A89BB0;
+  --mauve-soft: #DCD2E0;
+  --line: rgba(58,46,42,0.08);
+  --line-strong: rgba(58,46,42,0.14);
+  --plus: #5A8E73;
+  --minus: #B06B75;
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+html, body{ width: 100%; min-height: 100vh; }
+body{
+  font-family: 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.app{
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  padding-bottom: 40px;
+}
+
+/* HEADER */
+.page-header{
+  position: sticky;
+  top: 0;
+  background: rgba(247,242,234,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  z-index: 10;
+}
+.back-btn{
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--ink-mid); text-decoration: none;
+}
+.back-btn svg{ width: 16px; height: 16px; }
+.title-area{ flex: 1; }
+.title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px; font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.title-en{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--rose-deep);
+}
+
+/* MONTH SELECTOR */
+.month-selector{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--line);
+}
+.month-btn{
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--ink-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.month-btn:hover{ background: var(--bg-soft); }
+.month-btn:disabled{ opacity: 0.3; cursor: not-allowed; }
+.month-display{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* SECTION */
+.section{
+  padding: 24px;
+}
+.section:not(:first-child){ padding-top: 0; }
+.section-title{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 12px;
+}
+
+/* HERO STATS */
+.hero-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.hero-label{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.hero-amount{
+  font-family: 'Inter', sans-serif;
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.hero-amount.plus{ color: var(--plus); }
+.hero-amount.minus{ color: var(--minus); }
+.hero-amount.zero{ color: var(--ink-soft); }
+.hero-trend{
+  font-size: 12px;
+  color: var(--ink-mid);
+  margin-top: 8px;
+}
+
+/* STAT GRID */
+.stat-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.stat-box{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+.stat-box-label{
+  font-size: 10px;
+  color: var(--ink-soft);
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+.stat-box-value{
+  font-family: 'Inter', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.stat-box-sub{
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+/* CHART CARD */
+.chart-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.chart-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.chart-title{
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.chart-wrap{
+  position: relative;
+  height: 180px;
+  width: 100%;
+}
+
+/* DAILY BAR */
+.daily-bar-wrap{
+  position: relative;
+  height: 160px;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  padding: 0 4px;
+}
+.daily-bar{
+  flex: 1;
+  border-radius: 2px;
+  min-height: 2px;
+  position: relative;
+  background: var(--rose-soft);
+}
+.daily-bar.plus{ background: var(--plus); }
+.daily-bar.minus{ background: var(--minus); }
+.daily-bar.zero{ background: var(--bg-soft); }
+
+/* PAIRS LIST */
+.pairs-list{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pair-row{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pair-info{
+  flex: 1;
+}
+.pair-name{
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.pair-stats{
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.pair-pl{
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+}
+.pair-pl.plus{ color: var(--plus); }
+.pair-pl.minus{ color: var(--minus); }
+
+/* TIME HEATMAP */
+.heatmap-wrap{
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 8px;
+  font-size: 10px;
+}
+.heatmap-label{
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+}
+.heatmap-cells{
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 3px;
+}
+.heatmap-cell{
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: var(--bg-soft);
+  position: relative;
+}
+.heatmap-cell.lv1{ background: rgba(90,142,115,0.2); }
+.heatmap-cell.lv2{ background: rgba(90,142,115,0.4); }
+.heatmap-cell.lv3{ background: rgba(90,142,115,0.7); }
+.heatmap-cell.lv4{ background: var(--plus); }
+.heatmap-cell.minus-lv1{ background: rgba(176,107,117,0.2); }
+.heatmap-cell.minus-lv2{ background: rgba(176,107,117,0.4); }
+.heatmap-cell.minus-lv3{ background: rgba(176,107,117,0.7); }
+.heatmap-cell.minus-lv4{ background: var(--minus); }
+.heatmap-legend{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 10px;
+  color: var(--ink-soft);
+}
+.heatmap-legend-scale{
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+.heatmap-legend-cell{
+  width: 12px; height: 12px;
+  border-radius: 2px;
+}
+
+/* EMPTY */
+.empty-state{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.empty-icon{ font-size: 32px; margin-bottom: 12px; }
+.empty-text{ font-size: 13px; line-height: 1.8; margin-bottom: 16px; }
+.empty-btn{
+  display: inline-block;
+  padding: 10px 20px;
+  background: var(--rose);
+  color: #FFF;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* INSIGHT */
+.insight-card{
+  background: linear-gradient(135deg, var(--rose-soft) 0%, var(--bg-card) 100%);
+  border: 1px solid var(--rose);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.insight-header{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.insight-icon{
+  width: 32px; height: 32px;
+  background: var(--rose);
+  color: #FFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.insight-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rose-deep);
+}
+.insight-body{
+  font-size: 12px;
+  color: var(--ink-mid);
+  line-height: 1.8;
+}
+.insight-list{
+  margin-top: 8px;
+  padding-left: 16px;
+}
+.insight-list li{
+  margin-bottom: 4px;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <a class="back-btn" href="dashboard.html" aria-label="戻る">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="title-area">
+      <div class="title">月次レポート</div>
+      <div class="title-en">Monthly Report</div>
+    </div>
+  </header>
+
+  <!-- MONTH SELECTOR -->
+  <div class="month-selector">
+    <button class="month-btn" id="prevMonth" onclick="changeMonth(-1)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="month-display" id="monthDisplay">2026年5月</div>
+    <button class="month-btn" id="nextMonth" onclick="changeMonth(1)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <div id="content"></div>
+
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
+  window.location.href = 'login.html';
+  throw new Error('Not authenticated');
+}
+const user = session.user;
+
+let currentDate = new Date();
+let currentTrades = [];
+
+window.changeMonth = async function(delta) {
+  currentDate.setMonth(currentDate.getMonth() + delta);
+  await loadMonth();
+};
+
+async function loadMonth() {
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const startOfMonth = new Date(year, month, 1).toISOString().split('T')[0];
+  const endOfMonth = new Date(year, month + 1, 0).toISOString().split('T')[0];
+
+  document.getElementById('monthDisplay').textContent = `${year}年${month + 1}月`;
+
+  // 来月以降は非活性化
+  const now = new Date();
+  const nextBtn = document.getElementById('nextMonth');
+  nextBtn.disabled = (year === now.getFullYear() && month >= now.getMonth());
+
+  const { data, error } = await supabase
+    .from('trades')
+    .select('*')
+    .eq('user_id', user.id)
+    .gte('trade_date', startOfMonth)
+    .lte('trade_date', endOfMonth)
+    .order('trade_date', { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  currentTrades = data || [];
+  renderReport();
+}
+
+function renderReport() {
+  const content = document.getElementById('content');
+
+  if (currentTrades.length === 0) {
+    content.innerHTML = `
+      <div class="section">
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <div class="empty-text">
+            この月にはまだトレード記録がありません<br>
+            記録をつけ始めると、ここに統計が表示されます 🌸
+          </div>
+          <a href="record.html" class="empty-btn">トレードを記録する</a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // 集計
+  const totalPL = currentTrades.reduce((sum, t) => sum + t.profit_loss, 0);
+  const winTrades = currentTrades.filter(t => t.profit_loss > 0);
+  const lossTrades = currentTrades.filter(t => t.profit_loss < 0);
+  const winRate = currentTrades.length > 0 ? Math.round((winTrades.length / currentTrades.length) * 100) : 0;
+  const avgWin = winTrades.length > 0 ? Math.round(winTrades.reduce((s, t) => s + t.profit_loss, 0) / winTrades.length) : 0;
+  const avgLoss = lossTrades.length > 0 ? Math.round(lossTrades.reduce((s, t) => s + t.profit_loss, 0) / lossTrades.length) : 0;
+  const profitFactor = lossTrades.length > 0 && avgLoss !== 0
+    ? Math.abs((winTrades.reduce((s, t) => s + t.profit_loss, 0)) / (lossTrades.reduce((s, t) => s + t.profit_loss, 0)))
+    : winTrades.length > 0 ? Infinity : 0;
+  const maxProfit = Math.max(...currentTrades.map(t => t.profit_loss));
+  const maxLoss = Math.min(...currentTrades.map(t => t.profit_loss));
+
+  // 累積で最大ドローダウン計算
+  let cumulative = 0;
+  let peak = 0;
+  let maxDD = 0;
+  currentTrades.forEach(t => {
+    cumulative += t.profit_loss;
+    if (cumulative > peak) peak = cumulative;
+    const dd = peak - cumulative;
+    if (dd > maxDD) maxDD = dd;
+  });
+
+  // 通貨ペア別集計
+  const pairStats = {};
+  currentTrades.forEach(t => {
+    if (!pairStats[t.pair]) {
+      pairStats[t.pair] = { count: 0, total: 0, wins: 0 };
+    }
+    pairStats[t.pair].count++;
+    pairStats[t.pair].total += t.profit_loss;
+    if (t.profit_loss > 0) pairStats[t.pair].wins++;
+  });
+  const pairArray = Object.entries(pairStats).map(([pair, stats]) => ({
+    pair,
+    ...stats,
+    winRate: Math.round((stats.wins / stats.count) * 100)
+  })).sort((a, b) => b.total - a.total);
+
+  // 日別集計
+  const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+  const dailyPL = new Array(daysInMonth).fill(0);
+  currentTrades.forEach(t => {
+    const day = new Date(t.trade_date).getDate();
+    dailyPL[day - 1] += t.profit_loss;
+  });
+  const maxDailyAbs = Math.max(...dailyPL.map(v => Math.abs(v)), 1);
+
+  // 時間帯別集計
+  const timeStats = new Array(24).fill(null).map(() => ({ count: 0, total: 0 }));
+  currentTrades.forEach(t => {
+    if (t.trade_time) {
+      const hour = parseInt(t.trade_time.split(':')[0]);
+      timeStats[hour].count++;
+      timeStats[hour].total += t.profit_loss;
+    }
+  });
+  const maxTimeAbs = Math.max(...timeStats.map(t => Math.abs(t.total)), 1);
+
+  // インサイト生成
+  const insights = generateInsights({
+    winRate, totalPL, profitFactor, pairArray, maxDD, currentTrades, timeStats, avgWin, avgLoss
+  });
+
+  // 描画
+  content.innerHTML = `
+    <div class="section">
+      <div class="hero-card">
+        <div class="hero-label">TOTAL P/L</div>
+        <div class="hero-amount ${totalPL > 0 ? 'plus' : totalPL < 0 ? 'minus' : 'zero'}">
+          ${totalPL >= 0 ? '+' : ''}¥${Math.abs(totalPL).toLocaleString('ja-JP')}
+        </div>
+        <div class="hero-trend">${currentTrades.length}回のトレード</div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-box-label">勝率</div>
+          <div class="stat-box-value">${winRate}<span style="font-size:14px">%</span></div>
+          <div class="stat-box-sub">${winTrades.length}勝 ${lossTrades.length}敗</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">プロフィットファクター</div>
+          <div class="stat-box-value">${profitFactor === Infinity ? '∞' : profitFactor.toFixed(2)}</div>
+          <div class="stat-box-sub">利益÷損失</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">平均利益</div>
+          <div class="stat-box-value" style="color: var(--plus); font-size:18px">+¥${avgWin.toLocaleString('ja-JP')}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">平均損失</div>
+          <div class="stat-box-value" style="color: var(--minus); font-size:18px">¥${avgLoss.toLocaleString('ja-JP')}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">最大利益</div>
+          <div class="stat-box-value" style="color: var(--plus); font-size:18px">+¥${maxProfit.toLocaleString('ja-JP')}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">最大ドローダウン</div>
+          <div class="stat-box-value" style="color: var(--minus); font-size:18px">¥${maxDD.toLocaleString('ja-JP')}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Daily P/L</div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-title">日別損益</span>
+        </div>
+        <div class="daily-bar-wrap">
+          ${dailyPL.map((pl, i) => {
+            if (pl === 0) return `<div class="daily-bar zero" title="${i+1}日"></div>`;
+            const height = (Math.abs(pl) / maxDailyAbs) * 100;
+            const cls = pl > 0 ? 'plus' : 'minus';
+            return `<div class="daily-bar ${cls}" style="height: ${height}%" title="${i+1}日: ${pl >= 0 ? '+' : ''}¥${pl.toLocaleString('ja-JP')}"></div>`;
+          }).join('')}
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--ink-soft); margin-top:6px;">
+          <span>1日</span>
+          <span>${Math.floor(daysInMonth/2)}日</span>
+          <span>${daysInMonth}日</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">By Currency Pair</div>
+      <div class="pairs-list">
+        ${pairArray.map(p => `
+          <div class="pair-row">
+            <div class="pair-info">
+              <div class="pair-name">${p.pair}</div>
+              <div class="pair-stats">${p.count}回 · 勝率 ${p.winRate}%</div>
+            </div>
+            <div class="pair-pl ${p.total >= 0 ? 'plus' : 'minus'}">
+              ${p.total >= 0 ? '+' : ''}¥${Math.abs(p.total).toLocaleString('ja-JP')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">By Time of Day</div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-title">時間帯別の取引</span>
+        </div>
+        ${renderTimeHeatmap(timeStats, maxTimeAbs)}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Insights</div>
+      <div class="insight-card">
+        <div class="insight-header">
+          <div class="insight-icon">✨</div>
+          <div class="insight-title">今月の振り返り</div>
+        </div>
+        <div class="insight-body">
+          ${insights}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTimeHeatmap(timeStats, maxAbs) {
+  // 3時間ごとに集計(0-2, 3-5, 6-8, 9-11, 12-14, 15-17, 18-20, 21-23)
+  const groups = [
+    { label: '0-3時', range: [0,1,2] },
+    { label: '3-6時', range: [3,4,5] },
+    { label: '6-9時', range: [6,7,8] },
+    { label: '9-12時', range: [9,10,11] },
+    { label: '12-15時', range: [12,13,14] },
+    { label: '15-18時', range: [15,16,17] },
+    { label: '18-21時', range: [18,19,20] },
+    { label: '21-24時', range: [21,22,23] }
+  ];
+
+  const grouped = groups.map(g => {
+    let total = 0;
+    let count = 0;
+    g.range.forEach(h => {
+      total += timeStats[h].total;
+      count += timeStats[h].count;
+    });
+    return { label: g.label, total, count };
+  });
+
+  const maxGroupAbs = Math.max(...grouped.map(g => Math.abs(g.total)), 1);
+
+  let html = '<div style="display:flex; gap:3px; margin-bottom:12px;">';
+  grouped.forEach(g => {
+    let cls = '';
+    if (g.count === 0) {
+      cls = '';
+    } else if (g.total > 0) {
+      const ratio = Math.abs(g.total) / maxGroupAbs;
+      if (ratio > 0.75) cls = 'lv4';
+      else if (ratio > 0.5) cls = 'lv3';
+      else if (ratio > 0.25) cls = 'lv2';
+      else cls = 'lv1';
+    } else if (g.total < 0) {
+      const ratio = Math.abs(g.total) / maxGroupAbs;
+      if (ratio > 0.75) cls = 'minus-lv4';
+      else if (ratio > 0.5) cls = 'minus-lv3';
+      else if (ratio > 0.25) cls = 'minus-lv2';
+      else cls = 'minus-lv1';
+    }
+    html += `<div class="heatmap-cell ${cls}" style="flex:1" title="${g.label}: ${g.total >= 0 ? '+' : ''}¥${g.total.toLocaleString('ja-JP')} (${g.count}回)"></div>`;
+  });
+  html += '</div>';
+
+  html += '<div style="display:flex; justify-content:space-between; font-size:9px; color:var(--ink-soft);">';
+  grouped.forEach(g => {
+    html += `<div style="flex:1; text-align:center;">${g.label.split('-')[0]}</div>`;
+  });
+  html += '</div>';
+
+  html += `
+    <div class="heatmap-legend">
+      <span>少ない</span>
+      <div class="heatmap-legend-scale">
+        <div class="heatmap-legend-cell" style="background: var(--minus)"></div>
+        <div class="heatmap-legend-cell" style="background: rgba(176,107,117,0.4)"></div>
+        <div class="heatmap-legend-cell" style="background: var(--bg-soft)"></div>
+        <div class="heatmap-legend-cell" style="background: rgba(90,142,115,0.4)"></div>
+        <div class="heatmap-legend-cell" style="background: var(--plus)"></div>
+      </div>
+      <span>多い</span>
+    </div>
+  `;
+
+  return html;
+}
+
+function generateInsights({ winRate, totalPL, profitFactor, pairArray, maxDD, currentTrades, timeStats, avgWin, avgLoss }) {
+  const insights = [];
+
+  // 全体評価
+  if (totalPL > 0) {
+    if (winRate >= 70) {
+      insights.push('🌸 今月は素晴らしい結果でしたね。勝率が高く、安定した成績です。');
+    } else if (profitFactor >= 2) {
+      insights.push('🌸 勝率は高くなくても、利益管理がお上手ですね。');
+    } else {
+      insights.push('🌸 月間プラスで終えられて素晴らしいです。');
+    }
+  } else if (totalPL < 0) {
+    insights.push('🌸 今月は難しい局面でしたね。学びノートで振り返ってみるのもいいかもしれません。');
+  } else {
+    insights.push('🌸 まずは記録をつけ続けることが大切です。');
+  }
+
+  // 得意通貨
+  if (pairArray.length > 0) {
+    const best = pairArray[0];
+    if (best.total > 0) {
+      insights.push(`<strong>${best.pair}</strong> が今月の得意なペアでしたね(+¥${best.total.toLocaleString('ja-JP')})。`);
+    }
+    
+    const worst = pairArray[pairArray.length - 1];
+    if (worst.total < 0 && pairArray.length > 1) {
+      insights.push(`<strong>${worst.pair}</strong> はやや苦戦されたようです。少しお休みするのも選択肢です。`);
+    }
+  }
+
+  // 時間帯
+  let bestHourGroup = { range: '', total: -Infinity };
+  const hourGroups = [
+    { range: '東京時間(9-15時)', hours: [9,10,11,12,13,14] },
+    { range: 'ロンドン時間(16-21時)', hours: [16,17,18,19,20] },
+    { range: 'NY時間(22-2時)', hours: [22,23,0,1,2] }
+  ];
+  hourGroups.forEach(g => {
+    const total = g.hours.reduce((sum, h) => sum + timeStats[h].total, 0);
+    if (total > bestHourGroup.total) bestHourGroup = { range: g.range, total };
+  });
+  if (bestHourGroup.total > 0) {
+    insights.push(`<strong>${bestHourGroup.range}</strong> での取引がうまくいっています。`);
+  }
+
+  // リスクリワード
+  if (avgWin > 0 && avgLoss < 0) {
+    const rr = Math.abs(avgWin / avgLoss);
+    if (rr >= 2) {
+      insights.push(`リスクリワードが <strong>1:${rr.toFixed(1)}</strong> と理想的です ✨`);
+    } else if (rr < 1) {
+      insights.push(`リスクリワード比が <strong>1:${rr.toFixed(1)}</strong> と低めです。利確を遅め、損切りを早めの意識を。`);
+    }
+  }
+
+  return '<ul class="insight-list">' + insights.map(i => `<li>${i}</li>`).join('') + '</ul>';
+}
+
+await loadMonth();
+</script>
+
+</body>
+</html>
