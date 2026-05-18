@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>学びノート — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="theme-color" content="#F7F2EA">
+<style>
+:root{
+  --bg: #F7F2EA;
+  --bg-soft: #EFE7DA;
+  --bg-card: #FFFEFB;
+  --ink: #3A2E2A;
+  --ink-mid: #6B5D57;
+  --ink-soft: #998B83;
+  --rose: #C98B95;
+  --rose-soft: #E8D0D2;
+  --rose-deep: #B06B75;
+  --sage: #9BB59C;
+  --sage-soft: #C9DACA;
+  --honey: #D4B677;
+  --honey-soft: #F0E1B8;
+  --mauve: #A89BB0;
+  --mauve-soft: #DCD2E0;
+  --line: rgba(58,46,42,0.08);
+  --line-strong: rgba(58,46,42,0.14);
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+html, body{ width: 100%; min-height: 100vh; }
+body{
+  font-family: 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.app{
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  position: relative;
+  padding-bottom: 80px;
+}
+
+/* HEADER */
+.page-header{
+  position: sticky;
+  top: 0;
+  background: rgba(247,242,234,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  z-index: 10;
+}
+.back-btn, .icon-btn{
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  color: var(--ink-mid); text-decoration: none;
+  border: none;
+}
+.back-btn svg, .icon-btn svg{ width: 16px; height: 16px; }
+.icon-btn:hover{ background: var(--rose-soft); color: var(--rose-deep); }
+.title-area{ flex: 1; }
+.title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px; font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.title-en{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--rose-deep);
+}
+
+/* CONTENT */
+.section{ padding: 24px; }
+
+/* SEARCH */
+.search-box{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.search-icon{
+  color: var(--ink-soft);
+  flex-shrink: 0;
+}
+.search-input{
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: transparent;
+}
+
+/* CATEGORIES */
+.categories{
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.categories::-webkit-scrollbar{ display: none; }
+.category-chip{
+  padding: 8px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--ink-mid);
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.category-chip:hover{ border-color: var(--rose); }
+.category-chip.active{
+  background: var(--rose-soft);
+  border-color: var(--rose);
+  color: var(--rose-deep);
+  font-weight: 500;
+}
+.category-chip .count{
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--ink-soft);
+}
+.category-chip.active .count{
+  color: var(--rose-deep);
+}
+
+/* NOTE LIST */
+.notes-list{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.note-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.note-card::before{
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--rose);
+}
+.note-card.cat-chart::before{ background: var(--sage); }
+.note-card.cat-mistake::before{ background: var(--rose); }
+.note-card.cat-streaming::before{ background: var(--mauve); }
+.note-card.cat-idea::before{ background: var(--honey); }
+.note-card.cat-other::before{ background: var(--ink-soft); }
+.note-card:hover{
+  border-color: var(--rose);
+  transform: translateY(-1px);
+}
+
+.note-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+.note-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  flex: 1;
+}
+.note-fav{
+  color: var(--honey);
+  flex-shrink: 0;
+  font-size: 14px;
+}
+.note-preview{
+  font-size: 12px;
+  color: var(--ink-mid);
+  line-height: 1.7;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.note-meta{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+.note-category{
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+}
+.cat-chart .note-category{ background: var(--sage-soft); color: #2D5F4F; }
+.cat-mistake .note-category{ background: var(--rose-soft); color: var(--rose-deep); }
+.cat-streaming .note-category{ background: var(--mauve-soft); color: #5A4E62; }
+.cat-idea .note-category{ background: var(--honey-soft); color: #7A5C1A; }
+.cat-other .note-category{ background: var(--bg-soft); color: var(--ink-mid); }
+.note-date{
+  font-family: 'Inter', sans-serif;
+}
+.note-tags{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+.note-tag{
+  font-size: 10px;
+  padding: 1px 8px;
+  background: var(--bg-soft);
+  border-radius: 4px;
+  color: var(--ink-mid);
+}
+
+/* EMPTY */
+.empty-state{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.empty-icon{
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+.empty-text{
+  font-size: 13px;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+.empty-btn{
+  display: inline-block;
+  padding: 10px 20px;
+  background: var(--rose);
+  color: #FFF;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+
+/* FAB */
+.fab{
+  position: fixed;
+  bottom: 24px;
+  right: 50%;
+  transform: translateX(215px);
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--rose);
+  border: none;
+  color: #FFF;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(176,107,117,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  transition: all 0.2s;
+}
+.fab:hover{
+  background: var(--rose-deep);
+  transform: translateX(215px) scale(1.05);
+}
+@media (max-width: 480px){
+  .fab{
+    transform: none;
+    right: 24px;
+  }
+  .fab:hover{ transform: scale(1.05); }
+}
+
+/* MODAL */
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(58,46,42,0.5);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.show{ display: flex; }
+.modal{
+  background: var(--bg-card);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  width: 100%;
+  max-width: 430px;
+  padding: 24px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-handle{
+  width: 40px; height: 4px;
+  background: var(--line-strong);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.modal-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.modal-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px;
+  font-weight: 600;
+}
+.modal-close{
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px; height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* FORM */
+.field{ margin-bottom: 14px; }
+.label{
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-mid);
+  margin-bottom: 6px;
+  letter-spacing: 0.06em;
+}
+.label .required{
+  color: var(--rose-deep);
+  margin-left: 2px;
+}
+.input, .select, .textarea{
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  transition: border-color 0.2s;
+}
+.input:focus, .select:focus, .textarea:focus{
+  outline: none;
+  border-color: var(--rose);
+  background: var(--bg-card);
+}
+.textarea{
+  min-height: 200px;
+  resize: vertical;
+  line-height: 1.7;
+}
+.tag-input-wrap{
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 8px;
+  background: var(--bg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 44px;
+}
+.tag-item{
+  background: var(--rose-soft);
+  color: var(--rose-deep);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.tag-remove{
+  cursor: pointer;
+  font-weight: 600;
+  opacity: 0.6;
+}
+.tag-input{
+  flex: 1;
+  min-width: 80px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 4px;
+}
+.checkbox-row{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+.checkbox-row input{
+  width: 18px; height: 18px;
+  cursor: pointer;
+}
+.checkbox-row label{
+  font-size: 13px;
+  color: var(--ink-mid);
+  cursor: pointer;
+}
+
+/* MODAL ACTIONS */
+.modal-actions{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 16px;
+}
+.btn-primary{
+  padding: 14px;
+  border: none;
+  background: var(--rose);
+  color: #FFF;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+.btn-primary:hover{ background: var(--rose-deep); }
+.btn-primary:disabled{ opacity: 0.5; cursor: not-allowed; }
+.btn-secondary{
+  padding: 14px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--ink-mid);
+}
+.btn-danger{
+  padding: 14px;
+  border: 1px solid var(--rose);
+  background: transparent;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--rose-deep);
+}
+
+/* VIEW MODE */
+.view-content{
+  font-size: 14px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  padding: 16px;
+  background: var(--bg-soft);
+  border-radius: 10px;
+  margin: 16px 0;
+}
+.view-meta{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--ink-soft);
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  margin-top: 16px;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <a class="back-btn" href="dashboard.html" aria-label="戻る">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="title-area">
+      <div class="title">学びノート</div>
+      <div class="title-en">My Notes</div>
+    </div>
+  </header>
+
+  <div class="section">
+
+    <!-- SEARCH -->
+    <div class="search-box">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="ノートを検索..." oninput="searchNotes()">
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="categories" id="categories">
+      <button class="category-chip active" data-cat="all" onclick="filterCategory('all')">
+        すべて <span class="count" id="countAll">0</span>
+      </button>
+      <button class="category-chip" data-cat="chart" onclick="filterCategory('chart')">
+        📈 チャートパターン <span class="count" id="countChart">0</span>
+      </button>
+      <button class="category-chip" data-cat="mistake" onclick="filterCategory('mistake')">
+        💭 失敗から学んだこと <span class="count" id="countMistake">0</span>
+      </button>
+      <button class="category-chip" data-cat="streaming" onclick="filterCategory('streaming')">
+        🎙 配信メモ <span class="count" id="countStreaming">0</span>
+      </button>
+      <button class="category-chip" data-cat="idea" onclick="filterCategory('idea')">
+        💡 アイデア・気づき <span class="count" id="countIdea">0</span>
+      </button>
+      <button class="category-chip" data-cat="other" onclick="filterCategory('other')">
+        📝 その他 <span class="count" id="countOther">0</span>
+      </button>
+      <button class="category-chip" data-cat="favorite" onclick="filterCategory('favorite')">
+        ⭐ お気に入り <span class="count" id="countFav">0</span>
+      </button>
+    </div>
+
+    <!-- NOTES LIST -->
+    <div class="notes-list" id="notesList">
+      <div class="empty-state">
+        <div class="empty-icon">📚</div>
+        <div class="empty-text">
+          まだノートがありません<br>
+          学びや気づきを記録しておくと<br>
+          自分だけのトレード辞典が作れます 🌸
+        </div>
+        <button class="empty-btn" onclick="openCreateModal()">最初のノートを書く</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openCreateModal()" aria-label="新規ノート">+</button>
+
+<!-- CREATE/EDIT MODAL -->
+<div class="modal-overlay" id="editModal" onclick="closeModal(event, 'editModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="editModalTitle">新しいノート</div>
+      <button class="modal-close" onclick="closeModal(null, 'editModal')">×</button>
+    </div>
+
+    <form id="noteForm">
+      <div class="field">
+        <label class="label">タイトル<span class="required">*</span></label>
+        <input type="text" id="noteTitle" class="input" placeholder="例:ダブルトップで損切り遅れた件" required>
+      </div>
+
+      <div class="field">
+        <label class="label">カテゴリ</label>
+        <select id="noteCategory" class="select">
+          <option value="chart">📈 チャートパターン</option>
+          <option value="mistake">💭 失敗から学んだこと</option>
+          <option value="streaming">🎙 配信メモ</option>
+          <option value="idea">💡 アイデア・気づき</option>
+          <option value="other">📝 その他</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="label">本文<span class="required">*</span></label>
+        <textarea id="noteContent" class="textarea" placeholder="学んだこと、気づき、振り返りを記録してください..." required></textarea>
+      </div>
+
+      <div class="field">
+        <label class="label">タグ(Enterで追加)</label>
+        <div class="tag-input-wrap" id="tagWrap">
+          <input type="text" class="tag-input" id="tagInput" placeholder="例:損切り、ドル円" onkeydown="handleTagInput(event)">
+        </div>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="isFavorite">
+        <label for="isFavorite">⭐ お気に入りに追加</label>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeModal(null, 'editModal')">キャンセル</button>
+        <button type="submit" class="btn-primary" id="saveBtn">保存する</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- VIEW MODAL -->
+<div class="modal-overlay" id="viewModal" onclick="closeModal(event, 'viewModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="viewTitle"></div>
+      <button class="modal-close" onclick="closeModal(null, 'viewModal')">×</button>
+    </div>
+    <div id="viewBody"></div>
+    <div class="view-meta" id="viewMeta"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="editCurrentNote()">編集</button>
+      <button class="btn-danger" onclick="deleteCurrentNote()">削除</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
+  window.location.href = 'login.html';
+  throw new Error('Not authenticated');
+}
+const user = session.user;
+
+const categoryLabels = {
+  chart: '📈 チャートパターン',
+  mistake: '💭 失敗から学んだこと',
+  streaming: '🎙 配信メモ',
+  idea: '💡 アイデア・気づき',
+  other: '📝 その他'
+};
+
+let allNotes = [];
+let currentFilter = 'all';
+let currentSearch = '';
+let currentTags = [];
+let editingNoteId = null;
+let currentViewedNote = null;
+
+await loadNotes();
+
+async function loadNotes() {
+  const { data, error } = await supabase
+    .from('notes')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  allNotes = data || [];
+  updateCounts();
+  renderNotes();
+}
+
+function updateCounts() {
+  document.getElementById('countAll').textContent = allNotes.length;
+  document.getElementById('countChart').textContent = allNotes.filter(n => n.category === 'chart').length;
+  document.getElementById('countMistake').textContent = allNotes.filter(n => n.category === 'mistake').length;
+  document.getElementById('countStreaming').textContent = allNotes.filter(n => n.category === 'streaming').length;
+  document.getElementById('countIdea').textContent = allNotes.filter(n => n.category === 'idea').length;
+  document.getElementById('countOther').textContent = allNotes.filter(n => n.category === 'other').length;
+  document.getElementById('countFav').textContent = allNotes.filter(n => n.is_favorite).length;
+}
+
+window.filterCategory = function(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('.category-chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
+  renderNotes();
+};
+
+window.searchNotes = function() {
+  currentSearch = document.getElementById('searchInput').value.toLowerCase();
+  renderNotes();
+};
+
+function renderNotes() {
+  let filtered = allNotes;
+
+  if (currentFilter === 'favorite') {
+    filtered = filtered.filter(n => n.is_favorite);
+  } else if (currentFilter !== 'all') {
+    filtered = filtered.filter(n => n.category === currentFilter);
+  }
+
+  if (currentSearch) {
+    filtered = filtered.filter(n => 
+      n.title.toLowerCase().includes(currentSearch) ||
+      (n.content && n.content.toLowerCase().includes(currentSearch)) ||
+      (n.tags && n.tags.some(t => t.toLowerCase().includes(currentSearch)))
+    );
+  }
+
+  const list = document.getElementById('notesList');
+
+  if (filtered.length === 0) {
+    if (allNotes.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📚</div>
+          <div class="empty-text">
+            まだノートがありません<br>
+            学びや気づきを記録しておくと<br>
+            自分だけのトレード辞典が作れます 🌸
+          </div>
+          <button class="empty-btn" onclick="openCreateModal()">最初のノートを書く</button>
+        </div>`;
+    } else {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <div class="empty-text">該当するノートが見つかりません</div>
+        </div>`;
+    }
+    return;
+  }
+
+  list.innerHTML = filtered.map(n => {
+    const cat = n.category || 'other';
+    const date = new Date(n.created_at).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+    const tags = (n.tags || []).map(t => `<span class="note-tag">#${escapeHtml(t)}</span>`).join('');
+
+    return `
+      <div class="note-card cat-${cat}" onclick='viewNote(${JSON.stringify(n).replace(/'/g, "&apos;")})'>
+        <div class="note-header">
+          <div class="note-title">${escapeHtml(n.title)}</div>
+          ${n.is_favorite ? '<div class="note-fav">⭐</div>' : ''}
+        </div>
+        ${n.content ? `<div class="note-preview">${escapeHtml(n.content)}</div>` : ''}
+        <div class="note-meta">
+          <span class="note-category">${categoryLabels[cat] || '📝 その他'}</span>
+          <span class="note-date">${date}</span>
+        </div>
+        ${tags ? `<div class="note-tags">${tags}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+window.openCreateModal = function() {
+  editingNoteId = null;
+  currentTags = [];
+  document.getElementById('editModalTitle').textContent = '新しいノート';
+  document.getElementById('noteForm').reset();
+  document.getElementById('noteCategory').value = 'chart';
+  renderTags();
+  document.getElementById('editModal').classList.add('show');
+  setTimeout(() => document.getElementById('noteTitle').focus(), 100);
+};
+
+window.viewNote = function(note) {
+  currentViewedNote = note;
+  document.getElementById('viewTitle').textContent = note.title;
+  
+  let body = `<div class="view-content">${escapeHtml(note.content || '')}</div>`;
+  if (note.tags && note.tags.length > 0) {
+    body += `<div class="note-tags">${note.tags.map(t => `<span class="note-tag">#${escapeHtml(t)}</span>`).join('')}</div>`;
+  }
+  document.getElementById('viewBody').innerHTML = body;
+  
+  const date = new Date(note.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+  const cat = categoryLabels[note.category] || '📝 その他';
+  document.getElementById('viewMeta').innerHTML = `
+    <span>${cat}${note.is_favorite ? ' · ⭐' : ''}</span>
+    <span>${date}</span>
+  `;
+  
+  document.getElementById('viewModal').classList.add('show');
+};
+
+window.editCurrentNote = function() {
+  if (!currentViewedNote) return;
+  const note = currentViewedNote;
+  editingNoteId = note.id;
+  currentTags = [...(note.tags || [])];
+  
+  document.getElementById('editModalTitle').textContent = 'ノートを編集';
+  document.getElementById('noteTitle').value = note.title;
+  document.getElementById('noteContent').value = note.content || '';
+  document.getElementById('noteCategory').value = note.category || 'chart';
+  document.getElementById('isFavorite').checked = note.is_favorite || false;
+  renderTags();
+  
+  document.getElementById('viewModal').classList.remove('show');
+  document.getElementById('editModal').classList.add('show');
+};
+
+window.deleteCurrentNote = async function() {
+  if (!currentViewedNote) return;
+  if (!confirm('このノートを削除しますか?')) return;
+  
+  const { error } = await supabase.from('notes').delete().eq('id', currentViewedNote.id);
+  if (error) {
+    alert('削除に失敗しました');
+    return;
+  }
+  
+  document.getElementById('viewModal').classList.remove('show');
+  await loadNotes();
+};
+
+window.closeModal = function(e, modalId) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById(modalId).classList.remove('show');
+};
+
+window.handleTagInput = function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const value = e.target.value.trim().replace(/^#/, '');
+    if (value && !currentTags.includes(value)) {
+      currentTags.push(value);
+      renderTags();
+    }
+    e.target.value = '';
+  }
+};
+
+function renderTags() {
+  const wrap = document.getElementById('tagWrap');
+  const tagsHTML = currentTags.map((t, i) => `
+    <span class="tag-item">
+      #${escapeHtml(t)}
+      <span class="tag-remove" onclick="removeTag(${i})">×</span>
+    </span>
+  `).join('');
+  wrap.innerHTML = tagsHTML + '<input type="text" class="tag-input" id="tagInput" placeholder="タグを追加..." onkeydown="handleTagInput(event)">';
+}
+
+window.removeTag = function(index) {
+  currentTags.splice(index, 1);
+  renderTags();
+};
+
+document.getElementById('noteForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const saveBtn = document.getElementById('saveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = '保存中...';
+
+  const noteData = {
+    title: document.getElementById('noteTitle').value.trim(),
+    content: document.getElementById('noteContent').value.trim(),
+    category: document.getElementById('noteCategory').value,
+    tags: currentTags.length > 0 ? currentTags : null,
+    is_favorite: document.getElementById('isFavorite').checked
+  };
+
+  let result;
+  if (editingNoteId) {
+    result = await supabase.from('notes').update(noteData).eq('id', editingNoteId);
+  } else {
+    result = await supabase.from('notes').insert({ ...noteData, user_id: user.id });
+  }
+
+  if (result.error) {
+    alert('保存に失敗しました');
+    console.error(result.error);
+    saveBtn.disabled = false;
+    saveBtn.textContent = '保存する';
+    return;
+  }
+
+  document.getElementById('editModal').classList.remove('show');
+  saveBtn.disabled = false;
+  saveBtn.textContent = '保存する';
+  await loadNotes();
+});
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+</script>
+
+</body>
+</html>
