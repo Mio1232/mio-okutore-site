@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>設定 — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="theme-color" content="#F7F2EA">
+<style>
+:root{
+  --bg: #F7F2EA;
+  --bg-soft: #EFE7DA;
+  --bg-card: #FFFEFB;
+  --ink: #3A2E2A;
+  --ink-mid: #6B5D57;
+  --ink-soft: #998B83;
+  --rose: #C98B95;
+  --rose-soft: #E8D0D2;
+  --rose-deep: #B06B75;
+  --sage: #9BB59C;
+  --sage-soft: #C9DACA;
+  --line: rgba(58,46,42,0.08);
+  --line-strong: rgba(58,46,42,0.14);
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+html, body{ width: 100%; min-height: 100vh; }
+body{
+  font-family: 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.app{
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  padding-bottom: 40px;
+}
+
+.page-header{
+  position: sticky;
+  top: 0;
+  background: rgba(247,242,234,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  z-index: 10;
+}
+.back-btn{
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-mid); text-decoration: none;
+  flex-shrink: 0;
+}
+.back-btn svg{ width: 16px; height: 16px; }
+.title-area{ flex: 1; }
+.title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px; font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.title-en{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--rose-deep);
+}
+
+/* USER CARD */
+.user-card{
+  margin: 24px;
+  padding: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  text-align: center;
+}
+.avatar-wrap{
+  width: 80px; height: 80px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--rose-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--rose-deep);
+  overflow: hidden;
+  position: relative;
+}
+.avatar-wrap img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.user-name{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.user-email{
+  font-size: 11px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+.plan-badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  background: var(--bg-soft);
+  border: 1px solid var(--line-strong);
+}
+.plan-badge.basic{
+  background: var(--sage-soft);
+  color: #2D5F4F;
+  border-color: var(--sage);
+}
+.plan-badge.pro{
+  background: var(--rose-soft);
+  color: var(--rose-deep);
+  border-color: var(--rose);
+}
+
+/* SECTION */
+.section{
+  padding: 0 24px 24px;
+}
+.section-header{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.section-icon{
+  font-size: 14px;
+}
+.section-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.section-en{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+  margin-left: auto;
+}
+
+.setting-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* FIELD ITEM */
+.field-item{
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.field-item:last-child{ border-bottom: none; }
+.field-label{
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-mid);
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
+}
+.field-input, .field-select, .field-textarea{
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink);
+}
+.field-input:focus, .field-select:focus, .field-textarea:focus{
+  outline: none;
+  border-color: var(--rose);
+  background: var(--bg-card);
+}
+.field-help{
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+.field-row{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* TOGGLE ITEM */
+.toggle-item{
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+.toggle-item:last-child{ border-bottom: none; }
+.toggle-item:hover{ background: var(--bg-soft); }
+.toggle-info{ flex: 1; }
+.toggle-label{
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.toggle-sub{
+  font-size: 11px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+.toggle-switch{
+  width: 44px; height: 24px;
+  background: var(--line-strong);
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle-switch.on{
+  background: var(--sage);
+}
+.toggle-thumb{
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px; height: 20px;
+  background: #FFF;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.toggle-switch.on .toggle-thumb{
+  transform: translateX(20px);
+}
+
+/* MENU ITEM */
+.menu-item{
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.menu-item:last-child{ border-bottom: none; }
+.menu-item:hover{ background: var(--bg-soft); }
+.menu-item.danger{ color: var(--rose-deep); }
+.menu-text{ flex: 1; }
+.menu-label{
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.menu-sub{
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.menu-arrow{
+  color: var(--ink-soft);
+  font-size: 18px;
+}
+
+/* SAVE BUTTON */
+.save-bar{
+  padding: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  margin: 24px 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  bottom: 16px;
+  z-index: 5;
+  box-shadow: 0 4px 16px rgba(58,46,42,0.08);
+}
+.save-info{
+  font-size: 12px;
+  color: var(--ink-mid);
+}
+.save-btn{
+  padding: 10px 24px;
+  background: var(--rose);
+  color: #FFF;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+.save-btn:hover{ background: var(--rose-deep); }
+.save-btn:disabled{ opacity: 0.5; cursor: not-allowed; }
+
+/* PLAN OPTIONS */
+.plan-options{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.plan-option{
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.plan-option.current{
+  border-color: var(--sage);
+  background: var(--sage-soft);
+}
+.plan-option.recommended{
+  border-color: var(--rose);
+  position: relative;
+}
+.plan-option.recommended::before{
+  content: 'おすすめ';
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  background: var(--rose);
+  color: #FFF;
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  letter-spacing: 0.08em;
+}
+.plan-option-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.plan-option-name{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+.plan-option-price{
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+.plan-option-desc{
+  font-size: 11px;
+  color: var(--ink-mid);
+  line-height: 1.6;
+}
+
+/* MESSAGE */
+.message{
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin: 0 24px 16px;
+  display: none;
+  text-align: center;
+}
+.message.success{ background: var(--sage-soft); color: #2D5F4F; }
+.message.error{ background: var(--rose-soft); color: var(--rose-deep); }
+.message.show{ display: block; }
+
+/* LOADING */
+.loading-screen{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+.loading-mark{
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--rose-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  color: var(--rose-deep);
+  font-weight: 600;
+  animation: pulse 1.8s ease-in-out infinite;
+  margin-bottom: 12px;
+}
+@keyframes pulse{
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.95); }
+}
+.loading-text{
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.16em;
+}
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading-screen">
+  <div class="loading-mark">m</div>
+  <div class="loading-text">— loading —</div>
+</div>
+
+<div class="app" id="app" style="display:none;">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <a class="back-btn" href="dashboard.html" aria-label="戻る">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="title-area">
+      <div class="title">設定</div>
+      <div class="title-en">Settings</div>
+    </div>
+  </header>
+
+  <div class="message" id="message"></div>
+
+  <!-- USER CARD -->
+  <div class="user-card">
+    <div class="avatar-wrap" id="avatar">m</div>
+    <div class="user-name" id="userName">--</div>
+    <div class="user-email" id="userEmail">--</div>
+    <div class="plan-badge" id="planBadge">FREE</div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">👤</span>
+      <span class="section-title">プロフィール</span>
+      <span class="section-en">Profile</span>
+    </div>
+    <div class="setting-card">
+      <div class="field-item">
+        <div class="field-label">表示名</div>
+        <input type="text" id="displayName" class="field-input" placeholder="お好きなお名前で">
+      </div>
+      <div class="field-item">
+        <div class="field-label">トレード歴</div>
+        <select id="tradeYears" class="field-select">
+          <option value="0">未経験</option>
+          <option value="1">1年未満</option>
+          <option value="2">1〜2年</option>
+          <option value="3">2〜3年</option>
+          <option value="5">3〜5年</option>
+          <option value="10">5年以上</option>
+        </select>
+      </div>
+      <div class="field-item">
+        <div class="field-label">主に取引する通貨ペア</div>
+        <input type="text" id="tradingPairs" class="field-input" placeholder="例:USD/JPY, GOLD, BTC">
+        <div class="field-help">カンマで区切って複数入力できます</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOAL -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">🎯</span>
+      <span class="section-title">目標金額</span>
+      <span class="section-en">Goals</span>
+    </div>
+    <div class="setting-card">
+      <div class="field-item">
+        <div class="field-row">
+          <div>
+            <div class="field-label">月間目標</div>
+            <input type="number" id="targetMonthly" class="field-input" placeholder="¥100,000" inputmode="numeric">
+          </div>
+          <div>
+            <div class="field-label">年間目標</div>
+            <input type="number" id="targetYearly" class="field-input" placeholder="¥1,200,000" inputmode="numeric">
+          </div>
+        </div>
+        <div class="field-help">ダッシュボードに進捗が表示されます</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">🔔</span>
+      <span class="section-title">通知設定</span>
+      <span class="section-en">Notifications</span>
+    </div>
+    <div class="setting-card">
+      <div class="toggle-item" onclick="toggleSwitch('notifEnabled')">
+        <div class="toggle-info">
+          <div class="toggle-label">通知を受け取る</div>
+          <div class="toggle-sub">トレード促進・お知らせなど</div>
+        </div>
+        <div class="toggle-switch" id="notifEnabled">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+      <div class="toggle-item" onclick="toggleSwitch('notifLine')">
+        <div class="toggle-info">
+          <div class="toggle-label">LINE通知</div>
+          <div class="toggle-sub">LINEでメッセージを受け取る</div>
+        </div>
+        <div class="toggle-switch" id="notifLine">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+      <div class="toggle-item" onclick="toggleSwitch('notifEmail')">
+        <div class="toggle-info">
+          <div class="toggle-label">メール通知</div>
+          <div class="toggle-sub">大切なお知らせをメールでも</div>
+        </div>
+        <div class="toggle-switch" id="notifEmail">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAN -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">💎</span>
+      <span class="section-title">プラン管理</span>
+      <span class="section-en">Plan</span>
+    </div>
+    <div class="plan-options">
+      <div class="plan-option" id="planFree">
+        <div class="plan-option-header">
+          <div class="plan-option-name">無料プラン</div>
+          <div class="plan-option-price">¥0</div>
+        </div>
+        <div class="plan-option-desc">
+          基本機能(コミュニティ・配信視聴・FX手帖など)
+        </div>
+      </div>
+      <div class="plan-option" id="planBasic">
+        <div class="plan-option-header">
+          <div class="plan-option-name">ベーシック</div>
+          <div class="plan-option-price">¥500<span style="font-size:11px; color:var(--ink-soft)">/月</span></div>
+        </div>
+        <div class="plan-option-desc">
+          AIチャット(月20回)・収支記録・学びノート・基本統計
+        </div>
+      </div>
+      <div class="plan-option recommended" id="planPro">
+        <div class="plan-option-header">
+          <div class="plan-option-name">プロ</div>
+          <div class="plan-option-price">¥1,500<span style="font-size:11px; color:var(--ink-soft)">/月</span></div>
+        </div>
+        <div class="plan-option-desc">
+          AI無制限・高性能モデル・チャート画像分析・詳細統計・AI月次総評
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 16px; padding: 12px 16px; background: var(--bg-soft); border-radius: 10px; font-size: 11px; color: var(--ink-mid); text-align: center; line-height: 1.7;">
+      🌸 サブスク機能は近日公開予定です<br>
+      既存メンバーの方には特別料金をご用意しています
+    </div>
+  </div>
+
+  <!-- ACCOUNT -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">🔐</span>
+      <span class="section-title">アカウント</span>
+      <span class="section-en">Account</span>
+    </div>
+    <div class="setting-card">
+      <a class="menu-item" href="reset.html">
+        <div class="menu-text">
+          <div class="menu-label">パスワード変更</div>
+          <div class="menu-sub">セキュリティのために定期的に変更</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </a>
+      <div class="menu-item danger" id="logoutBtn">
+        <div class="menu-text">
+          <div class="menu-label">ログアウト</div>
+          <div class="menu-sub">アカウントから出る</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVE BAR -->
+  <div class="save-bar" id="saveBar" style="display:none;">
+    <div class="save-info">変更を保存しますか?</div>
+    <button class="save-btn" id="saveBtn" onclick="saveSettings()">保存</button>
+  </div>
+
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
+  window.location.href = 'login.html';
+  throw new Error('Not authenticated');
+}
+const user = session.user;
+
+let originalData = {};
+let currentData = {};
+
+// プロフィール取得
+const { data: profile } = await supabase
+  .from('profiles')
+  .select('*')
+  .eq('id', user.id)
+  .single();
+
+// 初期表示
+const displayName = profile?.display_name || user.email.split('@')[0];
+document.getElementById('userName').textContent = displayName + ' さん';
+document.getElementById('userEmail').textContent = user.email;
+
+// アバター
+const avatarEl = document.getElementById('avatar');
+if (profile?.avatar_url) {
+  avatarEl.innerHTML = `<img src="${profile.avatar_url}" alt="">`;
+} else {
+  avatarEl.textContent = displayName.charAt(0).toUpperCase();
+}
+
+// プランバッジ
+const plan = profile?.plan || 'free';
+const planLabels = {
+  free: { label: 'FREE', class: '' },
+  basic: { label: 'BASIC', class: 'basic' },
+  pro: { label: 'PRO', class: 'pro' }
+};
+const p = planLabels[plan] || planLabels.free;
+const planBadge = document.getElementById('planBadge');
+planBadge.textContent = p.label;
+planBadge.className = 'plan-badge ' + p.class;
+
+// 現在プランをハイライト
+document.getElementById('plan' + plan.charAt(0).toUpperCase() + plan.slice(1)).classList.add('current');
+
+// フォーム値設定
+document.getElementById('displayName').value = profile?.display_name || '';
+document.getElementById('tradeYears').value = profile?.trade_years || '0';
+document.getElementById('tradingPairs').value = profile?.trading_pairs?.join(', ') || '';
+document.getElementById('targetMonthly').value = profile?.target_monthly || '';
+document.getElementById('targetYearly').value = profile?.target_yearly || '';
+
+// トグル状態
+const notifEnabled = profile?.notification_enabled !== false;
+setToggle('notifEnabled', notifEnabled);
+setToggle('notifLine', notifEnabled);
+setToggle('notifEmail', false);
+
+// 元データ保存
+originalData = {
+  display_name: profile?.display_name || '',
+  trade_years: profile?.trade_years || 0,
+  trading_pairs: profile?.trading_pairs?.join(', ') || '',
+  target_monthly: profile?.target_monthly || null,
+  target_yearly: profile?.target_yearly || null,
+  notification_enabled: notifEnabled
+};
+
+// 変更検知
+['displayName', 'tradeYears', 'tradingPairs', 'targetMonthly', 'targetYearly'].forEach(id => {
+  document.getElementById(id).addEventListener('input', checkChanges);
+  document.getElementById(id).addEventListener('change', checkChanges);
+});
+
+function setToggle(id, value) {
+  const el = document.getElementById(id);
+  if (value) el.classList.add('on');
+  else el.classList.remove('on');
+  el.dataset.value = value ? '1' : '0';
+}
+
+window.toggleSwitch = function(id) {
+  const el = document.getElementById(id);
+  const newValue = el.dataset.value !== '1';
+  setToggle(id, newValue);
+  checkChanges();
+};
+
+function checkChanges() {
+  const current = {
+    display_name: document.getElementById('displayName').value.trim(),
+    trade_years: parseInt(document.getElementById('tradeYears').value),
+    trading_pairs: document.getElementById('tradingPairs').value.trim(),
+    target_monthly: parseInt(document.getElementById('targetMonthly').value) || null,
+    target_yearly: parseInt(document.getElementById('targetYearly').value) || null,
+    notification_enabled: document.getElementById('notifEnabled').dataset.value === '1'
+  };
+
+  const changed = Object.keys(current).some(k => current[k] !== originalData[k]);
+  document.getElementById('saveBar').style.display = changed ? 'flex' : 'none';
+  currentData = current;
+}
+
+window.saveSettings = async function() {
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.textContent = '保存中...';
+
+  const tradingPairsArr = currentData.trading_pairs
+    ? currentData.trading_pairs.split(',').map(s => s.trim()).filter(Boolean)
+    : null;
+
+  const updateData = {
+    display_name: currentData.display_name || null,
+    trade_years: currentData.trade_years,
+    trading_pairs: tradingPairsArr,
+    target_monthly: currentData.target_monthly,
+    target_yearly: currentData.target_yearly,
+    notification_enabled: currentData.notification_enabled,
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabase
+    .from('profiles')
+    .update(updateData)
+    .eq('id', user.id);
+
+  if (error) {
+    showMessage('保存に失敗しました', 'error');
+    console.error(error);
+    btn.disabled = false;
+    btn.textContent = '保存';
+    return;
+  }
+
+  showMessage('設定を保存しました 🌸', 'success');
+  originalData = { ...currentData };
+  document.getElementById('saveBar').style.display = 'none';
+  
+  // 表示名を更新
+  const newName = currentData.display_name || user.email.split('@')[0];
+  document.getElementById('userName').textContent = newName + ' さん';
+  if (!profile?.avatar_url) {
+    document.getElementById('avatar').textContent = newName.charAt(0).toUpperCase();
+  }
+
+  btn.disabled = false;
+  btn.textContent = '保存';
+};
+
+function showMessage(text, type = 'success') {
+  const msg = document.getElementById('message');
+  msg.textContent = text;
+  msg.className = 'message show ' + type;
+  setTimeout(() => msg.classList.remove('show'), 3000);
+}
+
+// ログアウト
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (confirm('ログアウトしますか?')) {
+    await supabase.auth.signOut();
+    window.location.href = 'index.html';
+  }
+});
+
+// 表示
+document.getElementById('loading').style.display = 'none';
+document.getElementById('app').style.display = 'block';
+</script>
+
+</body>
+</html>
