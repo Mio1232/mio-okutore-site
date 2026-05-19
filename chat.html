@@ -7,13 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
 <link rel="apple-touch-icon" sizes="192x192" href="/favicon-192.png">
 <link rel="apple-touch-icon" sizes="512x512" href="/favicon-512.png">
-<!-- OGP -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="みおAI — mio億トレ">
 <meta property="og:description" content="美桜MioのAIアシスタント。トレードのご質問、いつでもお気軽に。">
@@ -99,6 +97,7 @@ body{
   font-weight: 600;
   color: var(--rose-deep);
   font-size: 18px;
+  overflow: hidden;
 }
 .header-info{ flex: 1; min-width: 0; }
 .header-name{
@@ -163,12 +162,11 @@ body{
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Noto Serif JP', serif;
-  font-weight: 600;
-  color: var(--rose-deep);
-  font-size: 28px;
   margin-bottom: 18px;
   animation: float 2s ease-in-out infinite;
+  background-image: url('/mio-icon.png');
+  background-size: cover;
+  background-position: center;
 }
 @keyframes float{
   0%, 100% { transform: translateY(0); }
@@ -188,6 +186,142 @@ body{
   letter-spacing: 0.16em;
   margin-top: 6px;
 }
+
+/* LOGIN GATE */
+.gate{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 32px 48px;
+  text-align: center;
+  background: var(--bg);
+  overflow-y: auto;
+}
+.gate-avatar{
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: var(--rose-soft);
+  background-image: url('/mio-icon.png');
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(201, 139, 149, 0.2);
+  animation: float 3s ease-in-out infinite;
+}
+.gate-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.gate-subtitle{
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  color: var(--rose-deep);
+  margin-bottom: 24px;
+}
+.gate-message{
+  font-size: 13px;
+  line-height: 2;
+  color: var(--ink-mid);
+  margin-bottom: 32px;
+  max-width: 320px;
+}
+.gate-features{
+  width: 100%;
+  max-width: 320px;
+  margin-bottom: 32px;
+  text-align: left;
+}
+.feature-item{
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+.feature-icon{
+  width: 32px; height: 32px;
+  background: var(--rose-soft);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.feature-text{
+  flex: 1;
+  font-size: 12px;
+  color: var(--ink-mid);
+  line-height: 1.6;
+}
+.feature-text strong{
+  color: var(--ink);
+  display: block;
+  margin-bottom: 2px;
+  font-size: 13px;
+}
+.gate-actions{
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.gate-btn{
+  display: block;
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+.gate-btn-primary{
+  background: var(--rose);
+  color: #FFFFFF;
+}
+.gate-btn-primary:hover{
+  background: var(--rose-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(176, 107, 117, 0.25);
+}
+.gate-btn-secondary{
+  background: transparent;
+  color: var(--ink-mid);
+  border: 1px solid var(--line-strong);
+}
+.gate-btn-secondary:hover{
+  background: var(--bg-card);
+  border-color: var(--rose);
+  color: var(--rose-deep);
+}
+.gate-footer{
+  margin-top: 24px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+}
+.gate-footer a{
+  color: var(--ink-soft);
+  text-decoration: none;
+}
 </style>
 </head>
 <body>
@@ -202,14 +336,66 @@ body{
     <div class="mio-avatar" style="background-image: url('/mio-icon.png'); background-size: cover; background-position: center;"></div>
     <div class="header-info">
       <div class="header-name">美桜Mio AI</div>
-      <div class="header-status">オンライン</div>
+      <div class="header-status" id="headerStatus">確認中</div>
     </div>
   </header>
 
-  <!-- CHAT IFRAME -->
+  <!-- 認証状態によって切り替わるコンテンツ -->
+  <div id="content" style="flex:1; display:flex; flex-direction:column; overflow:hidden;"></div>
+
+</div>
+
+<!-- LOGIN GATE TEMPLATE -->
+<template id="gateTemplate">
+  <div class="gate">
+    <div class="gate-avatar"></div>
+    <h1 class="gate-title">美桜Mio AI</h1>
+    <div class="gate-subtitle">— Your AI assistant —</div>
+    <p class="gate-message">
+      AIチャットをご利用いただくには<br>
+      ログインが必要です 🌸
+    </p>
+
+    <div class="gate-features">
+      <div class="feature-item">
+        <div class="feature-icon">💬</div>
+        <div class="feature-text">
+          <strong>24時間いつでも相談</strong>
+          トレード・メンタル・相場のご質問なんでも
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📸</div>
+        <div class="feature-text">
+          <strong>チャート画像分析</strong>
+          スクショを送れば、一緒に分析できます
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🌸</div>
+        <div class="feature-text">
+          <strong>無料でお試しいただけます</strong>
+          ご登録は1分で完了します
+        </div>
+      </div>
+    </div>
+
+    <div class="gate-actions">
+      <a href="register.html" class="gate-btn gate-btn-primary">無料で新規登録</a>
+      <a href="login.html" class="gate-btn gate-btn-secondary">すでにアカウントをお持ちの方</a>
+    </div>
+
+    <div class="gate-footer">
+      <a href="index.html">— back to home —</a>
+    </div>
+  </div>
+</template>
+
+<!-- CHAT TEMPLATE -->
+<template id="chatTemplate">
   <div class="chat-wrap">
     <div class="loading" id="loading">
-      <div class="loading-avatar" style="background-image: url('/mio-icon.png'); background-size: cover; background-position: center;"></div>
+      <div class="loading-avatar"></div>
       <div class="loading-text">準備しています</div>
       <div class="loading-en">— Please wait —</div>
     </div>
@@ -221,24 +407,48 @@ body{
       title="美桜Mio AI">
     </iframe>
   </div>
+</template>
 
-</div>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-<script>
-// iframe読み込み完了でローディング非表示
-const iframe = document.getElementById('chat-iframe');
-const loading = document.getElementById('loading');
+const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
 
-iframe.addEventListener('load', () => {
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// 認証状態チェック
+const { data: { session } } = await supabase.auth.getSession();
+
+const content = document.getElementById('content');
+const headerStatus = document.getElementById('headerStatus');
+
+if (session) {
+  // ログイン中:チャットを表示
+  headerStatus.textContent = 'オンライン';
+  const template = document.getElementById('chatTemplate');
+  content.appendChild(template.content.cloneNode(true));
+  
+  // iframe loading 処理
+  const iframe = document.getElementById('chat-iframe');
+  const loading = document.getElementById('loading');
+  
+  iframe.addEventListener('load', () => {
+    setTimeout(() => {
+      loading.classList.add('hidden');
+    }, 500);
+  });
+  
   setTimeout(() => {
     loading.classList.add('hidden');
-  }, 500);
-});
-
-// 念のため、5秒後にも強制的に非表示
-setTimeout(() => {
-  loading.classList.add('hidden');
-}, 5000);
+  }, 5000);
+} else {
+  // 未ログイン:誘導画面を表示
+  headerStatus.textContent = 'ログインしてください';
+  headerStatus.style.color = 'var(--ink-soft)';
+  const template = document.getElementById('gateTemplate');
+  content.appendChild(template.content.cloneNode(true));
+}
 </script>
 
 </body>
