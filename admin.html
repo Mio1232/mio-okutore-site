@@ -297,14 +297,10 @@ async function init() {
     return;
   }
 
-  // 管理者チェック
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('is_admin, display_name')
-    .eq('id', session.user.id)
-    .single();
-
-  if (profileError || !profile?.is_admin) {
+  // 管理者チェック(関数を使って無限ループ回避)
+  const { data: isAdminResult, error: adminError } = await supabase.rpc('is_admin_user');
+  
+  if (adminError || !isAdminResult) {
     content.innerHTML = `
       <div class="denied">
         <h2>🔒 アクセス権限がありません</h2>
