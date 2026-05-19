@@ -587,7 +587,7 @@ function renderReport() {
 
   // インサイト生成
   const insights = generateInsights({
-    winRate, totalPL, profitFactor, pairArray, maxDD, currentTrades, timeStats, avgWin, avgLoss
+    winRate, totalPL, profitFactor, pairArray, maxDD, currentTrades, timeStats, avgWin, avgLoss, typeArray
   });
 
   // 描画
@@ -782,7 +782,7 @@ function renderTimeHeatmap(timeStats, maxAbs) {
   return html;
 }
 
-function generateInsights({ winRate, totalPL, profitFactor, pairArray, maxDD, currentTrades, timeStats, avgWin, avgLoss }) {
+function generateInsights({ winRate, totalPL, profitFactor, pairArray, maxDD, currentTrades, timeStats, avgWin, avgLoss, typeArray }) {
   const insights = [];
 
   // 全体評価
