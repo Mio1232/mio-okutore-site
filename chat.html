@@ -402,7 +402,7 @@ body{
     <iframe
       class="chat-iframe"
       id="chat-iframe"
-      src="https://udify.app/chatbot/SFiiQJ4MoyrquwMY"
+      src=""
       allow="microphone"
       title="美桜Mio AI">
     </iframe>
@@ -429,8 +429,104 @@ if (session) {
   const template = document.getElementById('chatTemplate');
   content.appendChild(template.content.cloneNode(true));
   
-  // iframe loading 処理
+  // ユーザー情報を取得して Dify URLに渡す
+  const user = session.user;
+  let userName = user.email.split('@')[0];
+  let userContext = '';
+  
+  try {
+    // プロフィールと最近のトレード情報を取得
+    const [profileRes, tradesRes] = await Promise.all([
+      supabase.from('profiles').select('*').eq('id', user.id).single(),
+      supabase.from('trades').select('*').eq('user_id', user.id)
+        .gte('trade_date', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0])
+        .order('trade_date', { ascending: false })
+    ]);
+    
+    const profile = profileRes.data;
+    const trades = tradesRes.data || [];
+    
+    if (profile?.display_name) userName = profile.display_name;
+    
+    // コンテキスト情報を組み立て
+    const contextParts = [];
+    
+    // 使用ツール
+    const tools = profile?.tools_used || [];
+    const toolMap = {
+      miyabi_3m: 'みやびEA(3ヶ月版)',
+      miyabi_perm: 'みやびEA(永久版)',
+      solid_edge: 'Solid Edgeインジ',
+      all_system: '全システム永久版'
+    };
+    if (tools.length > 0) {
+      contextParts.push('【使用中のツール】' + tools.map(t => toolMap[t] || t).join('、'));
+    } else {
+      contextParts.push('【使用中のツール】特になし(裁量のみ)');
+    }
+    
+    // コミュニティ参加状況
+    const community = profile?.community_status || '';
+    if (community.includes('discord')) {
+      contextParts.push('【コミュニティ】Discord参加中');
+    } else if (community.includes('line')) {
+      contextParts.push('【コミュニティ】LINEメンバー(Discord未参加)');
+    } else {
+      contextParts.push('【コミュニティ】未参加');
+    }
+    
+    // 興味
+    const interests = profile?.interests || [];
+    if (interests.length > 0) {
+      const interestMap = { ea: 'EA導入検討中', indicator: 'インジ導入検討中', community: 'コミュニティ参加検討中' };
+      contextParts.push('【興味】' + interests.map(i => interestMap[i] || i).join('、'));
+    }
+    
+    // 今月のトレード状況
+    if (trades.length > 0) {
+      const totalPL = trades.reduce((sum, t) => sum + t.profit_loss, 0);
+      const wins = trades.filter(t => t.profit_loss > 0).length;
+      const winRate = Math.round((wins / trades.length) * 100);
+      
+      // 種類別
+      const byType = { discretionary: 0, miyabi_ea: 0, solid_edge: 0 };
+      trades.forEach(t => {
+        const type = t.trade_type || 'discretionary';
+        byType[type] = (byType[type] || 0) + t.profit_loss;
+      });
+      
+      const plSign = totalPL >= 0 ? '+' : '';
+      contextParts.push(`【今月の収支】${plSign}¥${totalPL.toLocaleString('ja-JP')}(${trades.length}回・勝率${winRate}%)`);
+      
+      const breakdownParts = [];
+      if (byType.discretionary !== 0) breakdownParts.push(`裁量${byType.discretionary >= 0 ? '+' : ''}¥${byType.discretionary.toLocaleString('ja-JP')}`);
+      if (byType.miyabi_ea !== 0) breakdownParts.push(`EA${byType.miyabi_ea >= 0 ? '+' : ''}¥${byType.miyabi_ea.toLocaleString('ja-JP')}`);
+      if (byType.solid_edge !== 0) breakdownParts.push(`インジ${byType.solid_edge >= 0 ? '+' : ''}¥${byType.solid_edge.toLocaleString('ja-JP')}`);
+      if (breakdownParts.length > 0) {
+        contextParts.push(`【内訳】${breakdownParts.join(' / ')}`);
+      }
+    } else {
+      contextParts.push('【今月の収支】まだトレード記録なし');
+    }
+    
+    // 目標
+    if (profile?.target_monthly) {
+      contextParts.push(`【月間目標】¥${profile.target_monthly.toLocaleString('ja-JP')}`);
+    }
+    
+    userContext = contextParts.join('\n');
+  } catch (e) {
+    console.warn('User context fetch failed:', e);
+  }
+  
+  // Dify iframeにユーザー情報を渡す(URLパラメータで)
   const iframe = document.getElementById('chat-iframe');
+  const baseUrl = 'https://udify.app/chatbot/SFiiQJ4MoyrquwMY';
+  const params = new URLSearchParams();
+  params.append('user_name', userName);
+  params.append('user_context', userContext);
+  iframe.src = baseUrl + '?' + params.toString();
+  
   const loading = document.getElementById('loading');
   
   iframe.addEventListener('load', () => {

@@ -536,6 +536,35 @@ function renderReport() {
     winRate: Math.round((stats.wins / stats.count) * 100)
   })).sort((a, b) => b.total - a.total);
 
+  // 取引種類別集計
+  const typeLabels = {
+    discretionary: '🧠 裁量',
+    miyabi_ea: '🤖 みやびEA',
+    solid_edge: '📊 Solid Edge'
+  };
+  const typeStats = {};
+  currentTrades.forEach(t => {
+    const type = t.trade_type || 'discretionary';
+    if (!typeStats[type]) {
+      typeStats[type] = { count: 0, total: 0, wins: 0, profits: 0, losses: 0 };
+    }
+    typeStats[type].count++;
+    typeStats[type].total += t.profit_loss;
+    if (t.profit_loss > 0) {
+      typeStats[type].wins++;
+      typeStats[type].profits += t.profit_loss;
+    } else if (t.profit_loss < 0) {
+      typeStats[type].losses += t.profit_loss;
+    }
+  });
+  const typeArray = Object.entries(typeStats).map(([type, stats]) => ({
+    type,
+    label: typeLabels[type] || type,
+    ...stats,
+    winRate: Math.round((stats.wins / stats.count) * 100),
+    pf: stats.losses !== 0 ? Math.abs(stats.profits / stats.losses) : (stats.profits > 0 ? Infinity : 0)
+  })).sort((a, b) => b.total - a.total);
+
   // 日別集計
   const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
   const dailyPL = new Array(daysInMonth).fill(0);
@@ -635,6 +664,23 @@ function renderReport() {
             </div>
             <div class="pair-pl ${p.total >= 0 ? 'plus' : 'minus'}">
               ${p.total >= 0 ? '+' : ''}¥${Math.abs(p.total).toLocaleString('ja-JP')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">By Trade Type</div>
+      <div class="pairs-list">
+        ${typeArray.map(t => `
+          <div class="pair-row">
+            <div class="pair-info">
+              <div class="pair-name">${t.label}</div>
+              <div class="pair-stats">${t.count}回 · 勝率 ${t.winRate}% · PF ${t.pf === Infinity ? '∞' : t.pf.toFixed(2)}</div>
+            </div>
+            <div class="pair-pl ${t.total >= 0 ? 'plus' : 'minus'}">
+              ${t.total >= 0 ? '+' : ''}¥${Math.abs(t.total).toLocaleString('ja-JP')}
             </div>
           </div>
         `).join('')}
@@ -764,6 +810,23 @@ function generateInsights({ winRate, totalPL, profitFactor, pairArray, maxDD, cu
     const worst = pairArray[pairArray.length - 1];
     if (worst.total < 0 && pairArray.length > 1) {
       insights.push(`<strong>${worst.pair}</strong> はやや苦戦されたようです。少しお休みするのも選択肢です。`);
+    }
+  }
+
+  // 取引種類別の分析
+  if (typeArray.length > 1) {
+    const bestType = typeArray[0];
+    const worstType = typeArray[typeArray.length - 1];
+    if (bestType.total > 0) {
+      insights.push(`<strong>${bestType.label}</strong> での取引が好調です ✨`);
+    }
+    if (worstType.total < 0 && typeArray.length > 1) {
+      insights.push(`<strong>${worstType.label}</strong> は調整の余地がありそうです。手法を見直してみてはいかがでしょう。`);
+    }
+  } else if (typeArray.length === 1) {
+    const onlyType = typeArray[0];
+    if (onlyType.type === 'discretionary' && onlyType.total < 0) {
+      insights.push('もしお時間が取れない時は、EAでの自動化も選択肢の一つですよ🌸');
     }
   }
 

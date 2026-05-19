@@ -160,6 +160,51 @@ body{
   padding-top: 16px;
   border-top: 1px solid var(--line);
 }
+
+/* TRADE TYPE BREAKDOWN */
+.breakdown-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-top: 12px;
+}
+.breakdown-title{
+  font-size: 11px;
+  color: var(--ink-soft);
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.breakdown-row{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.breakdown-row:last-child{ border-bottom: none; }
+.breakdown-info{ flex: 1; }
+.breakdown-type{
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.breakdown-stats{
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.breakdown-pl{
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+.breakdown-pl.plus{ color: var(--plus); }
+.breakdown-pl.minus{ color: var(--minus); }
+.breakdown-pl.zero{ color: var(--ink-soft); }
 .stat-item{
   text-align: center;
 }
@@ -515,6 +560,12 @@ body{
         </div>
       </div>
     </div>
+
+    <!-- TRADE TYPE BREAKDOWN -->
+    <div class="breakdown-card" id="breakdownCard" style="display:none;">
+      <div class="breakdown-title">取引種類別の内訳</div>
+      <div id="breakdownList"></div>
+    </div>
   </div>
 
   <!-- GOAL PROGRESS -->
@@ -689,6 +740,44 @@ if (trades && trades.length > 0) {
   const winTrades = trades.filter(t => t.profit_loss > 0).length;
   const winRate = Math.round((winTrades / trades.length) * 100);
   const maxProfit = Math.max(...trades.map(t => t.profit_loss));
+
+  // 取引種類別の内訳計算
+  const typeBreakdown = {
+    discretionary: { label: '🧠 裁量', trades: [], total: 0 },
+    miyabi_ea: { label: '🤖 みやびEA', trades: [], total: 0 },
+    solid_edge: { label: '📊 Solid Edge', trades: [], total: 0 }
+  };
+  
+  trades.forEach(t => {
+    const type = t.trade_type || 'discretionary';
+    if (typeBreakdown[type]) {
+      typeBreakdown[type].trades.push(t);
+      typeBreakdown[type].total += t.profit_loss;
+    }
+  });
+
+  // 内訳表示(取引があるカテゴリーだけ)
+  const activeTypes = Object.entries(typeBreakdown).filter(([k, v]) => v.trades.length > 0);
+  if (activeTypes.length > 0) {
+    const breakdownHTML = activeTypes.map(([key, t]) => {
+      const wins = t.trades.filter(tr => tr.profit_loss > 0).length;
+      const winRate = Math.round((wins / t.trades.length) * 100);
+      const cls = t.total > 0 ? 'plus' : t.total < 0 ? 'minus' : 'zero';
+      const sign = t.total >= 0 ? '+' : '';
+      return `
+        <div class="breakdown-row">
+          <div class="breakdown-info">
+            <div class="breakdown-type">${t.label}</div>
+            <div class="breakdown-stats">${t.trades.length}回 · 勝率${winRate}%</div>
+          </div>
+          <div class="breakdown-pl ${cls}">${sign}¥${Math.abs(t.total).toLocaleString('ja-JP')}</div>
+        </div>
+      `;
+    }).join('');
+    
+    document.getElementById('breakdownList').innerHTML = breakdownHTML;
+    document.getElementById('breakdownCard').style.display = 'block';
+  }
 
   // 月間PL表示
   const plEl = document.getElementById('monthlyPL');

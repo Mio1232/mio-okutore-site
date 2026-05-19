@@ -195,6 +195,50 @@ body{
   border-color: var(--plus);
   color: var(--plus);
 }
+/* TRADE TYPE TOGGLE */
+.trade-type-group{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+.trade-type-btn{
+  padding: 10px 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-mid);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.3;
+}
+.trade-type-btn.active{
+  background: var(--rose-soft);
+  border-color: var(--rose);
+  color: var(--rose-deep);
+}
+.trade-type-btn .icon{
+  font-size: 18px;
+}
+.trade-type-badge{
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 500;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.trade-type-badge.discretionary{ background: rgba(168,155,176,0.2); color: #5A4E62; }
+.trade-type-badge.miyabi_ea{ background: rgba(155,181,156,0.2); color: #2D5F4F; }
+.trade-type-badge.solid_edge{ background: rgba(212,182,119,0.2); color: #7A5C1A; }
+
 .direction-btn.active.sell{
   background: rgba(176,107,117,0.12);
   border-color: var(--minus);
@@ -493,6 +537,25 @@ body{
             <input type="hidden" id="direction">
           </div>
 
+          <div class="field">
+            <label class="label">取引種類<span class="required">*</span></label>
+            <div class="trade-type-group">
+              <button type="button" class="trade-type-btn active" data-type="discretionary" onclick="selectTradeType('discretionary')">
+                <span class="icon">🧠</span>
+                <span>裁量</span>
+              </button>
+              <button type="button" class="trade-type-btn" data-type="miyabi_ea" onclick="selectTradeType('miyabi_ea')">
+                <span class="icon">🤖</span>
+                <span>みやびEA</span>
+              </button>
+              <button type="button" class="trade-type-btn" data-type="solid_edge" onclick="selectTradeType('solid_edge')">
+                <span class="icon">📊</span>
+                <span>Solid Edge</span>
+              </button>
+            </div>
+            <input type="hidden" id="tradeType" value="discretionary">
+          </div>
+
           <div class="row">
             <div class="field">
               <label class="label">ロット数</label>
@@ -552,9 +615,11 @@ body{
 
       <div class="history-filter">
         <button class="filter-chip active" data-filter="all" onclick="filterHistory('all')">すべて</button>
+        <button class="filter-chip" data-filter="type:discretionary" onclick="filterHistory('type:discretionary')">🧠裁量</button>
+        <button class="filter-chip" data-filter="type:miyabi_ea" onclick="filterHistory('type:miyabi_ea')">🤖EA</button>
+        <button class="filter-chip" data-filter="type:solid_edge" onclick="filterHistory('type:solid_edge')">📊インジ</button>
         <button class="filter-chip" data-filter="USD/JPY" onclick="filterHistory('USD/JPY')">USD/JPY</button>
         <button class="filter-chip" data-filter="XAU/USD" onclick="filterHistory('XAU/USD')">GOLD</button>
-        <button class="filter-chip" data-filter="BTC/USD" onclick="filterHistory('BTC/USD')">BTC</button>
         <button class="filter-chip" data-filter="win" onclick="filterHistory('win')">勝ち</button>
         <button class="filter-chip" data-filter="loss" onclick="filterHistory('loss')">負け</button>
       </div>
@@ -619,6 +684,13 @@ window.selectDirection = function(dir) {
   document.getElementById('direction').value = dir;
 };
 
+// 取引種類選択
+window.selectTradeType = function(type) {
+  document.querySelectorAll('.trade-type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.trade-type-btn[data-type="${type}"]`).classList.add('active');
+  document.getElementById('tradeType').value = type;
+};
+
 // メッセージ表示
 function showMessage(text, type = 'success') {
   const msg = document.getElementById('message');
@@ -640,6 +712,7 @@ document.getElementById('tradeForm').addEventListener('submit', async (e) => {
     trade_time: document.getElementById('tradeTime').value || null,
     pair: document.getElementById('pair').value,
     direction: document.getElementById('direction').value || null,
+    trade_type: document.getElementById('tradeType').value || 'discretionary',
     lot_size: parseFloat(document.getElementById('lotSize').value) || null,
     entry_price: parseFloat(document.getElementById('entryPrice').value) || null,
     exit_price: parseFloat(document.getElementById('exitPrice').value) || null,
@@ -664,6 +737,10 @@ document.getElementById('tradeForm').addEventListener('submit', async (e) => {
   document.getElementById('pair').value = '';
   document.getElementById('direction').value = '';
   document.querySelectorAll('.direction-btn').forEach(b => b.classList.remove('active'));
+  // 取引種類は「裁量」にデフォルトリセット
+  document.querySelectorAll('.trade-type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.trade-type-btn[data-type="discretionary"]').classList.add('active');
+  document.getElementById('tradeType').value = 'discretionary';
   document.getElementById('lotSize').value = '';
   document.getElementById('duration').value = '';
   document.getElementById('entryPrice').value = '';
@@ -734,6 +811,9 @@ function renderHistory() {
     filtered = allTrades.filter(t => t.profit_loss > 0);
   } else if (currentFilter === 'loss') {
     filtered = allTrades.filter(t => t.profit_loss < 0);
+  } else if (currentFilter.startsWith('type:')) {
+    const type = currentFilter.replace('type:', '');
+    filtered = allTrades.filter(t => (t.trade_type || 'discretionary') === type);
   } else if (currentFilter !== 'all') {
     filtered = allTrades.filter(t => t.pair === currentFilter);
   }
@@ -753,10 +833,17 @@ function renderHistory() {
     const dirLabel = t.direction === 'buy' ? '買い' : t.direction === 'sell' ? '売り' : '';
     const dirCls = t.direction || '';
     
+    const typeLabels = {
+      discretionary: { label: '🧠裁量', cls: 'discretionary' },
+      miyabi_ea: { label: '🤖EA', cls: 'miyabi_ea' },
+      solid_edge: { label: '📊インジ', cls: 'solid_edge' }
+    };
+    const typeBadge = typeLabels[t.trade_type] || typeLabels.discretionary;
+    
     return `
       <div class="trade-item" onclick='showTradeDetail(${JSON.stringify(t).replace(/'/g, "&apos;")})'>
         <div class="trade-row1">
-          <div class="trade-pair">${t.pair}</div>
+          <div class="trade-pair">${t.pair}<span class="trade-type-badge ${typeBadge.cls}">${typeBadge.label}</span></div>
           <div class="trade-pl ${cls}">${sign}¥${Math.abs(pl).toLocaleString('ja-JP')}</div>
         </div>
         <div class="trade-row2">
@@ -788,10 +875,20 @@ window.showTradeDetail = function(trade) {
   const sign = pl >= 0 ? '+' : '';
   const cls = pl >= 0 ? 'var(--plus)' : 'var(--minus)';
 
+  const typeMap = {
+    discretionary: '🧠 裁量',
+    miyabi_ea: '🤖 みやびEA',
+    solid_edge: '📊 Solid Edgeインジ'
+  };
+  
   content.innerHTML = `
     <div class="modal-row">
       <span class="modal-row-label">通貨ペア</span>
       <strong>${trade.pair}</strong>
+    </div>
+    <div class="modal-row">
+      <span class="modal-row-label">取引種類</span>
+      <strong>${typeMap[trade.trade_type] || typeMap.discretionary}</strong>
     </div>
     <div class="modal-row">
       <span class="modal-row-label">損益</span>

@@ -263,6 +263,42 @@ body{
   transform: translateX(20px);
 }
 
+/* CHECKBOX LIST */
+.checkbox-list{
+  display: flex;
+  flex-direction: column;
+}
+.checkbox-row{
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.checkbox-row:last-child{ border-bottom: none; }
+.checkbox-row:hover{ background: var(--bg-soft); }
+.checkbox-row input[type="checkbox"]{
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--rose);
+  flex-shrink: 0;
+}
+.checkbox-row label{
+  flex: 1;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--ink);
+}
+.checkbox-row .desc{
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+  display: block;
+}
+
 /* MENU ITEM */
 .menu-item{
   padding: 16px 18px;
@@ -517,6 +553,108 @@ body{
     </div>
   </div>
 
+  <!-- TOOLS USED -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">🛠</span>
+      <span class="section-title">使用中のツール</span>
+      <span class="section-en">My Tools</span>
+    </div>
+    <div class="setting-card">
+      <div class="checkbox-list">
+        <div class="checkbox-row" onclick="toggleCheckbox('tool_miyabi_3m')">
+          <input type="checkbox" id="tool_miyabi_3m">
+          <label for="tool_miyabi_3m">
+            🤖 みやびロジックEA(3ヶ月版)
+            <span class="desc">¥50,000で導入したEA</span>
+          </label>
+        </div>
+        <div class="checkbox-row" onclick="toggleCheckbox('tool_miyabi_perm')">
+          <input type="checkbox" id="tool_miyabi_perm">
+          <label for="tool_miyabi_perm">
+            🤖 みやびロジックEA(永久版)
+            <span class="desc">¥100,000で導入したEA</span>
+          </label>
+        </div>
+        <div class="checkbox-row" onclick="toggleCheckbox('tool_solid_edge')">
+          <input type="checkbox" id="tool_solid_edge">
+          <label for="tool_solid_edge">
+            📊 Solid Edgeインジケーター
+            <span class="desc">TradingView用のインジ</span>
+          </label>
+        </div>
+        <div class="checkbox-row" onclick="toggleCheckbox('tool_all_system')">
+          <input type="checkbox" id="tool_all_system">
+          <label for="tool_all_system">
+            💎 全システム永久版
+            <span class="desc">¥150,000で導入したすべて</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMUNITY STATUS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">🌸</span>
+      <span class="section-title">コミュニティ参加</span>
+      <span class="section-en">Community</span>
+    </div>
+    <div class="setting-card">
+      <div class="checkbox-list">
+        <div class="checkbox-row" onclick="toggleCheckbox('community_line')">
+          <input type="checkbox" id="community_line">
+          <label for="community_line">
+            LINEメンバー
+            <span class="desc">mio様のLINEに登録済み</span>
+          </label>
+        </div>
+        <div class="checkbox-row" onclick="toggleCheckbox('community_discord')">
+          <input type="checkbox" id="community_discord">
+          <label for="community_discord">
+            Discordコミュニティ参加中
+            <span class="desc">配信や交流に参加中</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERESTS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">💭</span>
+      <span class="section-title">興味のあるサービス</span>
+      <span class="section-en">Interests</span>
+    </div>
+    <div class="setting-card">
+      <div class="checkbox-list">
+        <div class="checkbox-row" onclick="toggleCheckbox('interest_ea')">
+          <input type="checkbox" id="interest_ea">
+          <label for="interest_ea">
+            EAの導入を検討中
+            <span class="desc">自動売買に興味あり</span>
+          </label>
+        </div>
+        <div class="checkbox-row" onclick="toggleCheckbox('interest_indicator')">
+          <input type="checkbox" id="interest_indicator">
+          <label for="interest_indicator">
+            インジケーターの導入を検討中
+            <span class="desc">補助ツールに興味あり</span>
+          </label>
+        </div>
+        <div class="checkbox-row" onclick="toggleCheckbox('interest_community')">
+          <input type="checkbox" id="interest_community">
+          <label for="interest_community">
+            コミュニティ参加を検討中
+            <span class="desc">本格的な学びに興味あり</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- NOTIFICATIONS -->
   <div class="section">
     <div class="section-header">
@@ -690,6 +828,23 @@ document.getElementById('tradingPairs').value = profile?.trading_pairs?.join(', 
 document.getElementById('targetMonthly').value = profile?.target_monthly || '';
 document.getElementById('targetYearly').value = profile?.target_yearly || '';
 
+// 使用ツール初期化
+const toolsUsed = profile?.tools_used || [];
+['miyabi_3m', 'miyabi_perm', 'solid_edge', 'all_system'].forEach(t => {
+  document.getElementById('tool_' + t).checked = toolsUsed.includes(t);
+});
+
+// コミュニティ参加状況
+const communityStatus = profile?.community_status || '';
+document.getElementById('community_line').checked = communityStatus.includes('line');
+document.getElementById('community_discord').checked = communityStatus.includes('discord');
+
+// 興味
+const interests = profile?.interests || [];
+['ea', 'indicator', 'community'].forEach(i => {
+  document.getElementById('interest_' + i).checked = interests.includes(i);
+});
+
 // トグル状態
 const notifEnabled = profile?.notification_enabled !== false;
 setToggle('notifEnabled', notifEnabled);
@@ -703,7 +858,10 @@ originalData = {
   trading_pairs: profile?.trading_pairs?.join(', ') || '',
   target_monthly: profile?.target_monthly || null,
   target_yearly: profile?.target_yearly || null,
-  notification_enabled: notifEnabled
+  notification_enabled: notifEnabled,
+  tools_used: toolsUsed.slice().sort().join(','),
+  community_status: communityStatus,
+  interests: interests.slice().sort().join(',')
 };
 
 // 変更検知
@@ -727,19 +885,48 @@ window.toggleSwitch = function(id) {
 };
 
 function checkChanges() {
+  const tools = [];
+  ['miyabi_3m', 'miyabi_perm', 'solid_edge', 'all_system'].forEach(t => {
+    if (document.getElementById('tool_' + t).checked) tools.push(t);
+  });
+  
+  const communityParts = [];
+  if (document.getElementById('community_line').checked) communityParts.push('line');
+  if (document.getElementById('community_discord').checked) communityParts.push('discord');
+  
+  const interestsList = [];
+  ['ea', 'indicator', 'community'].forEach(i => {
+    if (document.getElementById('interest_' + i).checked) interestsList.push(i);
+  });
+
   const current = {
     display_name: document.getElementById('displayName').value.trim(),
     trade_years: parseInt(document.getElementById('tradeYears').value),
     trading_pairs: document.getElementById('tradingPairs').value.trim(),
     target_monthly: parseInt(document.getElementById('targetMonthly').value) || null,
     target_yearly: parseInt(document.getElementById('targetYearly').value) || null,
-    notification_enabled: document.getElementById('notifEnabled').dataset.value === '1'
+    notification_enabled: document.getElementById('notifEnabled').dataset.value === '1',
+    tools_used: tools.slice().sort().join(','),
+    community_status: communityParts.join(','),
+    interests: interestsList.slice().sort().join(',')
   };
 
   const changed = Object.keys(current).some(k => current[k] !== originalData[k]);
   document.getElementById('saveBar').style.display = changed ? 'flex' : 'none';
   currentData = current;
 }
+
+// チェックボックス切り替え
+window.toggleCheckbox = function(id) {
+  const cb = document.getElementById(id);
+  cb.checked = !cb.checked;
+  checkChanges();
+};
+
+// チェックボックスのクリック時の処理
+document.querySelectorAll('.checkbox-row input[type="checkbox"]').forEach(cb => {
+  cb.addEventListener('change', checkChanges);
+});
 
 window.saveSettings = async function() {
   const btn = document.getElementById('saveBtn');
@@ -750,6 +937,9 @@ window.saveSettings = async function() {
     ? currentData.trading_pairs.split(',').map(s => s.trim()).filter(Boolean)
     : null;
 
+  const toolsArr = currentData.tools_used ? currentData.tools_used.split(',').filter(Boolean) : [];
+  const interestsArr = currentData.interests ? currentData.interests.split(',').filter(Boolean) : [];
+
   const updateData = {
     display_name: currentData.display_name || null,
     trade_years: currentData.trade_years,
@@ -757,6 +947,9 @@ window.saveSettings = async function() {
     target_monthly: currentData.target_monthly,
     target_yearly: currentData.target_yearly,
     notification_enabled: currentData.notification_enabled,
+    tools_used: toolsArr.length > 0 ? toolsArr : null,
+    community_status: currentData.community_status || null,
+    interests: interestsArr.length > 0 ? interestsArr : null,
     updated_at: new Date().toISOString()
   };
 
