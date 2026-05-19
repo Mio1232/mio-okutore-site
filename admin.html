@@ -285,20 +285,20 @@ html, body{
 <script>
 const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const content = document.getElementById('content');
 
 async function init() {
   // 認証チェック
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sb.auth.getSession();
   if (!session) {
     location.href = 'login.html';
     return;
   }
 
   // 管理者チェック(関数を使って無限ループ回避)
-  const { data: isAdminResult, error: adminError } = await supabase.rpc('is_admin_user');
+  const { data: isAdminResult, error: adminError } = await sb.rpc('is_admin_user');
   
   if (adminError || !isAdminResult) {
     content.innerHTML = `
@@ -312,7 +312,7 @@ async function init() {
   }
 
   // 全ユーザーのプロフィール取得
-  const { data: allProfiles, error: profilesError } = await supabase
+  const { data: allProfiles, error: profilesError } = await sb
     .from('profiles')
     .select('*')
     .order('created_at', { ascending: false });
@@ -323,7 +323,7 @@ async function init() {
   }
 
   // 全ユーザーの取引データ取得
-  const { data: allTrades, error: tradesError } = await supabase
+  const { data: allTrades, error: tradesError } = await sb
     .from('trades')
     .select('*')
     .order('trade_date', { ascending: false });
