@@ -651,44 +651,6 @@ body{
     </div>
   </div>
 
-  <!-- NOTIFICATIONS -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-icon">🔔</span>
-      <span class="section-title">通知設定</span>
-      <span class="section-en">Notifications</span>
-    </div>
-    <div class="setting-card">
-      <div class="toggle-item" onclick="toggleSwitch('notifEnabled')">
-        <div class="toggle-info">
-          <div class="toggle-label">通知を受け取る</div>
-          <div class="toggle-sub">トレード促進・お知らせなど</div>
-        </div>
-        <div class="toggle-switch" id="notifEnabled">
-          <div class="toggle-thumb"></div>
-        </div>
-      </div>
-      <div class="toggle-item" onclick="toggleSwitch('notifLine')">
-        <div class="toggle-info">
-          <div class="toggle-label">LINE通知</div>
-          <div class="toggle-sub">LINEでメッセージを受け取る</div>
-        </div>
-        <div class="toggle-switch" id="notifLine">
-          <div class="toggle-thumb"></div>
-        </div>
-      </div>
-      <div class="toggle-item" onclick="toggleSwitch('notifEmail')">
-        <div class="toggle-info">
-          <div class="toggle-label">メール通知</div>
-          <div class="toggle-sub">大切なお知らせをメールでも</div>
-        </div>
-        <div class="toggle-switch" id="notifEmail">
-          <div class="toggle-thumb"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- PLAN -->
   <div class="section">
     <div class="section-header">
@@ -839,10 +801,7 @@ const interests = profile?.interests || [];
 });
 
 // トグル状態
-const notifEnabled = profile?.notification_enabled !== false;
-setToggle('notifEnabled', notifEnabled);
-setToggle('notifLine', notifEnabled);
-setToggle('notifEmail', false);
+// 通知設定は削除済み
 
 // 元データ保存
 originalData = {
@@ -852,7 +811,6 @@ originalData = {
   target_monthly: profile?.target_monthly || null,
   target_yearly: profile?.target_yearly || null,
   line_name: profile?.line_name || '',
-  notification_enabled: notifEnabled,
   tools_used: toolsUsed.slice().sort().join(','),
   community_status: communityStatus,
   interests: interests.slice().sort().join(',')
@@ -900,7 +858,6 @@ function checkChanges() {
     target_monthly: parseInt(document.getElementById('targetMonthly').value) || null,
     target_yearly: parseInt(document.getElementById('targetYearly').value) || null,
     line_name: document.getElementById('lineName').value.trim(),
-    notification_enabled: document.getElementById('notifEnabled').dataset.value === '1',
     tools_used: tools.slice().sort().join(','),
     community_status: communityParts.join(','),
     interests: interestsList.slice().sort().join(',')
@@ -942,7 +899,6 @@ window.saveSettings = async function() {
     target_monthly: currentData.target_monthly,
     target_yearly: currentData.target_yearly,
     line_name: currentData.line_name || null,
-    notification_enabled: currentData.notification_enabled,
     tools_used: toolsArr.length > 0 ? toolsArr : null,
     community_status: currentData.community_status || null,
     interests: interestsArr.length > 0 ? interestsArr : null,
