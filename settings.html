@@ -526,6 +526,11 @@ body{
         <input type="text" id="tradingPairs" class="field-input" placeholder="例:USD/JPY, GOLD, BTC">
         <div class="field-help">カンマで区切って複数入力できます</div>
       </div>
+      <div class="field-item">
+        <div class="field-label">LINE登録名</div>
+        <input type="text" id="lineName" class="field-input" placeholder="LINEに登録しているお名前">
+        <div class="field-help">サポート時の本人確認に使用します</div>
+      </div>
     </div>
   </div>
 
@@ -814,6 +819,7 @@ document.getElementById('tradeYears').value = profile?.trade_years || '0';
 document.getElementById('tradingPairs').value = profile?.trading_pairs?.join(', ') || '';
 document.getElementById('targetMonthly').value = profile?.target_monthly || '';
 document.getElementById('targetYearly').value = profile?.target_yearly || '';
+document.getElementById('lineName').value = profile?.line_name || '';
 
 // 使用ツール初期化
 const toolsUsed = profile?.tools_used || [];
@@ -845,6 +851,7 @@ originalData = {
   trading_pairs: profile?.trading_pairs?.join(', ') || '',
   target_monthly: profile?.target_monthly || null,
   target_yearly: profile?.target_yearly || null,
+  line_name: profile?.line_name || '',
   notification_enabled: notifEnabled,
   tools_used: toolsUsed.slice().sort().join(','),
   community_status: communityStatus,
@@ -892,6 +899,7 @@ function checkChanges() {
     trading_pairs: document.getElementById('tradingPairs').value.trim(),
     target_monthly: parseInt(document.getElementById('targetMonthly').value) || null,
     target_yearly: parseInt(document.getElementById('targetYearly').value) || null,
+    line_name: document.getElementById('lineName').value.trim(),
     notification_enabled: document.getElementById('notifEnabled').dataset.value === '1',
     tools_used: tools.slice().sort().join(','),
     community_status: communityParts.join(','),
@@ -933,6 +941,7 @@ window.saveSettings = async function() {
     trading_pairs: tradingPairsArr,
     target_monthly: currentData.target_monthly,
     target_yearly: currentData.target_yearly,
+    line_name: currentData.line_name || null,
     notification_enabled: currentData.notification_enabled,
     tools_used: toolsArr.length > 0 ? toolsArr : null,
     community_status: currentData.community_status || null,

@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>管理画面 | mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600&family=Cormorant+Garamond:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg: #F7F2EA;
+  --bg-soft: #FAF6F0;
+  --bg-card: #FFFFFF;
+  --ink: #2C2825;
+  --ink-mid: #5A524C;
+  --ink-soft: #8A8079;
+  --line: #EAE2D5;
+  --line-strong: #D8CDB8;
+  --rose: #C98B95;
+  --rose-deep: #A06570;
+  --rose-soft: #E8C7CD;
+  --sage: #9BB59C;
+  --honey: #D4B677;
+  --mauve: #A89BB0;
+  --plus: #4A8B6A;
+  --minus: #B45A5A;
+  --warn: #D89B5A;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body{
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.app-frame{
+  max-width: 430px;
+  margin: 0 auto;
+  background: var(--bg);
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 80px;
+}
+
+/* HEADER */
+.header{
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 100;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.header-top{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.back-btn{
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--ink-mid);
+  padding: 0;
+}
+.header-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  font-weight: 500;
+  flex: 1;
+}
+.header-en{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.1em;
+  padding-left: 32px;
+}
+
+/* CONTENT */
+.content{
+  padding: 20px 20px 40px;
+}
+
+/* SECTION */
+.section{
+  margin-bottom: 28px;
+}
+.section-header{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+.section-icon{ font-size: 16px; }
+.section-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  font-weight: 500;
+}
+.section-count{
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--ink-soft);
+  background: var(--bg-soft);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* SUMMARY CARDS */
+.summary-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.summary-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+}
+.summary-card .label{
+  font-size: 10px;
+  color: var(--ink-soft);
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.summary-card .value{
+  font-family: 'Inter', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.summary-card .sub{
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+/* USER LIST */
+.user-list{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.user-row{
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.user-row:last-child{ border-bottom: none; }
+.user-info{
+  flex: 1;
+  min-width: 0;
+}
+.user-name{
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.user-name .line-badge{
+  font-size: 9px;
+  background: rgba(155, 181, 156, 0.2);
+  color: #2D5F4F;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.user-meta{
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.user-status{
+  font-size: 11px;
+  font-weight: 500;
+  text-align: right;
+  white-space: nowrap;
+}
+.user-status.warn{ color: var(--warn); }
+.user-status.bad{ color: var(--minus); }
+.user-status.good{ color: var(--plus); }
+.user-status.info{ color: var(--mauve); }
+
+/* EMPTY STATE */
+.empty-state{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 30px 20px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+/* CSV EXPORT BUTTON */
+.export-btn{
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+.export-btn:hover{
+  background: var(--bg-soft);
+}
+
+/* LOADING */
+.loading{
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+/* DENIED */
+.denied{
+  text-align: center;
+  padding: 80px 20px;
+}
+.denied h2{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+.denied p{
+  font-size: 13px;
+  color: var(--ink-mid);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.denied a{
+  display: inline-block;
+  padding: 12px 28px;
+  background: var(--rose);
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  font-size: 13px;
+}
+</style>
+</head>
+<body>
+<div class="app-frame">
+
+  <header class="header">
+    <div class="header-top">
+      <button class="back-btn" onclick="location.href='dashboard.html'">←</button>
+      <h1 class="header-title">管理画面</h1>
+    </div>
+    <div class="header-en">ADMIN DASHBOARD</div>
+  </header>
+
+  <div class="content" id="content">
+    <div class="loading">読み込み中...</div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const content = document.getElementById('content');
+
+async function init() {
+  // 認証チェック
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    location.href = 'login.html';
+    return;
+  }
+
+  // 管理者チェック
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('is_admin, display_name')
+    .eq('id', session.user.id)
+    .single();
+
+  if (profileError || !profile?.is_admin) {
+    content.innerHTML = `
+      <div class="denied">
+        <h2>🔒 アクセス権限がありません</h2>
+        <p>この画面は管理者専用です。<br>マイページに戻ります。</p>
+        <a href="dashboard.html">マイページへ</a>
+      </div>
+    `;
+    return;
+  }
+
+  // 全ユーザーのプロフィール取得
+  const { data: allProfiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (profilesError) {
+    content.innerHTML = `<div class="empty-state">データ取得エラー: ${profilesError.message}</div>`;
+    return;
+  }
+
+  // 全ユーザーの取引データ取得
+  const { data: allTrades, error: tradesError } = await supabase
+    .from('trades')
+    .select('*')
+    .order('trade_date', { ascending: false });
+
+  if (tradesError) {
+    content.innerHTML = `<div class="empty-state">取引データエラー: ${tradesError.message}</div>`;
+    return;
+  }
+
+  // 集計
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+  const threeDaysAgo = new Date(now.getTime() - 3 * 86400000).toISOString().split('T')[0];
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000).toISOString().split('T')[0];
+  const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+
+  // ユーザー別データ作成
+  const userMap = {};
+  allProfiles.forEach(p => {
+    userMap[p.id] = {
+      ...p,
+      trades: [],
+      lastTradeDate: null,
+      thisMonthPL: 0,
+      thisMonthCount: 0,
+      consecutiveLosses: 0
+    };
+  });
+
+  allTrades.forEach(t => {
+    const u = userMap[t.user_id];
+    if (!u) return;
+    u.trades.push(t);
+    if (!u.lastTradeDate || t.trade_date > u.lastTradeDate) {
+      u.lastTradeDate = t.trade_date;
+    }
+    if (t.trade_date >= firstOfMonth) {
+      u.thisMonthPL += t.profit_loss;
+      u.thisMonthCount++;
+    }
+  });
+
+  // 連敗計算
+  Object.values(userMap).forEach(u => {
+    const sortedTrades = u.trades.sort((a, b) => 
+      new Date(b.trade_date) - new Date(a.trade_date)
+    );
+    let losses = 0;
+    for (const t of sortedTrades) {
+      if (t.profit_loss < 0) losses++;
+      else break;
+    }
+    u.consecutiveLosses = losses;
+  });
+
+  // 集計結果
+  const totalUsers = allProfiles.length;
+  const thisMonthNew = allProfiles.filter(p => 
+    p.created_at >= firstOfMonth
+  ).length;
+  const activeUsers = Object.values(userMap).filter(u => 
+    u.lastTradeDate && u.lastTradeDate >= sevenDaysAgo
+  ).length;
+  const activeRate = totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100) : 0;
+  const totalTrades = allTrades.length;
+  const totalThisMonthPL = Object.values(userMap).reduce((sum, u) => sum + u.thisMonthPL, 0);
+
+  // 要注意リスト
+  const noRecord3Days = Object.values(userMap).filter(u => 
+    !u.lastTradeDate || u.lastTradeDate < threeDaysAgo
+  );
+  const consecutiveLosersList = Object.values(userMap).filter(u => 
+    u.consecutiveLosses >= 3
+  );
+
+  // 興味あるユーザー
+  const eaInterested = Object.values(userMap).filter(u => 
+    u.interests && u.interests.includes('ea')
+  );
+  const indicatorInterested = Object.values(userMap).filter(u => 
+    u.interests && u.interests.includes('indicator')
+  );
+  const communityInterested = Object.values(userMap).filter(u => 
+    u.interests && u.interests.includes('community') &&
+    (!u.community_status || !u.community_status.includes('discord'))
+  );
+
+  // HTML 構築
+  let html = '';
+
+  // 全体サマリー
+  html += `
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">📊</span>
+        <span class="section-title">全体サマリー</span>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="label">登録ユーザー</div>
+          <div class="value">${totalUsers}</div>
+          <div class="sub">名</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">今月新規</div>
+          <div class="value">+${thisMonthNew}</div>
+          <div class="sub">名</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">アクティブ率</div>
+          <div class="value">${activeRate}%</div>
+          <div class="sub">${activeUsers}/${totalUsers}名</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">総取引数</div>
+          <div class="value">${totalTrades}</div>
+          <div class="sub">回</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // 要注意:3日以上記録なし
+  html += `
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">⚠️</span>
+        <span class="section-title">3日以上記録なし</span>
+        <span class="section-count">${noRecord3Days.length}名</span>
+      </div>
+      ${renderUserList(noRecord3Days, 'no-record')}
+      <button class="export-btn" onclick='exportCSV(${JSON.stringify(noRecord3Days).replace(/'/g, "&apos;")}, "no-record")'>
+        📥 CSVダウンロード
+      </button>
+    </div>
+  `;
+
+  // 連敗中
+  html += `
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">💔</span>
+        <span class="section-title">連敗中(3連敗以上)</span>
+        <span class="section-count">${consecutiveLosersList.length}名</span>
+      </div>
+      ${renderUserList(consecutiveLosersList, 'losses')}
+      <button class="export-btn" onclick='exportCSV(${JSON.stringify(consecutiveLosersList).replace(/'/g, "&apos;")}, "losses")'>
+        📥 CSVダウンロード
+      </button>
+    </div>
+  `;
+
+  // EA興味あり
+  html += `
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">🤖</span>
+        <span class="section-title">EA興味あり</span>
+        <span class="section-count">${eaInterested.length}名</span>
+      </div>
+      ${renderUserList(eaInterested, 'ea')}
+      <button class="export-btn" onclick='exportCSV(${JSON.stringify(eaInterested).replace(/'/g, "&apos;")}, "ea")'>
+        📥 CSVダウンロード
+      </button>
+    </div>
+  `;
+
+  // インジ興味あり
+  html += `
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">📊</span>
+        <span class="section-title">インジ興味あり</span>
+        <span class="section-count">${indicatorInterested.length}名</span>
+      </div>
+      ${renderUserList(indicatorInterested, 'indicator')}
+      <button class="export-btn" onclick='exportCSV(${JSON.stringify(indicatorInterested).replace(/'/g, "&apos;")}, "indicator")'>
+        📥 CSVダウンロード
+      </button>
+    </div>
+  `;
+
+  // コミュニティ未参加・興味あり
+  html += `
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">🌸</span>
+        <span class="section-title">コミュニティ未参加・興味あり</span>
+        <span class="section-count">${communityInterested.length}名</span>
+      </div>
+      ${renderUserList(communityInterested, 'community')}
+      <button class="export-btn" onclick='exportCSV(${JSON.stringify(communityInterested).replace(/'/g, "&apos;")}, "community")'>
+        📥 CSVダウンロード
+      </button>
+    </div>
+  `;
+
+  content.innerHTML = html;
+}
+
+function renderUserList(users, type) {
+  if (users.length === 0) {
+    return '<div class="empty-state">該当するユーザーはいません🌸</div>';
+  }
+
+  return `
+    <div class="user-list">
+      ${users.map(u => {
+        const displayName = u.display_name || u.line_name || (u.email ? u.email.split('@')[0] : '名無し');
+        const lineName = u.line_name;
+        const lineBadge = lineName ? `<span class="line-badge">LINE: ${lineName}</span>` : '';
+        
+        let metaText = '';
+        let statusText = '';
+        let statusCls = 'info';
+        
+        if (type === 'no-record') {
+          const days = u.lastTradeDate 
+            ? Math.floor((new Date() - new Date(u.lastTradeDate)) / 86400000)
+            : '∞';
+          metaText = `最終記録:${u.lastTradeDate || '未記録'}`;
+          statusText = `${days}日前`;
+          statusCls = 'warn';
+        } else if (type === 'losses') {
+          metaText = `今月:${u.thisMonthCount}回 ¥${u.thisMonthPL.toLocaleString('ja-JP')}`;
+          statusText = `${u.consecutiveLosses}連敗`;
+          statusCls = 'bad';
+        } else if (type === 'ea') {
+          const tools = u.tools_used || [];
+          const hasEA = tools.some(t => t.includes('miyabi'));
+          metaText = `${hasEA ? '✅ EA使用中' : '⏳ 未導入'}`;
+          statusText = 'EA検討中';
+          statusCls = 'info';
+        } else if (type === 'indicator') {
+          const tools = u.tools_used || [];
+          const hasInd = tools.includes('solid_edge');
+          metaText = `${hasInd ? '✅ インジ使用中' : '⏳ 未導入'}`;
+          statusText = 'インジ検討中';
+          statusCls = 'info';
+        } else if (type === 'community') {
+          metaText = u.community_status ? `現在:${u.community_status}` : '未参加';
+          statusText = 'コミュ検討中';
+          statusCls = 'info';
+        }
+        
+        return `
+          <div class="user-row">
+            <div class="user-info">
+              <div class="user-name">
+                ${displayName}
+                ${lineBadge}
+              </div>
+              <div class="user-meta">${metaText}</div>
+            </div>
+            <div class="user-status ${statusCls}">${statusText}</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+window.exportCSV = function(users, type) {
+  if (users.length === 0) {
+    alert('対象ユーザーがいません');
+    return;
+  }
+
+  const typeLabels = {
+    'no-record': '3日以上記録なし',
+    'losses': '連敗中',
+    'ea': 'EA興味あり',
+    'indicator': 'インジ興味あり',
+    'community': 'コミュニティ未参加'
+  };
+
+  // CSV ヘッダー
+  let csv = 'display_name,line_name,email,last_trade,this_month_count,this_month_pl,consecutive_losses,tools_used,community_status,interests,created_at\n';
+  
+  users.forEach(u => {
+    const row = [
+      u.display_name || '',
+      u.line_name || '',
+      u.email || '',
+      u.lastTradeDate || '',
+      u.thisMonthCount || 0,
+      u.thisMonthPL || 0,
+      u.consecutiveLosses || 0,
+      (u.tools_used || []).join(';'),
+      u.community_status || '',
+      (u.interests || []).join(';'),
+      u.created_at || ''
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+    csv += row + '\n';
+  });
+
+  // UTF-8 BOM付きでダウンロード(Excel対応)
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+  link.href = URL.createObjectURL(blob);
+  link.download = `${typeLabels[type] || type}_${dateStr}.csv`;
+  link.click();
+};
+
+init();
+</script>
+</body>
+</html>
