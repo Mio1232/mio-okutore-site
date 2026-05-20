@@ -681,32 +681,16 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 // 通貨換算レート(固定:1USD = 159 JPY)
 const USD_TO_JPY = 159;
 
-// 円・ドル両方表示用フォーマット関数
-function formatDualCurrency(jpyTotal, usdTotal, options = {}) {
-  const { withSign = true, compact = false } = options;
-  
-  const fmtJPY = (n) => {
-    const sign = (withSign && n >= 0) ? '+' : (n < 0 ? '-' : '');
-    return sign + '¥' + Math.abs(n).toLocaleString('ja-JP');
-  };
-  const fmtUSD = (n) => {
-    const sign = (withSign && n >= 0) ? '+' : (n < 0 ? '-' : '');
-    return sign + '$' + Math.abs(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
-  };
-  
-  const hasJPY = Math.abs(jpyTotal) > 0;
-  const hasUSD = Math.abs(usdTotal) > 0;
-  
-  if (hasJPY && hasUSD) {
-    return `<div class="dual-currency">
-      <div class="dc-jpy">${fmtJPY(jpyTotal)}</div>
-      <div class="dc-usd">${fmtUSD(usdTotal)}</div>
-    </div>`;
-  } else if (hasUSD) {
-    return fmtUSD(usdTotal);
-  } else {
-    return fmtJPY(jpyTotal);
-  }
+// 円表示フォーマット関数(USD は円換算して合算)
+function formatJPYTotal(totalInJPY, withSign = true) {
+  const sign = (withSign && totalInJPY >= 0) ? '+' : (totalInJPY < 0 ? '-' : '');
+  return sign + '¥' + Math.abs(Math.round(totalInJPY)).toLocaleString('ja-JP');
+}
+
+// 互換用エイリアス(既存呼び出しが残っている場合用)
+function formatDualCurrency(jpyTotal, usdTotal) {
+  const totalInJPY = jpyTotal + (usdTotal * USD_TO_JPY);
+  return formatJPYTotal(totalInJPY);
 }
 
 // 取引リストから JPY と USD それぞれの合計を計算
@@ -822,7 +806,7 @@ if (trades && trades.length > 0) {
             <div class="breakdown-type">${t.label}</div>
             <div class="breakdown-stats">${t.trades.length}回 · 勝率${winRate}%</div>
           </div>
-          <div class="breakdown-pl ${cls}">${formatDualCurrency(t.jpy, t.usd)}</div>
+          <div class="breakdown-pl ${cls}">${formatJPYTotal(t.jpy + (t.usd * USD_TO_JPY))}</div>
         </div>
       `;
     }).join('');
@@ -831,17 +815,16 @@ if (trades && trades.length > 0) {
     document.getElementById('breakdownCard').style.display = 'block';
   }
 
-  // 月間PL表示(JPY + USD両方)
+  // 月間PL表示(全て円換算で合算)
   const totals = calcDualTotals(trades);
   const plEl = document.getElementById('monthlyPL');
-  plEl.innerHTML = formatDualCurrency(totals.jpy, totals.usd);
+  plEl.textContent = formatJPYTotal(totals.totalInJPY);
   plEl.className = 'summary-amount ' + (totals.totalInJPY > 0 ? 'plus' : totals.totalInJPY < 0 ? 'minus' : 'zero');
 
   document.getElementById('tradeCount').textContent = trades.length + '回';
   document.getElementById('winRate').textContent = winRate + '%';
-  const maxCurr = maxProfitTrade?.currency || 'JPY';
-  const maxPL = maxProfitTrade?.profit_loss || 0;
-  document.getElementById('maxProfit').textContent = (maxCurr === 'USD' ? '$' : '¥') + Math.abs(maxPL).toLocaleString(maxCurr === 'USD' ? 'en-US' : 'ja-JP');
+  // 最大利益も円換算で表示
+  document.getElementById('maxProfit').textContent = '¥' + Math.abs(Math.round(maxProfitJPY)).toLocaleString('ja-JP');
 
   // 目標達成率(円換算ベース)
   if (profile?.target_monthly && profile.target_monthly > 0) {

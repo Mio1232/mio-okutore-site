@@ -591,8 +591,17 @@ body{
               </button>
             </div>
             <input type="hidden" id="currency" value="JPY">
-            <input type="text" id="profitLoss" class="input" placeholder="+12500 または -3200" required inputmode="numeric" autocomplete="off">
-            <div class="currency-hint" id="currencyHint">※円で入力してください</div>
+            <div class="pl-sign-group">
+              <button type="button" class="pl-sign-btn active" data-sign="plus" onclick="selectPLSign('plus')">
+                <span>+ 利益</span>
+              </button>
+              <button type="button" class="pl-sign-btn" data-sign="minus" onclick="selectPLSign('minus')">
+                <span>− 損失</span>
+              </button>
+            </div>
+            <input type="hidden" id="plSign" value="plus">
+            <input type="text" id="profitLoss" class="input" placeholder="12500" required inputmode="decimal" autocomplete="off">
+            <div class="currency-hint" id="currencyHint">※円で金額を入力してください(マイナスは「損失」を選択)</div>
           </div>
 
           <div class="field">
@@ -677,6 +686,14 @@ if (!session) {
 }
 const user = session.user;
 
+// 利益/損失の符号選択
+function selectPLSign(sign) {
+  document.getElementById('plSign').value = sign;
+  document.querySelectorAll('.pl-sign-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`.pl-sign-btn[data-sign="${sign}"]`).classList.add('active');
+}
+window.selectPLSign = selectPLSign;
+
 // 通貨選択
 function selectCurrency(curr) {
   document.getElementById('currency').value = curr;
@@ -687,11 +704,11 @@ function selectCurrency(curr) {
   const hint = document.getElementById('currencyHint');
   const input = document.getElementById('profitLoss');
   if (curr === 'JPY') {
-    hint.textContent = '※円で入力してください';
-    input.placeholder = '+12500 または -3200';
+    hint.textContent = '※円で金額を入力してください(マイナスは「損失」を選択)';
+    input.placeholder = '12500';
   } else {
-    hint.textContent = '※ドルで入力してください(1USD ≒ 159円で換算表示)';
-    input.placeholder = '+250.50 または -100.75';
+    hint.textContent = '※ドルで金額を入力してください(1USD ≒ 159円で換算)';
+    input.placeholder = '250.50';
   }
 }
 window.selectCurrency = selectCurrency;
@@ -735,13 +752,16 @@ function showMessage(text, type = 'success') {
 document.getElementById('tradeForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   
-  // 損益入力のバリデーション(+ 記号を許容、空白を除去)
-  const plRaw = document.getElementById('profitLoss').value.trim().replace(/\s/g, '').replace(/^\+/, '').replace(/,/g, '');
+  // 損益入力のバリデーション(数値のみ + 符号は別ボタンから)
+  const plRaw = document.getElementById('profitLoss').value.trim().replace(/\s/g, '').replace(/[+\-]/g, '').replace(/,/g, '');
   const plNum = parseFloat(plRaw);
-  if (isNaN(plNum)) {
-    showMessage('損益は数値で入力してください(例: 12500 または -3200)', 'error');
+  if (isNaN(plNum) || plNum < 0) {
+    showMessage('金額は数値で入力してください(例: 12500)', 'error');
     return;
   }
+  // 符号を適用
+  const plSign = document.getElementById('plSign').value;
+  const plFinal = plSign === 'minus' ? -Math.abs(plNum) : Math.abs(plNum);
   
   const submitBtn = document.getElementById('submitBtn');
   submitBtn.disabled = true;
@@ -758,7 +778,7 @@ document.getElementById('tradeForm').addEventListener('submit', async (e) => {
     lot_size: parseFloat(document.getElementById('lotSize').value) || null,
     entry_price: parseFloat(document.getElementById('entryPrice').value) || null,
     exit_price: parseFloat(document.getElementById('exitPrice').value) || null,
-    profit_loss: plNum,
+    profit_loss: plFinal,
     duration_minutes: parseInt(document.getElementById('duration').value) || null,
     memo: document.getElementById('memo').value || null
   };
@@ -788,6 +808,8 @@ document.getElementById('tradeForm').addEventListener('submit', async (e) => {
   document.getElementById('entryPrice').value = '';
   document.getElementById('exitPrice').value = '';
   document.getElementById('profitLoss').value = '';
+  // 符号を「利益」にリセット
+  selectPLSign('plus');
   document.getElementById('memo').value = '';
   document.getElementById('tradeTime').value = '';
 
