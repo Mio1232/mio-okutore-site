@@ -591,7 +591,7 @@ body{
               </button>
             </div>
             <input type="hidden" id="currency" value="JPY">
-            <input type="text" id="profitLoss" class="input" placeholder="+12500 または -3200" required inputmode="text" pattern="[\-0-9.]*" autocomplete="off">
+            <input type="text" id="profitLoss" class="input" placeholder="+12500 または -3200" required inputmode="numeric" autocomplete="off">
             <div class="currency-hint" id="currencyHint">※円で入力してください</div>
           </div>
 
@@ -734,6 +734,15 @@ function showMessage(text, type = 'success') {
 // 記録送信
 document.getElementById('tradeForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  
+  // 損益入力のバリデーション(+ 記号を許容、空白を除去)
+  const plRaw = document.getElementById('profitLoss').value.trim().replace(/\s/g, '').replace(/^\+/, '').replace(/,/g, '');
+  const plNum = parseFloat(plRaw);
+  if (isNaN(plNum)) {
+    showMessage('損益は数値で入力してください(例: 12500 または -3200)', 'error');
+    return;
+  }
+  
   const submitBtn = document.getElementById('submitBtn');
   submitBtn.disabled = true;
   submitBtn.textContent = '記録中...';
@@ -749,7 +758,7 @@ document.getElementById('tradeForm').addEventListener('submit', async (e) => {
     lot_size: parseFloat(document.getElementById('lotSize').value) || null,
     entry_price: parseFloat(document.getElementById('entryPrice').value) || null,
     exit_price: parseFloat(document.getElementById('exitPrice').value) || null,
-    profit_loss: parseFloat(document.getElementById('profitLoss').value),
+    profit_loss: plNum,
     duration_minutes: parseInt(document.getElementById('duration').value) || null,
     memo: document.getElementById('memo').value || null
   };
