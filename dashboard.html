@@ -654,14 +654,6 @@ body{
         <div class="settings-arrow">›</div>
       </a>
       <a class="settings-item" href="settings.html">
-        <div class="settings-icon">🔔</div>
-        <div class="settings-text">
-          <div class="settings-label">通知設定</div>
-          <div class="settings-sub">LINE通知・メール通知</div>
-        </div>
-        <div class="settings-arrow">›</div>
-      </a>
-      <a class="settings-item" href="settings.html">
         <div class="settings-icon">💎</div>
         <div class="settings-text">
           <div class="settings-label">プラン管理</div>
@@ -685,6 +677,49 @@ body{
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+// 通貨換算レート(固定:1USD = 159 JPY)
+const USD_TO_JPY = 159;
+
+// 円・ドル両方表示用フォーマット関数
+function formatDualCurrency(jpyTotal, usdTotal, options = {}) {
+  const { withSign = true, compact = false } = options;
+  
+  const fmtJPY = (n) => {
+    const sign = (withSign && n >= 0) ? '+' : (n < 0 ? '-' : '');
+    return sign + '¥' + Math.abs(n).toLocaleString('ja-JP');
+  };
+  const fmtUSD = (n) => {
+    const sign = (withSign && n >= 0) ? '+' : (n < 0 ? '-' : '');
+    return sign + '$' + Math.abs(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  };
+  
+  const hasJPY = Math.abs(jpyTotal) > 0;
+  const hasUSD = Math.abs(usdTotal) > 0;
+  
+  if (hasJPY && hasUSD) {
+    return `<div class="dual-currency">
+      <div class="dc-jpy">${fmtJPY(jpyTotal)}</div>
+      <div class="dc-usd">${fmtUSD(usdTotal)}</div>
+    </div>`;
+  } else if (hasUSD) {
+    return fmtUSD(usdTotal);
+  } else {
+    return fmtJPY(jpyTotal);
+  }
+}
+
+// 取引リストから JPY と USD それぞれの合計を計算
+function calcDualTotals(trades) {
+  let jpy = 0, usd = 0;
+  trades.forEach(t => {
+    const curr = t.currency || 'JPY';
+    const pl = t.profit_loss || 0;
+    if (curr === 'USD') usd += pl;
+    else jpy += pl;
+  });
+  return { jpy, usd, totalInJPY: jpy + (usd * USD_TO_JPY) };
+}
 
 const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
@@ -749,20 +784,27 @@ if (trades && trades.length > 0) {
   const totalPL = trades.reduce((sum, t) => sum + t.profit_loss, 0);
   const winTrades = trades.filter(t => t.profit_loss > 0).length;
   const winRate = Math.round((winTrades / trades.length) * 100);
-  const maxProfit = Math.max(...trades.map(t => t.profit_loss));
+  // 最大利益(円換算ベースで比較)
+  const profitsInJPY = trades.map(t => (t.currency === 'USD') ? t.profit_loss * USD_TO_JPY : t.profit_loss);
+  const maxProfitJPY = Math.max(...profitsInJPY);
+  const maxProfitIdx = profitsInJPY.indexOf(maxProfitJPY);
+  const maxProfitTrade = trades[maxProfitIdx];
 
-  // 取引種類別の内訳計算
+  // 取引種類別の内訳計算(両通貨対応)
   const typeBreakdown = {
-    discretionary: { label: '🧠 裁量', trades: [], total: 0 },
-    miyabi_ea: { label: '🤖 みやびEA', trades: [], total: 0 },
-    solid_edge: { label: '📊 Solid Edge', trades: [], total: 0 }
+    discretionary: { label: '🧠 裁量', trades: [], jpy: 0, usd: 0 },
+    miyabi_ea: { label: '🤖 みやびEA', trades: [], jpy: 0, usd: 0 },
+    solid_edge: { label: '📊 Solid Edge', trades: [], jpy: 0, usd: 0 },
+    trade_stream: { label: '📡 トレード配信', trades: [], jpy: 0, usd: 0 }
   };
   
   trades.forEach(t => {
     const type = t.trade_type || 'discretionary';
     if (typeBreakdown[type]) {
       typeBreakdown[type].trades.push(t);
-      typeBreakdown[type].total += t.profit_loss;
+      const curr = t.currency || 'JPY';
+      if (curr === 'USD') typeBreakdown[type].usd += t.profit_loss;
+      else typeBreakdown[type].jpy += t.profit_loss;
     }
   });
 
@@ -772,15 +814,15 @@ if (trades && trades.length > 0) {
     const breakdownHTML = activeTypes.map(([key, t]) => {
       const wins = t.trades.filter(tr => tr.profit_loss > 0).length;
       const winRate = Math.round((wins / t.trades.length) * 100);
-      const cls = t.total > 0 ? 'plus' : t.total < 0 ? 'minus' : 'zero';
-      const sign = t.total >= 0 ? '+' : '';
+      const totalInJPY = t.jpy + (t.usd * USD_TO_JPY);
+      const cls = totalInJPY > 0 ? 'plus' : totalInJPY < 0 ? 'minus' : 'zero';
       return `
         <div class="breakdown-row">
           <div class="breakdown-info">
             <div class="breakdown-type">${t.label}</div>
             <div class="breakdown-stats">${t.trades.length}回 · 勝率${winRate}%</div>
           </div>
-          <div class="breakdown-pl ${cls}">${sign}¥${Math.abs(t.total).toLocaleString('ja-JP')}</div>
+          <div class="breakdown-pl ${cls}">${formatDualCurrency(t.jpy, t.usd)}</div>
         </div>
       `;
     }).join('');
@@ -789,22 +831,25 @@ if (trades && trades.length > 0) {
     document.getElementById('breakdownCard').style.display = 'block';
   }
 
-  // 月間PL表示
+  // 月間PL表示(JPY + USD両方)
+  const totals = calcDualTotals(trades);
   const plEl = document.getElementById('monthlyPL');
-  plEl.textContent = (totalPL >= 0 ? '+' : '') + '¥' + Math.abs(totalPL).toLocaleString('ja-JP');
-  plEl.className = 'summary-amount ' + (totalPL > 0 ? 'plus' : totalPL < 0 ? 'minus' : 'zero');
+  plEl.innerHTML = formatDualCurrency(totals.jpy, totals.usd);
+  plEl.className = 'summary-amount ' + (totals.totalInJPY > 0 ? 'plus' : totals.totalInJPY < 0 ? 'minus' : 'zero');
 
   document.getElementById('tradeCount').textContent = trades.length + '回';
   document.getElementById('winRate').textContent = winRate + '%';
-  document.getElementById('maxProfit').textContent = '¥' + maxProfit.toLocaleString('ja-JP');
+  const maxCurr = maxProfitTrade?.currency || 'JPY';
+  const maxPL = maxProfitTrade?.profit_loss || 0;
+  document.getElementById('maxProfit').textContent = (maxCurr === 'USD' ? '$' : '¥') + Math.abs(maxPL).toLocaleString(maxCurr === 'USD' ? 'en-US' : 'ja-JP');
 
-  // 目標達成率
+  // 目標達成率(円換算ベース)
   if (profile?.target_monthly && profile.target_monthly > 0) {
-    const percent = Math.round((totalPL / profile.target_monthly) * 100);
+    const percent = Math.round((totals.totalInJPY / profile.target_monthly) * 100);
     document.getElementById('goalPercent').textContent = percent + '%';
     document.getElementById('goalFill').style.width = Math.min(percent, 100) + '%';
     document.getElementById('goalText').textContent = 
-      `目標 ¥${profile.target_monthly.toLocaleString('ja-JP')} / 現在 ¥${totalPL.toLocaleString('ja-JP')}`;
+      `目標 ¥${profile.target_monthly.toLocaleString('ja-JP')} / 現在 ¥${totals.totalInJPY.toLocaleString('ja-JP')}`;
   }
 
   // 直近5件

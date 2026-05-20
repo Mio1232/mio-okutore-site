@@ -500,15 +500,13 @@ body{
       <div class="form-card">
         <form id="tradeForm">
           
-          <div class="row">
-            <div class="field">
-              <label class="label">日付<span class="required">*</span></label>
-              <input type="date" id="tradeDate" class="input" required>
-            </div>
-            <div class="field">
-              <label class="label">時刻</label>
-              <input type="time" id="tradeTime" class="input">
-            </div>
+          <div class="field">
+            <label class="label">日付<span class="required">*</span></label>
+            <input type="date" id="tradeDate" class="input" required>
+          </div>
+          <div class="field">
+            <label class="label">時刻</label>
+            <input type="time" id="tradeTime" class="input">
           </div>
 
           <div class="field">
@@ -552,6 +550,10 @@ body{
                 <span class="icon">📊</span>
                 <span>Solid Edge</span>
               </button>
+              <button type="button" class="trade-type-btn" data-type="trade_stream" onclick="selectTradeType('trade_stream')">
+                <span class="icon">📡</span>
+                <span>トレード配信</span>
+              </button>
             </div>
             <input type="hidden" id="tradeType" value="discretionary">
           </div>
@@ -579,8 +581,18 @@ body{
           </div>
 
           <div class="field">
-            <label class="label">損益(円)<span class="required">*</span></label>
-            <input type="number" id="profitLoss" class="input" placeholder="+12500 または -3200" required inputmode="numeric">
+            <label class="label">損益<span class="required">*</span></label>
+            <div class="currency-group">
+              <button type="button" class="currency-btn active" data-currency="JPY" onclick="selectCurrency('JPY')">
+                <span>¥ 円</span>
+              </button>
+              <button type="button" class="currency-btn" data-currency="USD" onclick="selectCurrency('USD')">
+                <span>$ ドル</span>
+              </button>
+            </div>
+            <input type="hidden" id="currency" value="JPY">
+            <input type="text" id="profitLoss" class="input" placeholder="+12500 または -3200" required inputmode="text" pattern="[\-0-9.]*" autocomplete="off">
+            <div class="currency-hint" id="currencyHint">※円で入力してください</div>
           </div>
 
           <div class="field">
@@ -618,6 +630,7 @@ body{
         <button class="filter-chip" data-filter="type:discretionary" onclick="filterHistory('type:discretionary')">🧠裁量</button>
         <button class="filter-chip" data-filter="type:miyabi_ea" onclick="filterHistory('type:miyabi_ea')">🤖EA</button>
         <button class="filter-chip" data-filter="type:solid_edge" onclick="filterHistory('type:solid_edge')">📊インジ</button>
+        <button class="filter-chip" data-filter="type:trade_stream" onclick="filterHistory('type:trade_stream')">📡配信</button>
         <button class="filter-chip" data-filter="USD/JPY" onclick="filterHistory('USD/JPY')">USD/JPY</button>
         <button class="filter-chip" data-filter="XAU/USD" onclick="filterHistory('XAU/USD')">GOLD</button>
         <button class="filter-chip" data-filter="win" onclick="filterHistory('win')">勝ち</button>
@@ -663,6 +676,25 @@ if (!session) {
   throw new Error('Not authenticated');
 }
 const user = session.user;
+
+// 通貨選択
+function selectCurrency(curr) {
+  document.getElementById('currency').value = curr;
+  document.querySelectorAll('.currency-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`.currency-btn[data-currency="${curr}"]`).classList.add('active');
+  
+  // ヒント文言更新 + プレースホルダー
+  const hint = document.getElementById('currencyHint');
+  const input = document.getElementById('profitLoss');
+  if (curr === 'JPY') {
+    hint.textContent = '※円で入力してください';
+    input.placeholder = '+12500 または -3200';
+  } else {
+    hint.textContent = '※ドルで入力してください(1USD ≒ 159円で換算表示)';
+    input.placeholder = '+250.50 または -100.75';
+  }
+}
+window.selectCurrency = selectCurrency;
 
 // 今日の日付をデフォルトに
 document.getElementById('tradeDate').value = new Date().toISOString().split('T')[0];
@@ -710,13 +742,14 @@ document.getElementById('tradeForm').addEventListener('submit', async (e) => {
     user_id: user.id,
     trade_date: document.getElementById('tradeDate').value,
     trade_time: document.getElementById('tradeTime').value || null,
+    currency: document.getElementById('currency').value,
     pair: document.getElementById('pair').value,
     direction: document.getElementById('direction').value || null,
     trade_type: document.getElementById('tradeType').value || 'discretionary',
     lot_size: parseFloat(document.getElementById('lotSize').value) || null,
     entry_price: parseFloat(document.getElementById('entryPrice').value) || null,
     exit_price: parseFloat(document.getElementById('exitPrice').value) || null,
-    profit_loss: parseInt(document.getElementById('profitLoss').value),
+    profit_loss: parseFloat(document.getElementById('profitLoss').value),
     duration_minutes: parseInt(document.getElementById('duration').value) || null,
     memo: document.getElementById('memo').value || null
   };

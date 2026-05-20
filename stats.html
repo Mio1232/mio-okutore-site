@@ -392,6 +392,9 @@ body{
 .insight-list li{
   margin-bottom: 4px;
 }
+.dual-currency{display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.1}
+.dual-currency .dc-jpy{font-size:inherit;font-weight:inherit}
+.dual-currency .dc-usd{font-size:0.55em;opacity:0.7;font-weight:400}
 </style>
 </head>
 <body>
@@ -426,6 +429,30 @@ body{
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+// 通貨換算レート(固定:1USD = 159 JPY)
+const USD_TO_JPY = 159;
+
+function formatDualCurrencyStr(jpyTotal, usdTotal, withSign = true) {
+  const fmtJPY = (n) => (withSign && n >= 0 ? '+' : (n < 0 ? '-' : '')) + '¥' + Math.abs(n).toLocaleString('ja-JP');
+  const fmtUSD = (n) => (withSign && n >= 0 ? '+' : (n < 0 ? '-' : '')) + '$' + Math.abs(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  const hasJPY = Math.abs(jpyTotal) > 0;
+  const hasUSD = Math.abs(usdTotal) > 0;
+  if (hasJPY && hasUSD) {
+    return `<div class="dual-currency"><div class="dc-jpy">${fmtJPY(jpyTotal)}</div><div class="dc-usd">${fmtUSD(usdTotal)}</div></div>`;
+  } else if (hasUSD) return fmtUSD(usdTotal);
+  return fmtJPY(jpyTotal);
+}
+
+function calcDualTotalsStats(trades) {
+  let jpy = 0, usd = 0;
+  trades.forEach(t => {
+    const curr = t.currency || 'JPY';
+    if (curr === 'USD') usd += (t.profit_loss || 0);
+    else jpy += (t.profit_loss || 0);
+  });
+  return { jpy, usd, totalInJPY: jpy + (usd * USD_TO_JPY) };
+}
 
 const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
@@ -497,7 +524,8 @@ function renderReport() {
   }
 
   // 集計
-  const totalPL = currentTrades.reduce((sum, t) => sum + t.profit_loss, 0);
+  const totalPL = currentTrades.reduce((sum, t) => sum + ((t.currency === 'USD' ? t.profit_loss * USD_TO_JPY : t.profit_loss) || 0), 0);
+  const dualTotals = calcDualTotalsStats(currentTrades);
   const winTrades = currentTrades.filter(t => t.profit_loss > 0);
   const lossTrades = currentTrades.filter(t => t.profit_loss < 0);
   const winRate = currentTrades.length > 0 ? Math.round((winTrades.length / currentTrades.length) * 100) : 0;
@@ -595,8 +623,8 @@ function renderReport() {
     <div class="section">
       <div class="hero-card">
         <div class="hero-label">TOTAL P/L</div>
-        <div class="hero-amount ${totalPL > 0 ? 'plus' : totalPL < 0 ? 'minus' : 'zero'}">
-          ${totalPL >= 0 ? '+' : ''}¥${Math.abs(totalPL).toLocaleString('ja-JP')}
+        <div class="hero-amount ${dualTotals.totalInJPY > 0 ? 'plus' : dualTotals.totalInJPY < 0 ? 'minus' : 'zero'}">
+          ${formatDualCurrencyStr(dualTotals.jpy, dualTotals.usd)}
         </div>
         <div class="hero-trend">${currentTrades.length}回のトレード</div>
       </div>
