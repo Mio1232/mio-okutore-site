@@ -90,9 +90,7 @@ body{
   border-radius: 50%;
   flex-shrink: 0;
   background: var(--rose-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   font-family: 'Noto Serif JP', serif;
   font-weight: 600;
   color: var(--rose-deep);
@@ -125,67 +123,175 @@ body{
   50% { opacity: 0.4; }
 }
 
-/* IFRAME WRAPPER */
-.chat-wrap{
+/* CHAT AREA */
+.chat-area{
   flex: 1;
-  position: relative;
-  overflow: hidden;
-  background: var(--bg-card);
-}
-.chat-iframe{
-  width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
+  overflow-y: auto;
+  padding: 16px 16px 8px;
+  background: var(--bg);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* LOADING */
-.loading{
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg);
-  z-index: 5;
-  transition: opacity 0.4s;
+/* WELCOME */
+.welcome-card{
+  text-align: center;
+  padding: 24px 16px;
+  margin-bottom: 12px;
 }
-.loading.hidden{
-  opacity: 0;
-  pointer-events: none;
-}
-.loading-avatar{
-  width: 64px; height: 64px;
+.welcome-avatar{
+  width: 56px; height: 56px;
   border-radius: 50%;
+  margin: 0 auto 12px;
   background: var(--rose-soft);
+  background-image: url('/mio-icon.png');
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 4px 12px rgba(201, 139, 149, 0.15);
+}
+.welcome-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.welcome-sub{
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+/* MESSAGES */
+.msg{
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 18px;
-  animation: float 2s ease-in-out infinite;
+  gap: 8px;
+  margin-bottom: 12px;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn{
+  from{ opacity: 0; transform: translateY(6px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+.msg-ai{ align-items: flex-start; }
+.msg-user{ flex-direction: row-reverse; }
+
+.msg-avatar{
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--rose-soft);
   background-image: url('/mio-icon.png');
   background-size: cover;
   background-position: center;
 }
-@keyframes float{
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+.msg-user .msg-avatar{ display: none; }
+
+.msg-bubble{
+  max-width: 78%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 13.5px;
+  line-height: 1.75;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
-.loading-text{
-  font-family: 'Noto Serif JP', serif;
+.msg-ai .msg-bubble{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 4px 16px 16px 16px;
+  color: var(--ink);
+}
+.msg-user .msg-bubble{
+  background: var(--rose);
+  color: #fff;
+  border-radius: 16px 4px 16px 16px;
+}
+
+/* TYPING */
+.typing{ display: flex; gap: 4px; padding: 4px 0; }
+.typing-dot{
+  width: 7px; height: 7px;
+  background: var(--ink-soft);
+  border-radius: 50%;
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+.typing-dot:nth-child(2){ animation-delay: 0.2s; }
+.typing-dot:nth-child(3){ animation-delay: 0.4s; }
+@keyframes typingBounce{
+  0%, 60%, 100%{ transform: translateY(0); opacity: 0.4; }
+  30%{ transform: translateY(-6px); opacity: 1; }
+}
+
+/* INPUT BAR */
+.input-bar{
+  flex-shrink: 0;
+  background: rgba(247,242,234,0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--line);
+  padding: 10px 14px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.input-field{
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-family: inherit;
   font-size: 14px;
-  color: var(--ink-mid);
-  letter-spacing: 0.05em;
+  color: var(--ink);
+  resize: none;
+  max-height: 100px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.2s;
 }
-.loading-en{
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 11px;
-  color: var(--rose-deep);
-  letter-spacing: 0.16em;
-  margin-top: 6px;
+.input-field:focus{ border-color: var(--rose); }
+.input-field::placeholder{ color: var(--ink-soft); }
+.send-btn{
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--rose);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
 }
+.send-btn:disabled{
+  background: var(--bg-soft);
+  cursor: default;
+}
+.send-btn:not(:disabled):hover{
+  background: var(--rose-deep);
+  transform: scale(1.05);
+}
+.send-btn svg{ width: 18px; height: 18px; fill: #fff; }
+.send-btn:disabled svg{ fill: var(--ink-soft); }
+
+/* TOAST */
+.toast{
+  position: fixed;
+  bottom: 80px;
+  left: 50%; transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 12px;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show{ opacity: 1; }
+.toast.error{ background: #c0392b; }
 
 /* LOGIN GATE */
 .gate{
@@ -209,6 +315,10 @@ body{
   margin-bottom: 24px;
   box-shadow: 0 8px 24px rgba(201, 139, 149, 0.2);
   animation: float 3s ease-in-out infinite;
+}
+@keyframes float{
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 .gate-title{
   font-family: 'Noto Serif JP', serif;
@@ -252,9 +362,7 @@ body{
   width: 32px; height: 32px;
   background: var(--rose-soft);
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   font-size: 16px;
   flex-shrink: 0;
 }
@@ -292,10 +400,7 @@ body{
   border: none;
   transition: all 0.2s;
 }
-.gate-btn-primary{
-  background: var(--rose);
-  color: #FFFFFF;
-}
+.gate-btn-primary{ background: var(--rose); color: #FFFFFF; }
 .gate-btn-primary:hover{
   background: var(--rose-deep);
   transform: translateY(-1px);
@@ -318,17 +423,12 @@ body{
   letter-spacing: 0.16em;
   color: var(--ink-soft);
 }
-.gate-footer a{
-  color: var(--ink-soft);
-  text-decoration: none;
-}
+.gate-footer a{ color: var(--ink-soft); text-decoration: none; }
 </style>
 </head>
 <body>
 
 <div class="app">
-
-  <!-- HEADER -->
   <header class="page-header">
     <a class="back-btn" href="index.html" aria-label="戻る">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -339,73 +439,54 @@ body{
       <div class="header-status" id="headerStatus">確認中</div>
     </div>
   </header>
-
-  <!-- 認証状態によって切り替わるコンテンツ -->
   <div id="content" style="flex:1; display:flex; flex-direction:column; overflow:hidden;"></div>
-
 </div>
 
-<!-- LOGIN GATE TEMPLATE -->
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN GATE -->
 <template id="gateTemplate">
   <div class="gate">
     <div class="gate-avatar"></div>
     <h1 class="gate-title">美桜Mio AI</h1>
     <div class="gate-subtitle">— Your AI assistant —</div>
-    <p class="gate-message">
-      AIチャットをご利用いただくには<br>
-      ログインが必要です 🌸
-    </p>
-
+    <p class="gate-message">AIチャットをご利用いただくには<br>ログインが必要です 🌸</p>
     <div class="gate-features">
       <div class="feature-item">
         <div class="feature-icon">💬</div>
-        <div class="feature-text">
-          <strong>24時間いつでも相談</strong>
-          トレード・メンタル・相場のご質問なんでも
-        </div>
+        <div class="feature-text"><strong>24時間いつでも相談</strong>トレード・メンタル・相場のご質問なんでも</div>
       </div>
       <div class="feature-item">
-        <div class="feature-icon">📸</div>
-        <div class="feature-text">
-          <strong>チャート画像分析</strong>
-          スクショを送れば、一緒に分析できます
-        </div>
+        <div class="feature-icon">📊</div>
+        <div class="feature-text"><strong>あなた専用のアドバイス</strong>収支データをもとにパーソナル分析</div>
       </div>
       <div class="feature-item">
         <div class="feature-icon">🌸</div>
-        <div class="feature-text">
-          <strong>無料でお試しいただけます</strong>
-          ご登録は1分で完了します
-        </div>
+        <div class="feature-text"><strong>無料でお試しいただけます</strong>ご登録は1分で完了します</div>
       </div>
     </div>
-
     <div class="gate-actions">
       <a href="register.html" class="gate-btn gate-btn-primary">無料で新規登録</a>
       <a href="login.html" class="gate-btn gate-btn-secondary">すでにアカウントをお持ちの方</a>
     </div>
-
-    <div class="gate-footer">
-      <a href="index.html">— back to home —</a>
-    </div>
+    <div class="gate-footer"><a href="index.html">— back to home —</a></div>
   </div>
 </template>
 
-<!-- CHAT TEMPLATE -->
+<!-- CHAT UI -->
 <template id="chatTemplate">
-  <div class="chat-wrap">
-    <div class="loading" id="loading">
-      <div class="loading-avatar"></div>
-      <div class="loading-text">準備しています</div>
-      <div class="loading-en">— Please wait —</div>
+  <div class="chat-area" id="chatArea">
+    <div class="welcome-card">
+      <div class="welcome-avatar"></div>
+      <div class="welcome-title">美桜Mio AI</div>
+      <div class="welcome-sub">トレードのこと、なんでも聞いてくださいね 🌸<br>あなたの収支データをもとにお話しします</div>
     </div>
-    <iframe
-      class="chat-iframe"
-      id="chat-iframe"
-      src=""
-      allow="microphone"
-      title="美桜Mio AI">
-    </iframe>
+  </div>
+  <div class="input-bar">
+    <textarea class="input-field" id="inputField" rows="1" placeholder="メッセージを入力…"></textarea>
+    <button class="send-btn" id="sendBtn" disabled aria-label="送信">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
   </div>
 </template>
 
@@ -414,43 +495,58 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// 認証状態チェック
-const { data: { session } } = await supabase.auth.getSession();
 
 const content = document.getElementById('content');
 const headerStatus = document.getElementById('headerStatus');
 
-if (session) {
-  // ログイン中:チャットを表示
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+const { data: { session } } = await supabase.auth.getSession();
+
+if (!session) {
+  headerStatus.textContent = 'ログインしてください';
+  headerStatus.style.color = 'var(--ink-soft)';
+  content.appendChild(document.getElementById('gateTemplate').content.cloneNode(true));
+} else {
+  // ===== ログイン中 =====
   headerStatus.textContent = 'オンライン';
-  const template = document.getElementById('chatTemplate');
-  content.appendChild(template.content.cloneNode(true));
-  
-  // ユーザー情報を取得して Dify URLに渡す
+  content.appendChild(document.getElementById('chatTemplate').content.cloneNode(true));
+
   const user = session.user;
   let userName = user.email.split('@')[0];
   let userContext = '';
-  
+  let conversationId = '';
+  let isLoading = false;
+
+  const chatArea = document.getElementById('chatArea');
+  const inputField = document.getElementById('inputField');
+  const sendBtn = document.getElementById('sendBtn');
+
+  // ===== ユーザーデータ取得（収支・プロフィール） =====
   try {
-    // プロフィールと最近のトレード情報を取得
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+
     const [profileRes, tradesRes] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
       supabase.from('trades').select('*').eq('user_id', user.id)
-        .gte('trade_date', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0])
+        .gte('trade_date', monthStart)
         .order('trade_date', { ascending: false })
     ]);
-    
+
     const profile = profileRes.data;
     const trades = tradesRes.data || [];
-    
+
     if (profile?.display_name) userName = profile.display_name;
-    
-    // コンテキスト情報を組み立て
-    const contextParts = [];
-    
+
+    const parts = [];
+
     // 使用ツール
     const tools = profile?.tools_used || [];
     const toolMap = {
@@ -459,93 +555,155 @@ if (session) {
       solid_edge: 'Solid Edgeインジ',
       all_system: '全システム永久版'
     };
-    if (tools.length > 0) {
-      contextParts.push('【使用中のツール】' + tools.map(t => toolMap[t] || t).join('、'));
-    } else {
-      contextParts.push('【使用中のツール】特になし(裁量のみ)');
-    }
-    
-    // コミュニティ参加状況
+    parts.push('使用中のツール: ' + (tools.length > 0 ? tools.map(t => toolMap[t] || t).join(', ') : '特になし(裁量のみ)'));
+
+    // コミュニティ
     const community = profile?.community_status || '';
-    if (community.includes('discord')) {
-      contextParts.push('【コミュニティ】Discord参加中');
-    } else if (community.includes('line')) {
-      contextParts.push('【コミュニティ】LINEメンバー(Discord未参加)');
-    } else {
-      contextParts.push('【コミュニティ】未参加');
-    }
-    
+    if (community.includes('discord')) parts.push('コミュニティ: Discord参加中');
+    else if (community.includes('line')) parts.push('コミュニティ: LINEメンバー');
+    else parts.push('コミュニティ: 未参加');
+
     // 興味
     const interests = profile?.interests || [];
     if (interests.length > 0) {
-      const interestMap = { ea: 'EA導入検討中', indicator: 'インジ導入検討中', community: 'コミュニティ参加検討中' };
-      contextParts.push('【興味】' + interests.map(i => interestMap[i] || i).join('、'));
+      const iMap = { ea: 'EA導入検討中', indicator: 'インジ導入検討中', community: 'コミュニティ参加検討中' };
+      parts.push('興味: ' + interests.map(i => iMap[i] || i).join(', '));
     }
-    
-    // 今月のトレード状況
+
+    // 今月の収支
     if (trades.length > 0) {
-      const totalPL = trades.reduce((sum, t) => sum + t.profit_loss, 0);
-      const wins = trades.filter(t => t.profit_loss > 0).length;
+      const totalPL = trades.reduce((s, t) => s + (t.profit_loss || 0), 0);
+      const wins = trades.filter(t => (t.profit_loss || 0) > 0).length;
       const winRate = Math.round((wins / trades.length) * 100);
-      
-      // 種類別
-      const byType = { discretionary: 0, miyabi_ea: 0, solid_edge: 0 };
+      const sign = totalPL >= 0 ? '+' : '';
+      parts.push('今月の収支: ' + sign + totalPL.toLocaleString('ja-JP') + '円 (' + trades.length + '回取引, 勝率' + winRate + '%)');
+
+      // 種類別内訳
+      const byType = {};
       trades.forEach(t => {
         const type = t.trade_type || 'discretionary';
-        byType[type] = (byType[type] || 0) + t.profit_loss;
+        byType[type] = (byType[type] || 0) + (t.profit_loss || 0);
       });
-      
-      const plSign = totalPL >= 0 ? '+' : '';
-      contextParts.push(`【今月の収支】${plSign}¥${totalPL.toLocaleString('ja-JP')}(${trades.length}回・勝率${winRate}%)`);
-      
-      const breakdownParts = [];
-      if (byType.discretionary !== 0) breakdownParts.push(`裁量${byType.discretionary >= 0 ? '+' : ''}¥${byType.discretionary.toLocaleString('ja-JP')}`);
-      if (byType.miyabi_ea !== 0) breakdownParts.push(`EA${byType.miyabi_ea >= 0 ? '+' : ''}¥${byType.miyabi_ea.toLocaleString('ja-JP')}`);
-      if (byType.solid_edge !== 0) breakdownParts.push(`インジ${byType.solid_edge >= 0 ? '+' : ''}¥${byType.solid_edge.toLocaleString('ja-JP')}`);
-      if (breakdownParts.length > 0) {
-        contextParts.push(`【内訳】${breakdownParts.join(' / ')}`);
-      }
+      const typeNames = { discretionary: '裁量', miyabi_ea: 'EA', solid_edge: 'インジ', signal: '配信' };
+      const breakdown = Object.entries(byType)
+        .filter(([, pl]) => pl !== 0)
+        .map(([type, pl]) => (typeNames[type] || type) + ' ' + (pl >= 0 ? '+' : '') + pl.toLocaleString('ja-JP') + '円');
+      if (breakdown.length > 0) parts.push('内訳: ' + breakdown.join(' / '));
     } else {
-      contextParts.push('【今月の収支】まだトレード記録なし');
+      parts.push('今月の収支: まだトレード記録なし');
     }
-    
+
     // 目標
     if (profile?.target_monthly) {
-      contextParts.push(`【月間目標】¥${profile.target_monthly.toLocaleString('ja-JP')}`);
+      parts.push('月間目標: ' + profile.target_monthly.toLocaleString('ja-JP') + '円');
     }
-    
-    userContext = contextParts.join('\n');
+
+    userContext = parts.join('\n');
+    console.log('[mioAI] ユーザーコンテキスト読込完了:', userContext);
   } catch (e) {
-    console.warn('User context fetch failed:', e);
+    console.warn('[mioAI] コンテキスト取得エラー:', e);
   }
-  
-  // Dify iframeにユーザー情報を渡す(URLパラメータで)
-  const iframe = document.getElementById('chat-iframe');
-  const baseUrl = 'https://udify.app/chatbot/SFiiQJ4MoyrquwMY';
-  const params = new URLSearchParams();
-  params.append('user_name', userName);
-  params.append('user_context', userContext);
-  iframe.src = baseUrl + '?' + params.toString();
-  
-  const loading = document.getElementById('loading');
-  
-  iframe.addEventListener('load', () => {
-    setTimeout(() => {
-      loading.classList.add('hidden');
-    }, 500);
+
+  // ===== チャット機能 =====
+  function scrollToBottom() {
+    requestAnimationFrame(() => { chatArea.scrollTop = chatArea.scrollHeight; });
+  }
+
+  function escapeHtml(text) {
+    const d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+  }
+
+  function addMessage(text, isUser) {
+    const el = document.createElement('div');
+    el.className = 'msg ' + (isUser ? 'msg-user' : 'msg-ai');
+    el.innerHTML = '<div class="msg-avatar"></div><div class="msg-bubble">' + escapeHtml(text) + '</div>';
+    chatArea.appendChild(el);
+    scrollToBottom();
+  }
+
+  function showTyping() {
+    const el = document.createElement('div');
+    el.className = 'msg msg-ai';
+    el.id = 'typingIndicator';
+    el.innerHTML = '<div class="msg-avatar"></div><div class="msg-bubble"><div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
+    chatArea.appendChild(el);
+    scrollToBottom();
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+
+  async function sendMessage() {
+    const text = inputField.value.trim();
+    if (!text || isLoading) return;
+
+    isLoading = true;
+    inputField.value = '';
+    inputField.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    addMessage(text, true);
+    showTyping();
+
+    try {
+      const res = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: text,
+          user_name: userName,
+          user_context: userContext,
+          conversation_id: conversationId,
+          user_id: user.id
+        })
+      });
+
+      removeTyping();
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || '通信エラー');
+      }
+
+      const data = await res.json();
+      if (data.conversation_id) conversationId = data.conversation_id;
+      addMessage(data.text || '申し訳ありません、応答を取得できませんでした。', false);
+
+    } catch (err) {
+      removeTyping();
+      console.error('[mioAI] 送信エラー:', err);
+      addMessage('通信エラーが発生しました。もう一度お試しください。', false);
+      showToast('通信エラー', true);
+    } finally {
+      isLoading = false;
+      sendBtn.disabled = !inputField.value.trim();
+    }
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+
+  inputField.addEventListener('input', () => {
+    sendBtn.disabled = !inputField.value.trim() || isLoading;
+    inputField.style.height = 'auto';
+    inputField.style.height = Math.min(inputField.scrollHeight, 100) + 'px';
   });
-  
-  setTimeout(() => {
-    loading.classList.add('hidden');
-  }, 5000);
-} else {
-  // 未ログイン:誘導画面を表示
-  headerStatus.textContent = 'ログインしてください';
-  headerStatus.style.color = 'var(--ink-soft)';
-  const template = document.getElementById('gateTemplate');
-  content.appendChild(template.content.cloneNode(true));
+
+  inputField.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  inputField.addEventListener('focus', () => { setTimeout(scrollToBottom, 300); });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', scrollToBottom);
+  }
 }
 </script>
-
 </body>
 </html>
