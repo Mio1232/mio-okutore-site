@@ -652,7 +652,7 @@ if (!session) {
         const type = t.trade_type || 'discretionary';
         byType[type] = (byType[type] || 0) + (t.profit_loss || 0);
       });
-      const typeNames = { discretionary: '裁量', miyabi_ea: 'EA', solid_edge: 'インジ', signal: '配信' };
+      const typeNames = { discretionary: '裁量', miyabi_ea: 'EA', solid_edge: 'インジ', signal: '配信', trade_stream: 'トレード配信' };
       const breakdown = Object.entries(byType)
         .filter(([, pl]) => pl !== 0)
         .map(([type, pl]) => (typeNames[type] || type) + ' ' + (pl >= 0 ? '+' : '') + pl.toLocaleString('ja-JP') + '円');
