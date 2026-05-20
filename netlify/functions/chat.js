@@ -1,5 +1,6 @@
 // Netlify Function: AI Chat via Dify API
 // user_context(収支データ等)をDifyのinputsとして送信
+// 画像添付対応: Dify file-upload → chat-messages
 // APIキーはNetlify環境変数で管理
 
 exports.handler = async function(event, context) {
@@ -20,7 +21,7 @@ exports.handler = async function(event, context) {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { query, user_name, user_context, conversation_id, user_id } = body;
+    const { query, user_name, user_context, conversation_id, user_id, image_base64, image_type } = body;
 
     if (!query || !query.trim()) {
       return {
@@ -41,24 +42,87 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // Dify APIにリクエスト
-    // inputs にユーザー情報を渡す（Dify側で変数として参照可能）
+    let fileInfo = null;
+
+    // 画像がある場合: Difyにファイルアップロード
+    if (image_base64) {
+      try {
+        const imageBuffer = Buffer.from(image_base64, 'base64');
+        const ext = (image_type || 'image/png').split('/')[1] || 'png';
+        const boundary = '----FormBoundary' + Date.now();
+
+        // multipart/form-data を手動構築
+        const parts = [];
+        // file フィールド
+        parts.push(
+          `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="file"; filename="chart.${ext}"\r\n` +
+          `Content-Type: ${image_type || 'image/png'}\r\n\r\n`
+        );
+        const filePartHeader = Buffer.from(parts[0], 'utf-8');
+        const filePartFooter = Buffer.from('\r\n', 'utf-8');
+
+        // user フィールド
+        const userPart = Buffer.from(
+          `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="user"\r\n\r\n` +
+          `${user_id || 'anonymous'}\r\n` +
+          `--${boundary}--\r\n`,
+          'utf-8'
+        );
+
+        const bodyBuffer = Buffer.concat([filePartHeader, imageBuffer, filePartFooter, userPart]);
+
+        const uploadRes = await fetch(`${difyApiUrl}/files/upload`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${difyApiKey}`,
+            'Content-Type': `multipart/form-data; boundary=${boundary}`
+          },
+          body: bodyBuffer
+        });
+
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          fileInfo = {
+            type: 'image',
+            transfer_method: 'local_file',
+            upload_file_id: uploadData.id
+          };
+          console.log('Image uploaded to Dify:', uploadData.id);
+        } else {
+          const errText = await uploadRes.text();
+          console.warn('Dify file upload failed:', uploadRes.status, errText);
+        }
+      } catch (uploadErr) {
+        console.warn('Image upload error:', uploadErr.message);
+      }
+    }
+
+    // Dify chat-messages API
+    const chatBody = {
+      inputs: {
+        user_name: user_name || '',
+        user_context: user_context || ''
+      },
+      query: query,
+      response_mode: 'blocking',
+      user: user_id || 'anonymous',
+      conversation_id: conversation_id || ''
+    };
+
+    // 画像がアップロードされた場合、filesに追加
+    if (fileInfo) {
+      chatBody.files = [fileInfo];
+    }
+
     const response = await fetch(`${difyApiUrl}/chat-messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${difyApiKey}`
       },
-      body: JSON.stringify({
-        inputs: {
-          user_name: user_name || '',
-          user_context: user_context || ''
-        },
-        query: query,
-        response_mode: 'blocking',
-        user: user_id || 'anonymous',
-        conversation_id: conversation_id || ''
-      })
+      body: JSON.stringify(chatBody)
     });
 
     if (!response.ok) {
