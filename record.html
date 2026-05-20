@@ -593,14 +593,17 @@ body{
             <input type="hidden" id="currency" value="JPY">
             <div class="pl-sign-group">
               <button type="button" class="pl-sign-btn active" data-sign="plus" onclick="selectPLSign('plus')">
-                <span>+ 利益</span>
+                <span style="font-size:16px;margin-right:4px;">+</span>利益
               </button>
               <button type="button" class="pl-sign-btn" data-sign="minus" onclick="selectPLSign('minus')">
-                <span>− 損失</span>
+                <span style="font-size:16px;margin-right:4px;">−</span>損失
               </button>
             </div>
             <input type="hidden" id="plSign" value="plus">
-            <input type="text" id="profitLoss" class="input" placeholder="12500" required inputmode="decimal" autocomplete="off">
+            <div class="pl-input-wrap">
+              <span class="pl-input-prefix plus" id="plPrefix">+</span>
+              <input type="text" id="profitLoss" class="input" placeholder="12500" required inputmode="decimal" autocomplete="off">
+            </div>
             <div class="currency-hint" id="currencyHint">※円で金額を入力してください(マイナスは「損失」を選択)</div>
           </div>
 
@@ -691,6 +694,18 @@ function selectPLSign(sign) {
   document.getElementById('plSign').value = sign;
   document.querySelectorAll('.pl-sign-btn').forEach(btn => btn.classList.remove('active'));
   document.querySelector(`.pl-sign-btn[data-sign="${sign}"]`).classList.add('active');
+  
+  // 入力欄の前の+/-表示も切り替え
+  const prefix = document.getElementById('plPrefix');
+  if (prefix) {
+    if (sign === 'plus') {
+      prefix.textContent = '+';
+      prefix.className = 'pl-input-prefix plus';
+    } else {
+      prefix.textContent = '−';
+      prefix.className = 'pl-input-prefix minus';
+    }
+  }
 }
 window.selectPLSign = selectPLSign;
 
