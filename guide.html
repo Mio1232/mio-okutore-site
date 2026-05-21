@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mio億トレ アプリガイド</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<meta property="og:title" content="mio億トレ アプリガイド">
+<meta property="og:description" content="トレードを記録し、振り返り、成長する場所。AIアシスタント・収支管理・学習ノートがすべて一つに。">
+<meta property="og:image" content="/ogp.png">
+<style>
+:root{--bg:#F7F2EA;--bg-soft:#EFE7DA;--bg-card:#FFFEFB;--bg-dark:#3A2E2A;--ink:#3A2E2A;--ink-mid:#6B5D57;--ink-soft:#998B83;--rose:#C98B95;--rose-soft:#E8D0D2;--rose-deep:#B06B75;--sage:#9BB59C;--sage-soft:#D4E4D4;--honey:#D4A76A;--honey-soft:#F0E0C8;--line:rgba(58,46,42,0.08);--line-strong:rgba(58,46,42,0.14)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.8;-webkit-font-smoothing:antialiased}
+
+.hero{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px;position:relative;overflow:hidden;background:linear-gradient(175deg,var(--bg) 0%,var(--rose-soft) 50%,var(--bg-soft) 100%)}
+.hero::before{content:'';position:absolute;top:-40%;right:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(201,139,149,0.15) 0%,transparent 70%);border-radius:50%}
+.hero::after{content:'';position:absolute;bottom:-30%;left:-15%;width:500px;height:500px;background:radial-gradient(circle,rgba(155,181,156,0.12) 0%,transparent 70%);border-radius:50%}
+.hero-badge{display:inline-block;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;letter-spacing:.2em;color:var(--rose-deep);background:rgba(255,255,255,0.6);backdrop-filter:blur(10px);padding:6px 20px;border-radius:20px;margin-bottom:28px;position:relative;z-index:1}
+.hero-title{font-family:'Noto Serif JP',serif;font-size:clamp(28px,7vw,48px);font-weight:700;letter-spacing:.06em;line-height:1.4;margin-bottom:20px;position:relative;z-index:1}
+.hero-title em{font-style:normal;background:linear-gradient(135deg,var(--rose-deep),var(--rose));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:15px;color:var(--ink-mid);max-width:480px;margin:0 auto 36px;line-height:2;position:relative;z-index:1}
+.hero-cta{display:inline-block;background:var(--rose);color:#fff;padding:16px 40px;border-radius:30px;font-size:15px;font-weight:600;letter-spacing:.1em;text-decoration:none;transition:all .3s;position:relative;z-index:1;box-shadow:0 8px 24px rgba(201,139,149,0.3)}
+.hero-cta:hover{background:var(--rose-deep);transform:translateY(-2px);box-shadow:0 12px 32px rgba(176,107,117,0.35)}
+.hero-scroll{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.2em;color:var(--ink-soft);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:1}
+.hero-scroll::after{content:'';width:1px;height:32px;background:var(--ink-soft);animation:scrollLine 2s ease-in-out infinite}
+@keyframes scrollLine{0%{opacity:.3;transform:scaleY(.5)}50%{opacity:1;transform:scaleY(1)}100%{opacity:.3;transform:scaleY(.5)}}
+
+.section{padding:80px 24px;max-width:720px;margin:0 auto}
+.section-tag{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;letter-spacing:.2em;color:var(--rose);text-transform:uppercase;margin-bottom:12px}
+.section-title{font-family:'Noto Serif JP',serif;font-size:clamp(22px,5vw,32px);font-weight:600;letter-spacing:.04em;line-height:1.5;margin-bottom:16px}
+.section-lead{color:var(--ink-mid);font-size:14px;line-height:2;margin-bottom:40px}
+
+.timeline{position:relative;padding-left:32px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--rose-soft),var(--sage-soft),var(--honey-soft));border-radius:1px}
+.timeline-item{position:relative;margin-bottom:36px;padding:20px 24px;background:var(--bg-card);border:1px solid var(--line);border-radius:14px}
+.timeline-item::before{content:'';position:absolute;left:-28px;top:24px;width:12px;height:12px;border-radius:50%;border:2px solid var(--rose);background:var(--bg)}
+.timeline-item:nth-child(2)::before{border-color:var(--sage)}
+.timeline-item:nth-child(3)::before{border-color:var(--honey)}
+.timeline-item:nth-child(4)::before{border-color:var(--rose-deep)}
+.timeline-period{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;letter-spacing:.12em;color:var(--rose);margin-bottom:6px}
+.timeline-item:nth-child(2) .timeline-period{color:var(--sage)}
+.timeline-item:nth-child(3) .timeline-period{color:var(--honey)}
+.timeline-item:nth-child(4) .timeline-period{color:var(--rose-deep)}
+.timeline-heading{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:600;margin-bottom:8px}
+.timeline-text{font-size:13.5px;color:var(--ink-mid);line-height:1.9}
+
+.feature-grid{display:flex;flex-direction:column;gap:32px}
+.feature-card{background:var(--bg-card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.feature-card-img{width:100%;max-height:480px;overflow-y:auto;overflow-x:hidden;border-bottom:1px solid var(--line);background:var(--bg-soft);display:flex;align-items:flex-start;justify-content:center;-webkit-overflow-scrolling:touch;position:relative}
+.feature-card-img::after{content:'↕ スクロールで全体を確認';position:sticky;bottom:0;left:0;right:0;display:block;text-align:center;font-size:11px;color:var(--ink-soft);background:linear-gradient(transparent,rgba(239,231,218,0.95));padding:12px 0 8px;pointer-events:none}
+.feature-card-img img{width:100%;height:auto;display:block}
+.feature-card-body{padding:24px}
+.feature-card-badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.08em;padding:3px 10px;border-radius:6px;margin-bottom:10px}
+.badge-ai{background:var(--rose-soft);color:var(--rose-deep)}
+.badge-record{background:var(--sage-soft);color:#5A8A5B}
+.badge-learn{background:var(--honey-soft);color:#9A7A3A}
+.badge-info{background:#DDD8F0;color:#6B5EA0}
+.badge-community{background:#D5E8F0;color:#4A7A8A}
+.feature-card-title{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:600;margin-bottom:10px;line-height:1.4}
+.feature-card-desc{font-size:13.5px;color:var(--ink-mid);line-height:1.9;margin-bottom:16px}
+.feature-card-points{list-style:none}
+.feature-card-points li{font-size:13px;color:var(--ink-mid);padding:6px 0 6px 20px;position:relative;line-height:1.7}
+.feature-card-points li::before{content:'🌸';position:absolute;left:0;font-size:11px}
+.feature-card-tip{margin-top:16px;padding:14px 16px;background:var(--bg);border-radius:10px;font-size:12.5px;color:var(--ink-mid);line-height:1.8}
+.feature-card-tip strong{color:var(--ink);font-weight:600}
+
+.steps{display:flex;flex-direction:column;gap:20px;counter-reset:step}
+.step{display:flex;gap:18px;align-items:flex-start;padding:20px;background:var(--bg-card);border:1px solid var(--line);border-radius:14px}
+.step-num{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;flex-shrink:0}
+.step-content{flex:1}
+.step-title{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:600;margin-bottom:4px}
+.step-desc{font-size:13px;color:var(--ink-mid);line-height:1.8}
+
+.cta-section{background:linear-gradient(170deg,var(--bg-dark) 0%,#4A3E3A 100%);padding:80px 24px;text-align:center}
+.cta-section .section-tag{color:var(--rose-soft)}
+.cta-section .section-title{color:#FFFEFB}
+.cta-section .section-lead{color:rgba(255,255,255,0.6)}
+.cta-buttons{display:flex;flex-direction:column;gap:12px;max-width:340px;margin:0 auto}
+.cta-btn{display:block;padding:16px 32px;border-radius:12px;font-size:14px;font-weight:600;letter-spacing:.08em;text-decoration:none;text-align:center;transition:all .3s}
+.cta-btn-primary{background:var(--rose);color:#fff;box-shadow:0 4px 16px rgba(201,139,149,0.4)}
+.cta-btn-primary:hover{background:var(--rose-deep);transform:translateY(-1px)}
+.cta-btn-secondary{background:transparent;color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.2)}
+.cta-btn-secondary:hover{background:rgba(255,255,255,0.05);color:#fff;border-color:rgba(255,255,255,0.4)}
+
+.footer{padding:40px 24px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:.16em;color:var(--ink-soft)}
+.footer-members{margin-bottom:8px;font-size:13px}
+
+.divider{max-width:720px;margin:0 auto;padding:0 24px}
+.divider-line{height:1px;background:var(--line-strong)}
+
+@media(max-width:480px){.hero{padding:48px 20px}.section{padding:56px 20px}.feature-card-body{padding:20px}}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-badge">— Your Trading Partner —</div>
+  <h1 class="hero-title">トレードを<br><em>記録し、振り返り、<br>成長する</em>場所</h1>
+  <p class="hero-sub">mio億トレアプリは、AIアシスタント・収支管理・学習ノート・<br>コミュニティ配信がすべて一つに。<br>あなたのトレードライフを丸ごとサポートします 🌸</p>
+  <a href="/register.html" class="hero-cta">無料で始める</a>
+  <div class="hero-scroll">scroll</div>
+</section>
+
+<section class="section">
+  <div class="section-tag">— Future Vision —</div>
+  <h2 class="section-title">使い続けると、<br>こう変わります</h2>
+  <p class="section-lead">mio億トレアプリは「使った瞬間」だけでなく、<br>時間をかけるほどあなたの力になります。</p>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-period">1 month later</div>
+      <div class="timeline-heading">記録する習慣が生まれる</div>
+      <div class="timeline-text">毎日の収支記録が習慣に。自分の勝ちパターン・負けパターンが少しずつ見えてきます。AIに気軽に相談できるようになり、一人で悩む時間が減ります。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-period">3 months later</div>
+      <div class="timeline-heading">データが語り始める</div>
+      <div class="timeline-text">月次レポートに3ヶ月分のデータが溜まり、勝率・得意な通貨ペア・時間帯の傾向がはっきり見えるように。学びノートには自分だけのトレードルールが蓄積されています。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-period">6 months later</div>
+      <div class="timeline-heading">AIがあなたを深く理解する</div>
+      <div class="timeline-text">AIがあなたのトレードスタイルを把握した上でアドバイス。過去の記録を見返すことで成長を実感。「あの時こうしてよかった」という振り返りが、トレードの質を確実に上げてくれます。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-period">1 year later</div>
+      <div class="timeline-heading">自分だけの教科書が完成する</div>
+      <div class="timeline-text">1年分のデータは、どんなトレード本よりも価値のある「自分専用の教科書」。あなただけの勝ちパターン、リスク管理の基準、メンタルの整え方が、すべて記録として残っています。</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<section class="section">
+  <div class="section-tag">— Features —</div>
+  <h2 class="section-title">すべての機能を<br>ご紹介します</h2>
+  <p class="section-lead">各機能の画面と使い方を、<br>ひとつずつ丁寧にご案内します 🌸</p>
+
+  <div class="feature-grid">
+
+    <div class="feature-card" id="ai">
+      <div class="feature-card-img"><img src="guide-images/ss-chat.jpg" alt="AIチャット画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-ai">AI</span>
+        <h3 class="feature-card-title">美桜Mio AI — あなた専属のアシスタント</h3>
+        <p class="feature-card-desc">美桜Mioをモデルにした、優しく丁寧なAIが24時間あなたのそばに。トレードの質問、チャート分析、メンタルケアまで、なんでも相談できます。</p>
+        <ul class="feature-card-points">
+          <li>あなたの収支データをもとにパーソナライズされた回答</li>
+          <li>チャート画像を送るとテクニカル分析を実施</li>
+          <li>連敗中の励ましやメンタルケアも</li>
+          <li>EA・インジケーターの使い方もサポート</li>
+        </ul>
+        <div class="feature-card-tip"><strong>💡 試してみてください：</strong>「こんにちは」と送ると名前で呼んでくれます。「今月の収支を振り返って」で、あなたのデータに基づいた分析が返ってきます。</div>
+      </div>
+    </div>
+
+    <div class="feature-card" id="dashboard">
+      <div class="feature-card-img"><img src="guide-images/ss-dashboard.jpg" alt="マイページ画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-record">マイページ</span>
+        <h3 class="feature-card-title">マイページ — 今月の状況がひと目で</h3>
+        <p class="feature-card-desc">ログイン後のホーム画面。今月の損益、取引回数、勝率がカードで表示されます。目標達成率や直近の損益推移グラフも確認できます。</p>
+        <ul class="feature-card-points">
+          <li>今月の損益合計・取引回数・勝率をリアルタイム表示</li>
+          <li>取引種類別の内訳（裁量・EA・配信）</li>
+          <li>月間目標の達成率プログレスバー</li>
+          <li>直近5日間の損益推移グラフ</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature-card" id="record">
+      <div class="feature-card-img"><img src="guide-images/ss-record.jpg" alt="収支記録画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-record">記録</span>
+        <h3 class="feature-card-title">収支記録 — トレードの積み重ねを形に</h3>
+        <p class="feature-card-desc">毎日のトレード結果をかんたんに記録。通貨ペア、方向、ロット数、エントリー・決済価格、損益、メモまで残せます。</p>
+        <ul class="feature-card-points">
+          <li>利益/損失をワンタップで切り替え</li>
+          <li>円建て・ドル建ての切り替え対応</li>
+          <li>取引種類（裁量・みやびEA・Solid Edge・配信）を選択</li>
+          <li>メモ欄に判断理由や反省点を記録</li>
+        </ul>
+        <div class="feature-card-tip"><strong>💡 ポイント：</strong>メモ欄に「なぜエントリーしたか」を書く習慣をつけると、振り返りの質が格段に上がります。小さな金額でも必ず記録しましょう。</div>
+      </div>
+    </div>
+
+    <div class="feature-card" id="record-history">
+      <div class="feature-card-img"><img src="guide-images/ss-record-history.jpg" alt="取引履歴画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-record">履歴</span>
+        <h3 class="feature-card-title">取引履歴 — 過去の記録をいつでも確認</h3>
+        <p class="feature-card-desc">記録したトレードの一覧を、フィルター付きで確認できます。今月の収支サマリーも上部に表示されます。</p>
+        <ul class="feature-card-points">
+          <li>取引種類（裁量・EA・インジ・配信）でフィルター</li>
+          <li>通貨ペア別、勝ち・負け別で絞り込み</li>
+          <li>今月の合計収支・取引回数・勝率を常に表示</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature-card" id="stats">
+      <div class="feature-card-img"><img src="guide-images/ss-stats.jpg" alt="月次レポート画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-record">分析</span>
+        <h3 class="feature-card-title">月次レポート — データがあなたの強みを教えてくれる</h3>
+        <p class="feature-card-desc">記録したデータを自動で分析。勝率、プロフィットファクター、通貨ペア別の成績、時間帯別の傾向まで、あらゆる角度から可視化します。</p>
+        <ul class="feature-card-points">
+          <li>日別の損益グラフで波を把握</li>
+          <li>通貨ペア別・取引種類別の成績比較</li>
+          <li>時間帯別ヒートマップで得意な時間がわかる</li>
+          <li>AIが今月の振り返りインサイトを自動生成</li>
+        </ul>
+        <div class="feature-card-tip"><strong>💡 ポイント：</strong>3ヶ月以上データを貯めると、トレンドや季節性の傾向も見えてきます。「裁量のドル円は得意だけどゴールドは苦手」のような発見が、戦略改善に直結します。</div>
+      </div>
+    </div>
+
+    <div class="feature-card" id="notes">
+      <div class="feature-card-img"><img src="guide-images/ss-notes.jpg" alt="学びノート画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-learn">学び</span>
+        <h3 class="feature-card-title">学びノート — 気づきを資産に変える</h3>
+        <p class="feature-card-desc">トレードで学んだこと、気づいたこと、反省点をカテゴリ別に保存。あなただけのトレード教科書が少しずつ出来上がります。</p>
+        <ul class="feature-card-points">
+          <li>チャートパターン、配信メモ、失敗から学んだこと等のカテゴリ</li>
+          <li>⭐お気に入り登録で大切なノートをすぐ見返せる</li>
+          <li>タグで検索・整理もかんたん</li>
+        </ul>
+        <div class="feature-card-tip"><strong>💡 ポイント：</strong>失敗から学んだことこそ、一番価値のあるノートになります。週に1回、過去のノートを読み返す習慣が効果的です。</div>
+      </div>
+    </div>
+
+    <div class="feature-card" id="settings">
+      <div class="feature-card-img"><img src="guide-images/ss-settings.jpg" alt="設定画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-info">設定</span>
+        <h3 class="feature-card-title">設定 — AIをもっと賢くする</h3>
+        <p class="feature-card-desc">プロフィール、使用ツール、目標金額、コミュニティ参加状況を設定するページ。ここで入力した情報をAIが参照して、よりパーソナルな回答をしてくれます。</p>
+        <ul class="feature-card-points">
+          <li>表示名・トレード歴・主に取引する通貨ペアを登録</li>
+          <li>使用中のツール（みやびEA・Solid Edge等）を選択</li>
+          <li>月間・年間の目標金額を設定</li>
+          <li>LINEメンバー・Discord参加状況の登録</li>
+        </ul>
+        <div class="feature-card-tip"><strong>💡 ポイント：</strong>設定を充実させるほど、AIの回答が的確になります。例えば「EA未使用」と設定すると、連敗時にAIがさりげなくEAを紹介してくれます。</div>
+      </div>
+    </div>
+
+    <div class="feature-card" id="calendar">
+      <div class="feature-card-img"><img src="guide-images/ss-calendar.jpg" alt="経済指標カレンダー画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-info">情報</span>
+        <h3 class="feature-card-title">経済指標カレンダー — 大切なイベントを逃さない</h3>
+        <p class="feature-card-desc">雇用統計、FOMC、CPIなど、相場を動かす重要イベントの日時と予想値を事前にチェック。ひなたの週間コメントも参考になります。</p>
+        <ul class="feature-card-points">
+          <li>Investing.comの経済指標カレンダーをリアルタイム表示</li>
+          <li>ひなたによる今週の注目ポイント解説</li>
+          <li>前回値・予想値・結果を一覧で確認</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature-card" id="events">
+      <div class="feature-card-img"><img src="guide-images/ss-events.jpg" alt="配信スケジュール画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-community">コミュニティ</span>
+        <h3 class="feature-card-title">配信スケジュール — ライブで学べる</h3>
+        <p class="feature-card-desc">みお、みやび、さくら、ひなたの4人による配信スケジュール。Discordでのライブ配信はリアルタイムで質問もできます。</p>
+        <ul class="feature-card-points">
+          <li>今日・明日以降の配信予定を一覧表示</li>
+          <li>配信ホストとテーマを事前に確認</li>
+          <li>「Discordで予定を見る」ボタンですぐ参加</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature-card" id="profit">
+      <div class="feature-card-img"><img src="guide-images/ss-profit.jpg" alt="収支報告画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-community">コミュニティ</span>
+        <h3 class="feature-card-title">収支報告 — リアルな声が集まる場所</h3>
+        <p class="feature-card-desc">コミュニティメンバーがDiscordで投稿した収支報告のタイムライン。みんなの結果をリアルタイムで確認できます。</p>
+        <ul class="feature-card-points">
+          <li>メンバーの利確報告がタイムラインで流れる</li>
+          <li>リアルな数字で透明性のある運営</li>
+          <li>仲間の頑張りがモチベーションに</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature-card" id="news">
+      <div class="feature-card-img"><img src="guide-images/ss-news.jpg" alt="マーケットニュース画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-info">ニュース</span>
+        <h3 class="feature-card-title">マーケットニュース — mioが厳選した記事</h3>
+        <p class="feature-card-desc">毎日のマーケットで読んでおきたい記事を厳選してお届け。各記事にはmioの一言コメント付きで、ドル円やゴールドへの影響もわかりやすく解説しています。</p>
+        <ul class="feature-card-points">
+          <li>米国市況・日本市況・経済政策のカテゴリ分け</li>
+          <li>各記事にmioの一言コメント付き</li>
+          <li>元記事へのリンクですぐ詳細を確認</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature-card" id="learn">
+      <div class="feature-card-img"><img src="guide-images/ss-learn.jpg" alt="FX手帖画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-learn">学習</span>
+        <h3 class="feature-card-title">FX手帖 — 基礎から丁寧に</h3>
+        <p class="feature-card-desc">FXの基本用語からテクニカル分析、チャートの読み方、リスク管理まで。12章構成＋動画コンテンツで、初心者の方もここから始められます。</p>
+        <ul class="feature-card-points">
+          <li>12章の基礎テキスト（FXとは・チャートの読み方・テクニカル分析等）</li>
+          <li>動画での解説コンテンツ</li>
+          <li>基礎を学んでからAIに質問するとさらに効果的</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature-card" id="members">
+      <div class="feature-card-img"><img src="guide-images/ss-members.jpg" alt="メンバー紹介画面"></div>
+      <div class="feature-card-body">
+        <span class="feature-card-badge badge-community">メンバー</span>
+        <h3 class="feature-card-title">メンバー紹介 — 4人の講師陣</h3>
+        <p class="feature-card-desc">みお、みやび、さくら、ひなた。それぞれ異なるバックグラウンドとトレードスタイルを持つ4人が、あなたの成長をサポートします。各メンバーのXの投稿も確認できます。</p>
+        <ul class="feature-card-points">
+          <li>みお — ドル円担当、コミュニティ主宰</li>
+          <li>みやび — ゴールド・マインドセット、EA開発</li>
+          <li>さくら — 借金1000万完済の実体験からのアドバイス</li>
+          <li>ひなた — テクニカル分析のスペシャリスト</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<section class="section">
+  <div class="section-tag">— Getting Started —</div>
+  <h2 class="section-title">はじめの3ステップ</h2>
+  <p class="section-lead">まずはこの3つだけ。1分で始められます 🌸</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">無料アカウントを作る</div>
+        <div class="step-desc">トップページの「新規登録」から、メールアドレスとパスワードで登録。1分で完了します。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">設定を整える</div>
+        <div class="step-desc">「設定」ページで表示名、使用中のツール、目標金額を入力。AIがあなたを認識して、パーソナルな回答をしてくれるようになります。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">AIに話しかけてみる</div>
+        <div class="step-desc">「こんにちは」と送ってみてください。あなたの名前で呼びかけてくれます。あとは毎日のトレードを記録する習慣をつけるだけ。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div style="max-width:720px;margin:0 auto">
+    <div class="section-tag">— Start Now —</div>
+    <h2 class="section-title">あなたのトレードを、<br>次のステージへ 🌸</h2>
+    <p class="section-lead">記録して、振り返って、AIに相談する。<br>その積み重ねが、確実にあなたを強くします。</p>
+    <div class="cta-buttons">
+      <a href="/register.html" class="cta-btn cta-btn-primary">無料で始める</a>
+      <a href="/login.html" class="cta-btn cta-btn-secondary">すでにアカウントをお持ちの方</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-members">美桜Mio / みやび / さくら / ひなた</div>
+  <div>— mio億トレ —</div>
+</footer>
+
+</body>
+</html>
