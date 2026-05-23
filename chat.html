@@ -620,24 +620,46 @@ if (!session) {
 
     const parts = [];
 
-    const tools = profile?.tools_used || [];
-    const toolMap = {
-      miyabi_3m: 'みやびEA(3ヶ月版)',
-      miyabi_perm: 'みやびEA(永久版)',
-      solid_edge: 'Solid Edgeインジ',
-      all_system: '全システム永久版'
-    };
-    parts.push('使用中のツール: ' + (tools.length > 0 ? tools.map(t => toolMap[t] || t).join(', ') : '特になし(裁量のみ)'));
-
     const community = profile?.community_status || '';
-    if (community.includes('discord')) parts.push('コミュニティ: Discord参加中');
-    else if (community.includes('line')) parts.push('コミュニティ: LINEメンバー');
+    const isDiscord = community === 'discord' || community.includes('discord');
+
+    // コミュニティ参加状況（必ず最初に）
+    if (isDiscord) parts.push('コミュニティ: Discord参加中');
+    else if (community === 'line' || community.includes('line')) parts.push('コミュニティ: LINEメンバー');
     else parts.push('コミュニティ: 未参加');
 
+    // FX経験
+    const expMap = { beginner: '初心者', under6m: '半年未満', '6m_1y': '半年〜1年', '1y_3y': '1〜3年', '3y_plus': '3年以上' };
+    if (profile?.fx_experience) parts.push('FX経験: ' + (expMap[profile.fx_experience] || profile.fx_experience));
+
+    // ツール情報はDiscord参加者にのみ送る
+    if (isDiscord) {
+      const tools = profile?.tools_used || [];
+      const toolMap = {
+        miyabi_ea: 'みやびロジックEA',
+        miyabi_3m: 'みやびEA(3ヶ月版)',
+        miyabi_perm: 'みやびEA(永久版)',
+        solid_edge: 'Solid Edgeインジ',
+        all_system: '全システム永久版'
+      };
+      parts.push('使用中のツール: ' + (tools.length > 0 ? tools.map(t => toolMap[t] || t).join(', ') : '特になし(裁量のみ)'));
+    }
+
+    // 興味（Discord参加者のみEA/インジ関連を送る）
     const interests = profile?.interests || [];
     if (interests.length > 0) {
-      const iMap = { ea: 'EA導入検討中', indicator: 'インジ導入検討中', community: 'コミュニティ参加検討中' };
-      parts.push('興味: ' + interests.map(i => iMap[i] || i).join(', '));
+      const iMap = {
+        ea: 'EA導入検討中',
+        indicator: 'インジ導入検討中',
+        community: 'コミュニティ参加検討中',
+        learn_fx: 'FX基礎学習に興味',
+        ask_ai: 'AI相談に興味',
+        record_trade: 'トレード記録・分析に興味'
+      };
+      const filteredInterests = isDiscord
+        ? interests.map(i => iMap[i] || i)
+        : interests.filter(i => i !== 'ea' && i !== 'indicator').map(i => iMap[i] || i);
+      if (filteredInterests.length > 0) parts.push('興味: ' + filteredInterests.join(', '));
     }
 
     if (trades.length > 0) {

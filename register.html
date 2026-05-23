@@ -245,7 +245,9 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // すでにログインしている場合はダッシュボードへ
 const { data: { session } } = await supabase.auth.getSession();
 if (session) {
-  window.location.href = 'dashboard.html';
+  // オンボーディング未完了ならonboardingへ、完了済みならdashboardへ
+  const { data: prof } = await supabase.from('profiles').select('onboarding_done').eq('id', session.user.id).single();
+  window.location.href = prof?.onboarding_done ? 'dashboard.html' : 'onboarding.html';
 }
 
 const form = document.getElementById('registerForm');
@@ -276,7 +278,7 @@ form.addEventListener('submit', async (e) => {
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin + '/dashboard.html'
+        emailRedirectTo: window.location.origin + '/onboarding.html'
       }
     });
 

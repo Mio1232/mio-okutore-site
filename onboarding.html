@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>はじめの設定 — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="theme-color" content="#F7F2EA">
+<style>
+:root{--bg:#F7F2EA;--bg-soft:#EFE7DA;--bg-card:#FFFEFB;--ink:#3A2E2A;--ink-mid:#6B5D57;--ink-soft:#998B83;--rose:#C98B95;--rose-soft:#E8D0D2;--rose-deep:#B06B75;--sage:#9BB59C;--line:rgba(58,46,42,0.08);--line-strong:rgba(58,46,42,0.14)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px}
+
+.card{width:100%;max-width:400px;background:var(--bg-card);border:1px solid var(--line);border-radius:20px;padding:32px 28px;box-shadow:0 8px 32px rgba(58,46,42,0.06)}
+
+.progress{display:flex;gap:6px;margin-bottom:28px}
+.progress-dot{flex:1;height:4px;border-radius:2px;background:var(--bg-soft);transition:background .3s}
+.progress-dot.active{background:var(--rose)}
+.progress-dot.done{background:var(--sage)}
+
+.step-title{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:600;text-align:center;margin-bottom:6px}
+.step-sub{text-align:center;font-size:12px;color:var(--ink-soft);margin-bottom:28px;font-family:'Cormorant Garamond',serif;font-style:italic;letter-spacing:.12em}
+
+.field{margin-bottom:20px}
+.field-label{font-size:13px;font-weight:500;margin-bottom:8px;color:var(--ink)}
+.field-input{width:100%;padding:12px 16px;border:1px solid var(--line-strong);border-radius:12px;font-family:inherit;font-size:14px;color:var(--ink);background:var(--bg);outline:none;transition:border-color .2s}
+.field-input:focus{border-color:var(--rose)}
+.field-input::placeholder{color:var(--ink-soft)}
+
+.options{display:flex;flex-wrap:wrap;gap:8px}
+.option{padding:10px 16px;border:1px solid var(--line-strong);border-radius:10px;font-size:13px;cursor:pointer;transition:all .2s;background:var(--bg);text-align:center;flex:1;min-width:calc(50% - 4px)}
+.option:hover{border-color:var(--rose);background:var(--rose-soft)}
+.option.selected{border-color:var(--rose);background:var(--rose-soft);color:var(--rose-deep);font-weight:600}
+.option.full{min-width:100%}
+
+.btn-row{display:flex;gap:10px;margin-top:28px}
+.btn{flex:1;padding:14px;border-radius:12px;font-family:inherit;font-size:14px;font-weight:600;letter-spacing:.06em;cursor:pointer;border:none;transition:all .2s;text-align:center}
+.btn-primary{background:var(--rose);color:#fff}
+.btn-primary:hover{background:var(--rose-deep)}
+.btn-primary:disabled{background:var(--bg-soft);color:var(--ink-soft);cursor:default}
+.btn-secondary{background:transparent;color:var(--ink-mid);border:1px solid var(--line-strong)}
+.btn-secondary:hover{border-color:var(--rose);color:var(--rose-deep)}
+.btn-skip{background:none;border:none;color:var(--ink-soft);font-size:12px;cursor:pointer;padding:12px;width:100%;text-align:center;margin-top:8px}
+.btn-skip:hover{color:var(--rose)}
+
+.step{display:none}
+.step.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.welcome-icon{text-align:center;font-size:48px;margin-bottom:16px}
+.field-hint{font-size:11px;color:var(--ink-soft);margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="progress">
+    <div class="progress-dot active" id="dot1"></div>
+    <div class="progress-dot" id="dot2"></div>
+    <div class="progress-dot" id="dot3"></div>
+    <div class="progress-dot" id="dot4"></div>
+  </div>
+
+  <!-- Step 1: あなたについて -->
+  <div class="step active" id="step1">
+    <div class="welcome-icon">🌸</div>
+    <div class="step-title">ようこそ、mio億トレへ</div>
+    <div class="step-sub">— let's get started —</div>
+
+    <div class="field">
+      <div class="field-label">お名前（ニックネーム）</div>
+      <input class="field-input" id="inputName" type="text" placeholder="例: みお" maxlength="20">
+    </div>
+
+    <div class="field">
+      <div class="field-label">FXの経験</div>
+      <div class="options" id="optExp">
+        <div class="option" data-val="beginner">これから始める</div>
+        <div class="option" data-val="under6m">半年未満</div>
+        <div class="option" data-val="6m_1y">半年〜1年</div>
+        <div class="option" data-val="1y_3y">1〜3年</div>
+        <div class="option" data-val="3y_plus">3年以上</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn1Next">次へ</button>
+    </div>
+  </div>
+
+  <!-- Step 2: コミュニティ参加状況 -->
+  <div class="step" id="step2">
+    <div class="step-title">コミュニティについて</div>
+    <div class="step-sub">— community —</div>
+
+    <div class="field">
+      <div class="field-label">mio億トレのコミュニティに参加していますか？</div>
+      <div class="options" id="optCommunity">
+        <div class="option full" data-val="discord">Discordに参加している</div>
+        <div class="option full" data-val="line">LINEだけ登録している</div>
+        <div class="option full" data-val="none">まだ参加していない</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="btn2Back">戻る</button>
+      <button class="btn btn-primary" id="btn2Next">次へ</button>
+    </div>
+  </div>
+
+  <!-- Step 3A: 未参加・LINEのみ -->
+  <div class="step" id="step3a">
+    <div class="step-title">もう少し教えてください</div>
+    <div class="step-sub">— about you —</div>
+
+    <div class="field">
+      <div class="field-label">このアプリをどこで知りましたか？</div>
+      <div class="options" id="optReferral">
+        <div class="option" data-val="x">X（Twitter）</div>
+        <div class="option" data-val="line_ref">LINE</div>
+        <div class="option" data-val="friend">友人の紹介</div>
+        <div class="option" data-val="search">検索</div>
+        <div class="option" data-val="other">その他</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">興味のあること（複数OK）</div>
+      <div class="options multi" id="optInterests3a">
+        <div class="option" data-val="learn_fx">FXの基礎を学びたい</div>
+        <div class="option" data-val="ask_ai">AIに相談したい</div>
+        <div class="option" data-val="record_trade">トレードを記録・分析したい</div>
+        <div class="option" data-val="community">コミュニティに興味がある</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="btn3aBack">戻る</button>
+      <button class="btn btn-primary" id="btn3aNext">次へ</button>
+    </div>
+  </div>
+
+  <!-- Step 3B: Discord参加者 -->
+  <div class="step" id="step3b">
+    <div class="step-title">使用中のツール</div>
+    <div class="step-sub">— your tools —</div>
+
+    <div class="field">
+      <div class="field-label">使っているツールを選んでください（複数OK）</div>
+      <div class="options multi" id="optTools">
+        <div class="option full" data-val="miyabi_ea">みやびロジックEA</div>
+        <div class="option full" data-val="solid_edge">Solid Edgeインジケーター</div>
+        <div class="option full" data-val="none">どちらも使っていない</div>
+      </div>
+    </div>
+
+    <!-- ツール未使用の場合のみ表示 -->
+    <div class="field" id="toolInterestField" style="display:none">
+      <div class="field-label">興味のあるツール（複数OK）</div>
+      <div class="options multi" id="optToolInterest">
+        <div class="option" data-val="ea">EAに興味がある</div>
+        <div class="option" data-val="indicator">インジケーターに興味がある</div>
+        <div class="option" data-val="no_interest">今は特にない</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">主に取引する通貨ペア（複数OK）</div>
+      <div class="options multi" id="optPairs">
+        <div class="option" data-val="USDJPY">USD/JPY</div>
+        <div class="option" data-val="XAUUSD">XAU/USD</div>
+        <div class="option" data-val="GBPJPY">GBP/JPY</div>
+        <div class="option" data-val="BTCUSD">BTC/USD</div>
+        <div class="option" data-val="other">その他</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="btn3bBack">戻る</button>
+      <button class="btn btn-primary" id="btn3bNext">次へ</button>
+    </div>
+  </div>
+
+  <!-- Step 4: 目標設定 -->
+  <div class="step" id="step4">
+    <div class="step-title">目標を設定しましょう</div>
+    <div class="step-sub">— your goal —</div>
+
+    <div class="field">
+      <div class="field-label">月間の目標金額（円）</div>
+      <input class="field-input" id="inputTarget" type="number" placeholder="例: 100000">
+      <div class="field-hint">ダッシュボードに目標達成率として表示されます。あとから変更もできます。</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btnComplete">設定を完了する 🌸</button>
+    </div>
+    <button class="btn-skip" id="btnSkipTarget">スキップしてあとで設定する</button>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// 認証チェック
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) { window.location.href = 'login.html'; }
+
+const user = session.user;
+
+// 既にオンボーディング済みかチェック
+const { data: prof } = await supabase.from('profiles').select('onboarding_done').eq('id', user.id).single();
+if (prof?.onboarding_done) { window.location.href = 'dashboard.html'; }
+
+// State
+let state = {
+  name: '',
+  experience: '',
+  community: '',
+  referral: '',
+  interests: [],
+  tools: [],
+  toolInterest: [],
+  pairs: [],
+  target: null
+};
+
+let currentStep = 1;
+
+// ===== UI Helpers =====
+function showStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + (n === 3 ? (state.community === 'discord' ? '3b' : '3a') : n)).classList.add('active');
+  document.querySelectorAll('.progress-dot').forEach((d, i) => {
+    d.classList.remove('active', 'done');
+    if (i + 1 < n) d.classList.add('done');
+    if (i + 1 === n) d.classList.add('active');
+  });
+  currentStep = n;
+}
+
+// Single select
+function setupSingleSelect(containerId, callback) {
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('.option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      container.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      if (callback) callback(opt.dataset.val);
+    });
+  });
+}
+
+// Multi select
+function setupMultiSelect(containerId, callback) {
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('.option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      // "none" / "no_interest" は排他
+      const val = opt.dataset.val;
+      if (val === 'none' || val === 'no_interest') {
+        container.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+      } else {
+        container.querySelectorAll('.option').forEach(o => {
+          if (o.dataset.val === 'none' || o.dataset.val === 'no_interest') o.classList.remove('selected');
+        });
+        opt.classList.toggle('selected');
+      }
+      const selected = Array.from(container.querySelectorAll('.option.selected')).map(o => o.dataset.val);
+      if (callback) callback(selected);
+    });
+  });
+}
+
+function getSelected(containerId) {
+  return Array.from(document.getElementById(containerId).querySelectorAll('.option.selected')).map(o => o.dataset.val);
+}
+
+function getSingleSelected(containerId) {
+  const sel = document.getElementById(containerId).querySelector('.option.selected');
+  return sel ? sel.dataset.val : '';
+}
+
+// ===== Setup =====
+setupSingleSelect('optExp', v => { state.experience = v; });
+setupSingleSelect('optCommunity', v => { state.community = v; });
+setupSingleSelect('optReferral', v => { state.referral = v; });
+setupMultiSelect('optInterests3a', v => { state.interests = v; });
+
+// Tools - special handling for "none" showing interest field
+setupMultiSelect('optTools', v => {
+  state.tools = v;
+  const showInterest = v.length === 1 && v[0] === 'none';
+  document.getElementById('toolInterestField').style.display = showInterest ? 'block' : 'none';
+  if (!showInterest) state.toolInterest = [];
+});
+setupMultiSelect('optToolInterest', v => { state.toolInterest = v; });
+setupMultiSelect('optPairs', v => { state.pairs = v; });
+
+// ===== Navigation =====
+document.getElementById('btn1Next').addEventListener('click', () => {
+  state.name = document.getElementById('inputName').value.trim();
+  showStep(2);
+});
+
+document.getElementById('btn2Back').addEventListener('click', () => showStep(1));
+document.getElementById('btn2Next').addEventListener('click', () => {
+  state.community = getSingleSelected('optCommunity');
+  if (!state.community) return;
+  showStep(3);
+});
+
+document.getElementById('btn3aBack').addEventListener('click', () => showStep(2));
+document.getElementById('btn3aNext').addEventListener('click', () => {
+  state.referral = getSingleSelected('optReferral');
+  state.interests = getSelected('optInterests3a');
+  showStep(4);
+});
+
+document.getElementById('btn3bBack').addEventListener('click', () => showStep(2));
+document.getElementById('btn3bNext').addEventListener('click', () => {
+  state.tools = getSelected('optTools');
+  state.toolInterest = getSelected('optToolInterest');
+  state.pairs = getSelected('optPairs');
+  showStep(4);
+});
+
+// ===== Complete =====
+async function saveAndComplete() {
+  const target = document.getElementById('inputTarget').value;
+  state.target = target ? parseInt(target) : null;
+
+  // Build profile update
+  const update = {
+    onboarding_done: true,
+    fx_experience: state.experience || null,
+    updated_at: new Date().toISOString()
+  };
+
+  if (state.name) update.display_name = state.name;
+
+  // Community status
+  if (state.community === 'discord') {
+    update.community_status = 'discord';
+  } else if (state.community === 'line') {
+    update.community_status = 'line';
+  } else {
+    update.community_status = 'none';
+  }
+
+  // Referral source (未参加/LINE only)
+  if (state.referral) update.referral_source = state.referral;
+
+  // Interests - merge from both paths
+  const interests = [];
+  if (state.interests.includes('community')) interests.push('community');
+  if (state.toolInterest.includes('ea')) interests.push('ea');
+  if (state.toolInterest.includes('indicator')) interests.push('indicator');
+  if (state.interests.includes('learn_fx')) interests.push('learn_fx');
+  if (state.interests.includes('ask_ai')) interests.push('ask_ai');
+  if (state.interests.includes('record_trade')) interests.push('record_trade');
+  if (interests.length > 0) update.interests = interests;
+
+  // Tools (Discord users)
+  if (state.community === 'discord') {
+    const tools = state.tools.filter(t => t !== 'none');
+    update.tools_used = tools.length > 0 ? tools : [];
+  }
+
+  // Trading pairs
+  if (state.pairs.length > 0) {
+    update.trading_pairs = state.pairs.filter(p => p !== 'other').join(', ');
+  }
+
+  // Target
+  if (state.target) update.target_monthly = state.target;
+
+  try {
+    const { error } = await supabase.from('profiles').update(update).eq('id', user.id);
+    if (error) {
+      console.error('Save error:', error);
+      alert('保存に失敗しました。もう一度お試しください。');
+      return;
+    }
+    window.location.href = 'dashboard.html';
+  } catch (e) {
+    console.error('Error:', e);
+    alert('エラーが発生しました。');
+  }
+}
+
+document.getElementById('btnComplete').addEventListener('click', saveAndComplete);
+document.getElementById('btnSkipTarget').addEventListener('click', saveAndComplete);
+</script>
+</body>
+</html>
