@@ -367,12 +367,12 @@ async function saveAndComplete() {
   if (state.interests.includes('learn_fx')) interests.push('learn_fx');
   if (state.interests.includes('ask_ai')) interests.push('ask_ai');
   if (state.interests.includes('record_trade')) interests.push('record_trade');
-  if (interests.length > 0) update.interests = interests;
+  update.interests = interests.length > 0 ? interests : null;
 
   // Tools (Discord users)
   if (state.community === 'discord') {
     const tools = state.tools.filter(t => t !== 'none');
-    update.tools_used = tools.length > 0 ? tools : [];
+    update.tools_used = tools.length > 0 ? tools : null;
   }
 
   // Trading pairs
