@@ -713,15 +713,38 @@ function render() {
     return;
   }
 
-  const groups = groupByDate(filtered);
-  groups.forEach(([_, evs]) => evs.sort((a,b) => new Date(a.startTime) - new Date(b.startTime)));
+  // これからの配信と過去の配信を分離
+  const upcoming = filtered.filter(ev => !isPassed(ev.startTime, ev.duration));
+  const past = filtered.filter(ev => isPassed(ev.startTime, ev.duration));
 
-  const html = groups.map(([date, evs]) => `
-    <div class="day-divider">${formatDayHeader(date)}</div>
-    <div class="events">
-      ${evs.map(renderEvent).join('')}
-    </div>
-  `).join('');
+  // これからの配信：日付昇順（近い日から）
+  const upcomingGroups = groupByDate(upcoming);
+  upcomingGroups.forEach(([_, evs]) => evs.sort((a,b) => new Date(a.startTime) - new Date(b.startTime)));
+
+  // 過去の配信：日付降順（直近の過去から）
+  const pastGroups = groupByDate(past);
+  pastGroups.reverse();
+  pastGroups.forEach(([_, evs]) => evs.sort((a,b) => new Date(b.startTime) - new Date(a.startTime)));
+
+  let html = '';
+
+  if (upcomingGroups.length > 0) {
+    html += upcomingGroups.map(([date, evs]) => `
+      <div class="day-divider">${formatDayHeader(date)}</div>
+      <div class="events">
+        ${evs.map(renderEvent).join('')}
+      </div>
+    `).join('');
+  }
+
+  if (pastGroups.length > 0) {
+    html += pastGroups.map(([date, evs]) => `
+      <div class="day-divider">${formatDayHeader(date)}</div>
+      <div class="events">
+        ${evs.map(renderEvent).join('')}
+      </div>
+    `).join('');
+  }
 
   container.innerHTML = html;
 }
@@ -763,6 +786,6 @@ document.querySelectorAll('.filter-tab').forEach(t => {
 
 load();
 </script>
-<script src="auth-header.js" defer></script>
+
 </body>
 </html>
