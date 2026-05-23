@@ -375,9 +375,10 @@ async function saveAndComplete() {
     update.tools_used = tools.length > 0 ? tools : null;
   }
 
-  // Trading pairs
+  // Trading pairs（配列として送る）
   if (state.pairs.length > 0) {
-    update.trading_pairs = state.pairs.filter(p => p !== 'other').join(', ');
+    const pairValues = state.pairs.filter(p => p !== 'other');
+    update.trading_pairs = pairValues.length > 0 ? pairValues : null;
   }
 
   // Target
