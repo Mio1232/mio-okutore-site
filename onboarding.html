@@ -76,13 +76,20 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
     </div>
 
     <div class="field">
+      <div class="field-label">LINE登録名</div>
+      <input class="field-input" id="inputLineName" type="text" placeholder="LINEに登録しているお名前">
+      <div class="field-hint">サポート時の本人確認に使用します</div>
+    </div>
+
+    <div class="field">
       <div class="field-label">FXの経験</div>
       <div class="options" id="optExp">
-        <div class="option" data-val="beginner">これから始める</div>
-        <div class="option" data-val="under6m">半年未満</div>
-        <div class="option" data-val="6m_1y">半年〜1年</div>
-        <div class="option" data-val="1y_3y">1〜3年</div>
-        <div class="option" data-val="3y_plus">3年以上</div>
+        <div class="option" data-val="0">未経験</div>
+        <div class="option" data-val="1">1年未満</div>
+        <div class="option" data-val="2">1〜2年</div>
+        <div class="option" data-val="3">2〜3年</div>
+        <div class="option" data-val="5">3〜5年</div>
+        <div class="option" data-val="10">5年以上</div>
       </div>
     </div>
 
@@ -222,6 +229,7 @@ if (prof?.onboarding_done) { window.location.href = 'dashboard.html'; }
 // State
 let state = {
   name: '',
+  lineName: '',
   experience: '',
   community: '',
   referral: '',
@@ -308,6 +316,7 @@ setupMultiSelect('optPairs', v => { state.pairs = v; });
 // ===== Navigation =====
 document.getElementById('btn1Next').addEventListener('click', () => {
   state.name = document.getElementById('inputName').value.trim();
+  state.lineName = document.getElementById('inputLineName').value.trim();
   showStep(2);
 });
 
@@ -341,11 +350,14 @@ async function saveAndComplete() {
   // Build profile update
   const update = {
     onboarding_done: true,
-    fx_experience: state.experience || null,
     updated_at: new Date().toISOString()
   };
 
   if (state.name) update.display_name = state.name;
+  if (state.lineName) update.line_name = state.lineName;
+
+  // トレード歴（数値で保存）
+  if (state.experience !== '') update.trade_years = parseInt(state.experience);
 
   // Community status
   if (state.community === 'discord') {

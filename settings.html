@@ -558,8 +558,8 @@ body{
     </div>
   </div>
 
-  <!-- TOOLS USED -->
-  <div class="section">
+  <!-- TOOLS USED (Discord参加者のみ表示) -->
+  <div class="section" id="sectionTools" style="display:none;">
     <div class="section-header">
       <span class="section-icon">🛠</span>
       <span class="section-title">使用中のツール</span>
@@ -621,7 +621,7 @@ body{
   </div>
 
   <!-- INTERESTS -->
-  <div class="section">
+  <div class="section" id="sectionInterests">
     <div class="section-header">
       <span class="section-icon">💭</span>
       <span class="section-title">興味のあるサービス</span>
@@ -629,19 +629,21 @@ body{
     </div>
     <div class="setting-card">
       <div class="checkbox-list">
-        <div class="checkbox-row" onclick="toggleCheckbox('interest_ea')">
+        <!-- Discord参加者のみ表示 -->
+        <div class="checkbox-row discord-only" style="display:none;" onclick="toggleCheckbox('interest_ea')">
           <input type="checkbox" id="interest_ea">
           <label for="interest_ea">
             EAの導入を検討中
           </label>
         </div>
-        <div class="checkbox-row" onclick="toggleCheckbox('interest_indicator')">
+        <div class="checkbox-row discord-only" style="display:none;" onclick="toggleCheckbox('interest_indicator')">
           <input type="checkbox" id="interest_indicator">
           <label for="interest_indicator">
             インジケーターの導入を検討中
           </label>
         </div>
-        <div class="checkbox-row" onclick="toggleCheckbox('interest_community')">
+        <!-- Discord未参加者のみ表示 -->
+        <div class="checkbox-row non-discord-only" onclick="toggleCheckbox('interest_community')">
           <input type="checkbox" id="interest_community">
           <label for="interest_community">
             コミュニティ参加を検討中
@@ -793,6 +795,23 @@ const toolsUsed = profile?.tools_used || [];
 const communityStatus = profile?.community_status || '';
 document.getElementById('community_line').checked = communityStatus.includes('line');
 document.getElementById('community_discord').checked = communityStatus.includes('discord');
+
+// Discord参加状況に応じた表示制御
+const isDiscord = communityStatus === 'discord' || communityStatus.includes('discord');
+// ツールセクション：Discord参加者のみ表示
+document.getElementById('sectionTools').style.display = isDiscord ? 'block' : 'none';
+// 興味セクション：Discord参加者にはEA/インジ、未参加者にはコミュニティ検討
+document.querySelectorAll('.discord-only').forEach(el => el.style.display = isDiscord ? 'flex' : 'none');
+document.querySelectorAll('.non-discord-only').forEach(el => el.style.display = isDiscord ? 'none' : 'flex');
+
+// コミュニティチェック変更時にも表示制御を更新
+document.getElementById('community_discord').addEventListener('change', function() {
+  const nowDiscord = this.checked;
+  document.getElementById('sectionTools').style.display = nowDiscord ? 'block' : 'none';
+  document.querySelectorAll('.discord-only').forEach(el => el.style.display = nowDiscord ? 'flex' : 'none');
+  document.querySelectorAll('.non-discord-only').forEach(el => el.style.display = nowDiscord ? 'none' : 'flex');
+  checkChanges();
+});
 
 // 興味
 const interests = profile?.interests || [];
