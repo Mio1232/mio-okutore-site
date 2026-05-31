@@ -92,7 +92,38 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
 .divider{max-width:720px;margin:0 auto;padding:0 24px}
 .divider-line{height:1px;background:var(--line-strong)}
 
-@media(max-width:480px){.hero{padding:48px 20px}.section{padding:56px 20px}.feature-card-body{padding:20px}}
+/* ===== PLAN COMPARISON ===== */
+.plan-cards{display:flex;flex-direction:column;gap:16px;margin-bottom:40px}
+.plan-card{background:var(--bg-card);border:1px solid var(--line);border-radius:16px;padding:24px;position:relative}
+.plan-card.featured{border:1.5px solid var(--rose);box-shadow:0 8px 28px rgba(201,139,149,0.18)}
+.plan-ribbon{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:#fff;font-size:11px;font-weight:600;letter-spacing:.08em;padding:4px 16px;border-radius:20px;white-space:nowrap}
+.plan-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:4px}
+.plan-name{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700}
+.plan-price{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--rose-deep);line-height:1}
+.plan-price small{font-family:'Noto Sans JP',sans-serif;font-size:13px;color:var(--ink-soft);font-weight:400}
+.plan-tagline{font-size:12.5px;color:var(--ink-mid);margin-bottom:16px;line-height:1.7}
+.plan-feats{list-style:none}
+.plan-feats li{font-size:12.5px;color:var(--ink-mid);padding:5px 0 5px 22px;position:relative;line-height:1.6}
+.plan-feats li::before{content:'✓';position:absolute;left:0;color:var(--sage);font-weight:700}
+.plan-feats li.no{color:var(--ink-soft)}
+.plan-feats li.no::before{content:'—';color:var(--ink-soft);font-weight:400}
+.plan-yearly{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line-strong);font-size:12px;color:var(--ink-mid)}
+.plan-yearly strong{color:var(--rose-deep)}
+
+.compare-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:14px;background:var(--bg-card)}
+.compare-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:440px}
+.compare-table th,.compare-table td{padding:11px 12px;text-align:center;border-bottom:1px solid var(--line)}
+.compare-table thead th{position:sticky;top:0;background:var(--bg-soft);font-family:'Noto Serif JP',serif;font-weight:600;font-size:13px}
+.compare-table thead th:first-child{text-align:left}
+.compare-table tbody td:first-child{text-align:left;color:var(--ink);font-weight:500}
+.compare-table .grp td{background:var(--bg-soft);font-weight:600;font-family:'Noto Serif JP',serif;color:var(--ink);text-align:left;letter-spacing:.04em}
+.compare-table .yes{color:var(--sage);font-weight:700}
+.compare-table .no{color:var(--ink-soft)}
+.compare-table .col-pro{background:rgba(232,208,210,0.18)}
+.compare-table tbody tr:last-child td{border-bottom:none}
+.plan-note{font-size:12px;color:var(--ink-soft);line-height:1.8;margin-top:16px;text-align:center}
+
+@media(max-width:480px){.hero{padding:48px 20px}.section{padding:56px 20px}.feature-card-body{padding:20px}.plan-card{padding:20px}}
 </style>
 </head>
 <body>
@@ -336,6 +367,115 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
     </div>
 
   </div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- ===== PLAN COMPARISON ===== -->
+<section class="section" id="plan">
+  <div class="section-tag">— Plans &amp; Pricing —</div>
+  <h2 class="section-title">あなたに合った<br>プランを</h2>
+  <p class="section-lead">
+    まずは無料で。本格的に使いたくなったら、<br>
+    いつでもアップグレードできます 🌸
+  </p>
+
+  <div class="plan-cards">
+
+    <div class="plan-card">
+      <div class="plan-head">
+        <span class="plan-name">🌱 FREE</span>
+        <span class="plan-price">¥0 <small>/月</small></span>
+      </div>
+      <p class="plan-tagline">まずはお試し。基本機能を無料で体験できます。</p>
+      <ul class="plan-feats">
+        <li>トレード記録（月10件まで）</li>
+        <li>美桜Mio AIチャット（月10回まで）</li>
+        <li>学びノート（5件まで）</li>
+        <li>ダッシュボード・通貨ペア別ランキング</li>
+        <li class="no">チャート画像分析</li>
+        <li class="no">詳細な分析機能</li>
+      </ul>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-head">
+        <span class="plan-name">🌿 BASIC</span>
+        <span class="plan-price">¥500 <small>/月</small></span>
+      </div>
+      <p class="plan-tagline">本格的にトレードを記録・分析したい方に。</p>
+      <ul class="plan-feats">
+        <li>トレード記録・学びノート 無制限</li>
+        <li>AIチャット（月50回／1日5回まで）</li>
+        <li>チャート画像分析（月5回まで）</li>
+        <li>AI個別最適化（取引履歴を反映）</li>
+        <li>分析機能フル解放（時間帯別・通貨ペア別・PF等）</li>
+        <li>月次レポート（過去3ヶ月）</li>
+      </ul>
+      <div class="plan-yearly">年払いなら <strong>¥4,800</strong>（20%OFF）</div>
+    </div>
+
+    <div class="plan-card featured">
+      <div class="plan-ribbon">いちばん人気</div>
+      <div class="plan-head">
+        <span class="plan-name">🌸 PRO</span>
+        <span class="plan-price">¥1,500 <small>/月</small></span>
+      </div>
+      <p class="plan-tagline">すべてを無制限で。億トレを本気で目指す方に。</p>
+      <ul class="plan-feats">
+        <li>AIチャット 無制限</li>
+        <li>チャート画像分析 無制限</li>
+        <li>AI過去会話保存 無制限</li>
+        <li>月次レポート 全期間閲覧</li>
+        <li>BASICの全機能を含む</li>
+      </ul>
+      <div class="plan-yearly">年払いなら <strong>¥14,400</strong>（20%OFF）</div>
+    </div>
+
+  </div>
+
+  <div class="compare-wrap">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>機能</th>
+          <th>🌱 FREE</th>
+          <th>🌿 BASIC</th>
+          <th class="col-pro">🌸 PRO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="grp"><td colspan="4">基本機能</td></tr>
+        <tr><td>会員登録・ログイン</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>トレード記録</td><td>月10件</td><td class="yes">無制限</td><td class="yes col-pro">無制限</td></tr>
+        <tr><td>学びノート</td><td>5件</td><td class="yes">無制限</td><td class="yes col-pro">無制限</td></tr>
+        <tr><td>ダッシュボード閲覧</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>通貨ペア別ランキング</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+
+        <tr class="grp"><td colspan="4">AI機能</td></tr>
+        <tr><td>美桜Mio AIチャット</td><td>月10回</td><td>月50回</td><td class="yes col-pro">無制限</td></tr>
+        <tr><td>チャート画像分析</td><td class="no">—</td><td>月5回</td><td class="yes col-pro">無制限</td></tr>
+        <tr><td>AI個別最適化</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>AI過去会話保存</td><td>直近5件</td><td>直近50件</td><td class="yes col-pro">無制限</td></tr>
+
+        <tr class="grp"><td colspan="4">分析機能</td></tr>
+        <tr><td>月次レポート</td><td>当月のみ</td><td>過去3ヶ月</td><td class="yes col-pro">無制限</td></tr>
+        <tr><td>取引種類別パフォーマンス</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>時間帯別ヒートマップ</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>通貨ペア別詳細分析</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>AIインサイト（改善提案）</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>最大DD・PF表示</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+
+        <tr class="grp"><td colspan="4">設定・カスタマイズ</td></tr>
+        <tr><td>目標金額設定</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>通貨ペア複数登録</td><td>1個</td><td>5個</td><td class="yes col-pro">無制限</td></tr>
+
+        <tr class="grp"><td colspan="4">年払い特典</td></tr>
+        <tr><td>年払い割引</td><td class="no">—</td><td>¥4,800<br>(20%OFF)</td><td class="col-pro">¥14,400<br>(20%OFF)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="plan-note">表は左右にスクロールできます。プランはいつでも変更・解約できます 🌸</p>
 </section>
 
 <div class="divider"><div class="divider-line"></div></div>
