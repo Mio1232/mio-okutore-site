@@ -390,6 +390,114 @@ body{
 }
 .toast.error{ background: #B07474; }
 
+/* AI CANDIDATES */
+.candidate{
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.candidate-title{
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+.candidate-meta{
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.candidate-comment{
+  font-size: 12px;
+  color: var(--ink-mid);
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  line-height: 1.7;
+}
+.candidate-comment-edit{
+  width: 100%;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  line-height: 1.7;
+  resize: vertical;
+  min-height: 50px;
+  outline: none;
+}
+.candidate-comment-edit:focus{ border-color: var(--rose); }
+.candidate-actions{
+  display: flex;
+  gap: 8px;
+}
+.candidate-actions .btn{
+  flex: 1;
+  padding: 9px;
+  font-size: 12px;
+}
+.btn-publish{
+  background: var(--sage);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+}
+.btn-publish:hover{ background: #7FA380; }
+.btn-skip{
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+}
+.btn-skip:hover{ background: var(--bg-soft); }
+.btn-edit-comment{
+  background: transparent;
+  color: var(--ink-mid);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+}
+.ai-loading{
+  text-align: center;
+  padding: 32px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+.ai-loading-spinner{
+  width: 32px; height: 32px;
+  border: 3px solid var(--line);
+  border-top-color: var(--rose);
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin{ to{ transform: rotate(360deg); } }
+.candidate.published{
+  opacity: 0.4;
+  pointer-events: none;
+}
+.candidate.skipped{ display: none; }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
@@ -501,6 +609,22 @@ body{
       <button class="btn btn-secondary" id="btn-cancel" style="display:none;">キャンセル</button>
       <button class="btn btn-primary" id="btn-save">保存</button>
     </div>
+  </section>
+
+  <!-- AI NEWS CANDIDATES -->
+  <section class="form-card" id="ai-section">
+    <div class="form-card-title" style="margin-bottom:12px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <span>AI ニュース候補</span>
+    </div>
+    <div style="font-size:12px;color:var(--ink-soft);margin-bottom:16px;line-height:1.7;">
+      ボタンを押すとAIがFX関連ニュースを自動取得し、mio風コメントを生成します。<br>
+      気に入った記事の「公開」を押すだけで登録されます。
+    </div>
+    <button class="btn btn-primary" id="btn-ai-fetch" style="width:100%;margin-bottom:16px;">
+      🌸 今日の候補を取得
+    </button>
+    <div id="ai-candidates" style="display:none;"></div>
   </section>
 
   <!-- NEWS LIST -->
@@ -771,6 +895,101 @@ function render() {
 
 clearForm();
 load();
+
+// ===== AI ニュース候補 =====
+document.getElementById('btn-ai-fetch').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-ai-fetch');
+  const container = document.getElementById('ai-candidates');
+
+  btn.disabled = true;
+  btn.textContent = '取得中...';
+  container.style.display = 'block';
+  container.innerHTML = `
+    <div class="ai-loading">
+      <div class="ai-loading-spinner"></div>
+      AIがニュースを収集しています...<br>
+      <span style="font-size:11px;color:var(--ink-soft);">30秒ほどかかることがあります</span>
+    </div>
+  `;
+
+  try {
+    const res = await fetch('/.netlify/functions/news-fetch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+
+    if (!res.ok) throw new Error('取得に失敗しました');
+
+    const data = await res.json();
+    const articles = data.articles || [];
+
+    if (articles.length === 0) {
+      container.innerHTML = '<div class="ai-loading">候補記事が見つかりませんでした</div>';
+      btn.disabled = false;
+      btn.textContent = '🌸 今日の候補を取得';
+      return;
+    }
+
+    let html = `<div style="font-size:12px;color:var(--sage);font-weight:600;margin-bottom:12px;">📰 ${articles.length}件の候補が見つかりました</div>`;
+
+    articles.forEach((article, i) => {
+      const catLabel = CAT_LABELS[article.category] || 'その他';
+      const catClass = CAT_CLASSES[article.category] || 'chip-other';
+      html += `
+        <div class="candidate" id="candidate-${i}">
+          <div class="candidate-title">${escapeHtml(article.title)}</div>
+          <div class="candidate-meta">
+            <span class="chip ${catClass}">${catLabel}</span>
+            <span>${escapeHtml(article.source)}</span>
+          </div>
+          <textarea class="candidate-comment-edit" id="comment-${i}">${escapeHtml(article.comment)}</textarea>
+          <div class="candidate-actions">
+            <button class="btn btn-publish" onclick="publishCandidate(${i})">✓ 公開</button>
+            <button class="btn btn-skip" onclick="skipCandidate(${i})">スキップ</button>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+    window._aiCandidates = articles;
+
+  } catch (err) {
+    container.innerHTML = `<div class="ai-loading" style="color:var(--rose);">エラー: ${err.message}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🌸 今日の候補を取得';
+});
+
+async function publishCandidate(i) {
+  const article = window._aiCandidates[i];
+  if (!article) return;
+
+  const comment = document.getElementById('comment-' + i).value;
+  const now = new Date();
+
+  const success = await insertNews({
+    title: article.title,
+    url: article.url,
+    comment: comment,
+    timestamp: now.toISOString(),
+    category: article.category || 'us',
+    source: article.source || ''
+  });
+
+  if (success) {
+    showToast('公開しました');
+    document.getElementById('candidate-' + i).classList.add('published');
+    document.getElementById('candidate-' + i).innerHTML = '<div style="text-align:center;padding:8px;color:var(--sage);font-size:12px;">✓ 公開済み</div>';
+    await load();
+  }
+}
+
+function skipCandidate(i) {
+  document.getElementById('candidate-' + i).classList.add('skipped');
+}
 </script>
 
 </body>
