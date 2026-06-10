@@ -136,6 +136,19 @@ body{
   border: 1.5px solid var(--bg);
   border-radius: 50%;
 }
+.mypage-btn{
+  display: flex; align-items: center; gap: 6px;
+  height: 38px; padding: 0 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 19px;
+  color: var(--ink-mid);
+  text-decoration: none;
+  font-size: 13px; font-weight: 600;
+  transition: all 0.2s;
+}
+.mypage-btn:hover{ border-color: var(--rose); color: var(--rose-deep); }
+.mypage-btn:active{ transform: scale(0.96); }
 
 /* HERO */
 .hero{
@@ -808,13 +821,10 @@ body{
       <div class="logo-text">mio<span class="accent">.</span>oku-tore</div>
     </div>
     <div class="header-icons">
-      <div class="icon-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-        <span class="badge"></span>
-      </div>
-      <div class="icon-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      </div>
+      <a href="dashboard.html" class="mypage-btn" aria-label="マイページ">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>マイページ</span>
+      </a>
     </div>
   </header>
 
