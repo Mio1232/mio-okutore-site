@@ -243,6 +243,45 @@ body{
 }
 .fine-print a{ color: var(--rose-deep); }
 
+/* CANCELLATION GUIDE */
+.cancel-note{
+  margin: 24px 20px 0;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+}
+.cancel-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.cancel-text{
+  font-size: 13px;
+  color: var(--ink-mid);
+  line-height: 1.85;
+  margin-bottom: 14px;
+}
+.cancel-line-btn{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 13px;
+  background: #06C755;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: opacity .2s, transform .1s;
+}
+.cancel-line-btn:hover{ opacity: 0.92; }
+.cancel-line-btn:active{ transform: translateY(1px); }
+
 /* LOADING */
 .loading{
   position: fixed; inset: 0;
@@ -338,6 +377,13 @@ body{
       <button class="plan-btn" id="btn-pro" data-plan="pro">申し込む</button>
     </div>
 
+  </div>
+
+  <!-- CANCELLATION GUIDE -->
+  <div class="cancel-note">
+    <div class="cancel-title">解約について</div>
+    <p class="cancel-text">解約をご希望の場合は、お手数ですが公式LINEよりご連絡ください。担当者が解約のお手続きを承ります🌸</p>
+    <a class="cancel-line-btn" href="https://liff.line.me/2009118446-ZPutgCO0/landing?follow=%40161qazcj&lp=BGfQ1J&liff_id=2009118446-ZPutgCO0" target="_blank" rel="noopener">公式LINEで連絡する</a>
   </div>
 
   <div class="fine-print">
