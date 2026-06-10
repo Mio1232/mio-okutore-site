@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>プラン — mio億トレ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/favicon-192.png">
+<meta name="theme-color" content="#F7F2EA">
+<style>
+:root{
+  --bg: #F7F2EA;
+  --bg-soft: #EFE7DA;
+  --bg-card: #FFFEFB;
+  --ink: #3A2E2A;
+  --ink-mid: #6B5D57;
+  --ink-soft: #998B83;
+  --rose: #C98B95;
+  --rose-soft: #E8D0D2;
+  --rose-deep: #B06B75;
+  --sage: #9BB59C;
+  --sage-soft: #C9DACA;
+  --honey: #D4B677;
+  --line: rgba(58,46,42,0.08);
+  --line-strong: rgba(58,46,42,0.14);
+  --plus: #5A8E73;
+  --minus: #B06B75;
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+html, body{ width: 100%; min-height: 100vh; }
+body{
+  font-family: 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.app{
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  position: relative;
+  padding-bottom: 40px;
+}
+
+/* HEADER */
+.page-header{
+  position: sticky;
+  top: 0;
+  background: rgba(247,242,234,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  z-index: 10;
+}
+.brand{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  color: var(--rose-deep);
+  text-transform: uppercase;
+  flex: 1;
+}
+.icon-btn{
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  color: var(--ink-mid);
+}
+.icon-btn svg{ width: 16px; height: 16px; }
+.icon-btn:hover{ background: var(--rose-soft); color: var(--rose-deep); }
+
+/* HERO */
+.hero{
+  padding: 32px 24px 8px;
+}
+.greeting{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.greeting-en{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--rose-deep);
+}
+.hero-sub{
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--ink-mid);
+  line-height: 1.8;
+}
+.plan-badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 14px;
+  padding: 4px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+.plan-badge.free{ color: var(--ink-mid); }
+.plan-badge.basic{ background: var(--sage-soft); color: #2D5F4F; border-color: var(--sage); }
+.plan-badge.pro{ background: var(--rose-soft); color: var(--rose-deep); border-color: var(--rose); }
+
+/* PLAN CARDS */
+.plans{
+  padding: 16px 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.plan-card{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px 20px;
+  position: relative;
+  transition: border-color .2s, box-shadow .2s;
+}
+.plan-card.featured{
+  border-color: var(--rose);
+  box-shadow: 0 6px 24px rgba(176,107,117,0.12);
+}
+.plan-card.current{
+  border-color: var(--sage);
+  background: linear-gradient(180deg, rgba(201,218,202,0.18), var(--bg-card));
+}
+.plan-ribbon{
+  position: absolute;
+  top: -10px; right: 18px;
+  background: var(--rose-deep);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+.plan-name{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.plan-name-en{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--rose-deep);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.plan-price{
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+.plan-price .amount{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.plan-price .unit{
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.plan-features{
+  list-style: none;
+  margin-bottom: 20px;
+}
+.plan-features li{
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-mid);
+  padding: 5px 0;
+}
+.plan-features li::before{
+  content: '✓';
+  color: var(--sage);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.plan-features li.muted{ color: var(--ink-soft); }
+.plan-features li.muted::before{ content: '·'; color: var(--ink-soft); }
+
+.plan-btn{
+  width: 100%;
+  padding: 13px;
+  border: 0;
+  border-radius: 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  background: var(--rose-deep);
+  color: #fff;
+  transition: opacity .2s, transform .1s;
+}
+.plan-btn:hover{ opacity: 0.92; }
+.plan-btn:active{ transform: translateY(1px); }
+.plan-btn.current{
+  background: var(--sage-soft);
+  color: #2D5F4F;
+  cursor: default;
+}
+.plan-btn.disabled{
+  background: var(--bg-soft);
+  color: var(--ink-soft);
+  cursor: default;
+}
+
+.fine-print{
+  padding: 22px 26px 0;
+  font-size: 11px;
+  color: var(--ink-soft);
+  line-height: 1.9;
+}
+.fine-print a{ color: var(--rose-deep); }
+
+/* LOADING */
+.loading{
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px; z-index: 100;
+}
+.loading-mark{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 40px;
+  font-weight: 600;
+  color: var(--rose-deep);
+}
+.loading-text{
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.16em;
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading" class="loading">
+  <div class="loading-mark">m</div>
+  <div class="loading-text">— loading —</div>
+</div>
+
+<!-- MAIN -->
+<div class="app" id="app" style="display: none;">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <a href="dashboard.html" class="brand" style="text-decoration:none; color:inherit; cursor:pointer;">← mio okutore</a>
+    <a class="icon-btn" href="settings.html" aria-label="設定">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </a>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1 class="greeting">プラン 🌸</h1>
+    <div class="greeting-en">Membership Plans</div>
+    <div class="hero-sub">記録 × AI × 仲間で、億トレへ。<br>いつでも変更・解約できます。</div>
+    <div class="plan-badge free" id="planBadge"><span>FREE</span></div>
+  </div>
+
+  <!-- PLAN CARDS -->
+  <div class="plans">
+
+    <!-- FREE -->
+    <div class="plan-card" id="card-free">
+      <div class="plan-name">無料</div>
+      <div class="plan-name-en">Free</div>
+      <div class="plan-price"><span class="amount">¥0</span><span class="unit">/ 月</span></div>
+      <ul class="plan-features">
+        <li>コミュニティ・配信の視聴</li>
+        <li>FX手帳（基本機能）</li>
+        <li>イベント・お知らせ</li>
+      </ul>
+      <button class="plan-btn" id="btn-free" data-plan="free">現在のプラン</button>
+    </div>
+
+    <!-- BASIC -->
+    <div class="plan-card" id="card-basic">
+      <div class="plan-name">ベーシック</div>
+      <div class="plan-name-en">Basic</div>
+      <div class="plan-price"><span class="amount">¥500</span><span class="unit">/ 月</span></div>
+      <ul class="plan-features">
+        <li>mio AIチャット</li>
+        <li>収支記録・損益分析</li>
+        <li>学びノート</li>
+        <li>基本統計</li>
+      </ul>
+      <button class="plan-btn" id="btn-basic" data-plan="basic">申し込む</button>
+    </div>
+
+    <!-- PRO -->
+    <div class="plan-card featured" id="card-pro">
+      <div class="plan-ribbon">おすすめ</div>
+      <div class="plan-name">プロ</div>
+      <div class="plan-name-en">Pro</div>
+      <div class="plan-price"><span class="amount">¥1,500</span><span class="unit">/ 月</span></div>
+      <ul class="plan-features">
+        <li>AIチャット 無制限</li>
+        <li>チャート画像のAI分析</li>
+        <li>詳細統計</li>
+        <li>AIによる月次総評</li>
+      </ul>
+      <button class="plan-btn" id="btn-pro" data-plan="pro">申し込む</button>
+    </div>
+
+  </div>
+
+  <div class="fine-print">
+    決済はテレコムクレジットの安全な決済画面で行われます。カード情報を当サイトで保管することはありません。
+    継続課金は毎月自動で更新され、いつでも解約できます。
+    お支払い前に<a href="tokushoho.html">特定商取引法に基づく表記</a>・<a href="privacy.html">プライバシーポリシー</a>をご確認ください。
+  </div>
+
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// テレコムクレジット 決済設定（test-payment.html と同一の動作実績ありの値）
+const TELECOM_ACTION = 'https://secure.telecomcredit.co.jp/inetcredit/secure/order.pl';
+const TELECOM_CLIENTIP = '00307';
+const PLAN_CONFIG = {
+  basic: { money: '500',  rebill: '1month500yen',  label: 'ベーシック' },
+  pro:   { money: '1500', rebill: '1month1500yen', label: 'プロ' },
+};
+
+// 認証チェック
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
+  window.location.href = 'login.html';
+  throw new Error('Not authenticated');
+}
+const user = session.user;
+
+// プロフィール取得（現在のプランと会員番号）
+const { data: profile } = await supabase
+  .from('profiles')
+  .select('plan, telecom_sendid')
+  .eq('id', user.id)
+  .single();
+
+const currentPlan = profile?.plan || 'free';
+const sendid = profile?.telecom_sendid || '';
+
+// 現在のプランバッジ
+const badge = document.getElementById('planBadge');
+badge.className = 'plan-badge ' + currentPlan;
+badge.innerHTML = '<span>' + currentPlan.toUpperCase() + '</span>';
+
+// テレコムの決済画面へ送り出す（hidden フォームを生成して POST）
+function startCheckout(planTier) {
+  const cfg = PLAN_CONFIG[planTier];
+  if (!cfg) return;
+  if (!sendid) {
+    alert('会員番号が見つかりませんでした。お手数ですが一度ログインし直してから、もう一度お試しください🌸');
+    return;
+  }
+  const fields = {
+    clientip: TELECOM_CLIENTIP,
+    money: cfg.money,
+    sendid: sendid,
+    rebill_param_id: cfg.rebill,
+  };
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = TELECOM_ACTION;
+  for (const [k, v] of Object.entries(fields)) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = k;
+    input.value = v;
+    form.appendChild(input);
+  }
+  document.body.appendChild(form);
+  form.submit();
+}
+
+// 各カードのボタン状態を、現在のプランに応じて整える
+function setupButton(tier) {
+  const btn = document.getElementById('btn-' + tier);
+  if (!btn) return;
+
+  if (tier === currentPlan) {
+    // 今このプランを利用中
+    btn.textContent = 'ご利用中';
+    btn.classList.add('current');
+    document.getElementById('card-' + tier).classList.add('current');
+    btn.onclick = null;
+    return;
+  }
+
+  if (tier === 'free') {
+    // 有料プラン利用中の人向け：無料カードはダウングレード扱い（解約は別途）
+    btn.textContent = '—';
+    btn.classList.add('disabled');
+    btn.onclick = null;
+    return;
+  }
+
+  // 申し込み可能な有料プラン
+  btn.textContent = '申し込む';
+  btn.onclick = () => startCheckout(tier);
+}
+
+['free', 'basic', 'pro'].forEach(setupButton);
+
+// 表示
+document.getElementById('loading').style.display = 'none';
+document.getElementById('app').style.display = 'block';
+</script>
+</body>
+</html>
