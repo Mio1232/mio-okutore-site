@@ -433,18 +433,42 @@ const badge = document.getElementById('planBadge');
 badge.className = 'plan-badge ' + currentPlan;
 badge.innerHTML = '<span>' + currentPlan.toUpperCase() + '</span>';
 
+// 16桁の新しい会員番号(sendid)を発番する
+// テレコムは退会済みでも同じ sendid の再登録を許さないため、申し込みのたびに新規発番する（再加入対策）
+function genFreshSendid() {
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+}
+
 // テレコムの決済画面へ送り出す（hidden フォームを生成して POST）
-function startCheckout(planTier) {
+async function startCheckout(planTier) {
   const cfg = PLAN_CONFIG[planTier];
   if (!cfg) return;
-  if (!sendid) {
-    alert('会員番号が見つかりませんでした。お手数ですが一度ログインし直してから、もう一度お試しください🌸');
+
+  // 有料プラン利用中の方が別の有料プランを申し込むと二重課金になるため停止
+  if (currentPlan === 'basic' || currentPlan === 'pro') {
+    alert('プラン変更をご希望の場合は、二重課金を防ぐため、現在のプランを解約してからのお申し込みとなります。お手数ですが公式LINEよりご連絡ください🌸');
     return;
   }
+
+  // 申し込みのたびに新しい会員番号を発番して保存（再加入時の「IDが正しくない」を防ぐ）
+  const freshSendid = genFreshSendid();
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ telecom_sendid: freshSendid })
+      .eq('id', user.id);
+    if (error) throw error;
+  } catch (e) {
+    console.error('[plan] sendid更新エラー:', e);
+    alert('お手続きの準備中にエラーが発生しました。少し時間をおいて、もう一度お試しください🌸');
+    return;
+  }
+
   const fields = {
     clientip: TELECOM_CLIENTIP,
     money: cfg.money,
-    sendid: sendid,
+    sendid: freshSendid,
     rebill_param_id: cfg.rebill,
   };
   const form = document.createElement('form');
@@ -478,6 +502,14 @@ function setupButton(tier) {
   if (tier === 'free') {
     // 有料プラン利用中の人向け：無料カードはダウングレード扱い（解約は別途）
     btn.textContent = '—';
+    btn.classList.add('disabled');
+    btn.onclick = null;
+    return;
+  }
+
+  // 有料プラン利用中の方が別の有料プランへ：二重課金になるためLINEへ誘導（解約後に再申込）
+  if (currentPlan === 'basic' || currentPlan === 'pro') {
+    btn.textContent = 'プラン変更はLINEへ';
     btn.classList.add('disabled');
     btn.onclick = null;
     return;
