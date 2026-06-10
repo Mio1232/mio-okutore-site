@@ -529,6 +529,34 @@ body{
 </template>
 
 <!-- CHAT UI -->
+<template id="planGateTemplate">
+  <div class="gate">
+    <div class="gate-avatar"></div>
+    <h1 class="gate-title">美桜Mio AI</h1>
+    <div class="gate-subtitle">— Basic &amp; Pro —</div>
+    <p class="gate-message">mio AIへのご相談は<br>ベーシックプラン以上でご利用いただけます 🌸</p>
+    <div class="gate-features">
+      <div class="feature-item">
+        <div class="feature-icon">💬</div>
+        <div class="feature-text"><strong>24時間いつでも相談</strong>トレード・メンタル・相場のご質問なんでも</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📊</div>
+        <div class="feature-text"><strong>あなたの収支を踏まえた回答</strong>記録データをもとにパーソナルにアドバイス</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📸</div>
+        <div class="feature-text"><strong>チャート画像分析（プロ）</strong>スクショを送れば、一緒に分析できます</div>
+      </div>
+    </div>
+    <div class="gate-actions">
+      <a href="plan.html" class="gate-btn gate-btn-primary">プランを見る</a>
+      <a href="dashboard.html" class="gate-btn gate-btn-secondary">マイページへ戻る</a>
+    </div>
+    <div class="gate-footer"><a href="dashboard.html">— back to my page —</a></div>
+  </div>
+</template>
+
 <template id="chatTemplate">
   <div class="chat-area" id="chatArea">
     <div class="welcome-card">
@@ -581,10 +609,23 @@ if (!session) {
   content.appendChild(document.getElementById('gateTemplate').content.cloneNode(true));
 } else {
   // ===== ログイン中 =====
-  headerStatus.textContent = 'オンライン';
-  content.appendChild(document.getElementById('chatTemplate').content.cloneNode(true));
-
   const user = session.user;
+
+  // プランチェック：AIチャットはベーシック以上の機能
+  const { data: planProfile } = await supabase
+    .from('profiles').select('plan, is_admin, ai_usage_month, ai_usage_count').eq('id', user.id).single();
+  const userPlan = planProfile?.plan || 'free';
+  const isAdminUser = planProfile?.is_admin === true;
+
+  if (userPlan === 'free' && !isAdminUser) {
+    // 無料プラン：チャットは出さず、アップグレード案内ゲートを表示
+    headerStatus.textContent = 'プランのご案内';
+    content.appendChild(document.getElementById('planGateTemplate').content.cloneNode(true));
+  } else {
+    // ベーシック / プロ / 管理者：通常のチャットを表示
+    headerStatus.textContent = 'オンライン';
+    content.appendChild(document.getElementById('chatTemplate').content.cloneNode(true));
+
   let userName = user.email.split('@')[0];
   let userContext = '';
   let conversationId = '';
@@ -592,6 +633,44 @@ if (!session) {
   let pendingImage = null; // { base64, type, name }
 
   const chatArea = document.getElementById('chatArea');
+
+  // ===== AI利用回数の制限（ベーシック=月20回 / プロ・管理者=無制限）=====
+  const AI_MONTHLY_LIMIT = 20;
+  const isLimited = (userPlan === 'basic') && !isAdminUser;
+  const currentYM = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
+  let aiUsageMonth = planProfile?.ai_usage_month || '';
+  let aiUsageCount = (aiUsageMonth === currentYM) ? (planProfile?.ai_usage_count || 0) : 0;
+
+  function aiRemaining() { return Math.max(0, AI_MONTHLY_LIMIT - aiUsageCount); }
+
+  function updateLimitStatus() {
+    if (isLimited) headerStatus.textContent = `今月あと${aiRemaining()}回`;
+  }
+
+  async function bumpAiUsage() {
+    if (!isLimited) return;
+    aiUsageCount = (aiUsageMonth === currentYM ? aiUsageCount : 0) + 1;
+    aiUsageMonth = currentYM;
+    try {
+      await supabase.from('profiles')
+        .update({ ai_usage_month: currentYM, ai_usage_count: aiUsageCount })
+        .eq('id', user.id);
+    } catch (e) { console.warn('[mioAI] 利用回数の更新エラー:', e); }
+    updateLimitStatus();
+  }
+
+  function showLimitReached() {
+    const el = document.createElement('div');
+    el.className = 'msg msg-ai';
+    el.innerHTML = '<div class="msg-avatar"></div><div class="msg-bubble">'
+      + '今月のAIチャットは上限（月20回）に達しました🌸<br>プロプランなら<strong>回数無制限</strong>でご相談いただけます。'
+      + '<div style="margin-top:10px;"><a href="plan.html" style="display:inline-block;padding:9px 16px;background:var(--rose);color:#fff;text-decoration:none;border-radius:10px;font-size:13px;font-weight:600;">プロにアップグレード →</a></div>'
+      + '</div>';
+    chatArea.appendChild(el);
+    scrollToBottom();
+  }
+
+  updateLimitStatus();
   const inputField = document.getElementById('inputField');
   const sendBtn = document.getElementById('sendBtn');
   const imgBtn = document.getElementById('imgBtn');
@@ -781,6 +860,12 @@ if (!session) {
 
     if ((!text && !image) || isLoading) return;
 
+    // ベーシックの月間上限チェック（プロ・管理者は無制限）
+    if (isLimited && aiRemaining() <= 0) {
+      showLimitReached();
+      return;
+    }
+
     isLoading = true;
     inputField.value = '';
     inputField.style.height = 'auto';
@@ -826,6 +911,7 @@ if (!session) {
       const data = await res.json();
       if (data.conversation_id) conversationId = data.conversation_id;
       addMessage(data.text || '申し訳ありません、応答を取得できませんでした。', false);
+      await bumpAiUsage();
 
     } catch (err) {
       removeTyping();
@@ -857,6 +943,7 @@ if (!session) {
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', scrollToBottom);
   }
+  } // end inner else（ベーシック以上のチャット表示）
 }
 </script>
 </body>

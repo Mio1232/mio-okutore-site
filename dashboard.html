@@ -116,6 +116,38 @@ body{
 .plan-badge.basic{ background: var(--sage-soft); color: #2D5F4F; border-color: var(--sage); }
 .plan-badge.pro{ background: var(--rose-soft); color: var(--rose-deep); border-color: var(--rose); }
 
+/* UPGRADE CARD (free users) */
+.upgrade-card{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 24px 0;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, var(--rose-soft), var(--bg-card));
+  border: 1px solid var(--rose);
+  border-radius: 16px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.upgrade-text{ flex: 1; }
+.upgrade-title{
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--rose-deep);
+  margin-bottom: 2px;
+}
+.upgrade-sub{
+  font-size: 12px;
+  color: var(--ink-mid);
+  line-height: 1.6;
+}
+.upgrade-arrow{
+  font-size: 18px;
+  color: var(--rose-deep);
+  flex-shrink: 0;
+}
+
 /* SUMMARY CARD */
 .section{
   padding: 0 24px;
@@ -542,6 +574,15 @@ body{
     </div>
   </div>
 
+  <!-- UPGRADE (free users only) -->
+  <a class="upgrade-card" id="upgradeCard" href="plan.html" style="display:none;">
+    <div class="upgrade-text">
+      <div class="upgrade-title">プランをアップグレード</div>
+      <div class="upgrade-sub">mio AIチャット・詳細統計・チャート画像分析が使えるように 🌸</div>
+    </div>
+    <div class="upgrade-arrow">→</div>
+  </a>
+
   <!-- SUMMARY -->
   <div class="section">
     <div class="section-title">This Month</div>
@@ -748,6 +789,12 @@ const p = planLabels[plan] || planLabels.free;
 planBadge.className = `plan-badge ${p.class}`;
 planBadge.innerHTML = `<span>${p.label}</span>`;
 planSub.textContent = `現在:${p.text}`;
+
+// 無料ユーザー(管理者以外)にはアップグレード案内カードを表示
+if (plan === 'free' && !profile?.is_admin) {
+  const uc = document.getElementById('upgradeCard');
+  if (uc) uc.style.display = 'flex';
+}
 
 // 現在の月表示
 const now = new Date();
