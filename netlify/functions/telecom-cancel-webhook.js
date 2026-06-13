@@ -2,13 +2,9 @@
 // テレコムクレジットの「退会通知（退会データ送信）」を受け取り、
 // 該当ユーザーを無料プランに戻す（ダウングレード専用）。
 //
-// ※ 送信パラメータ名（特に会員番号 = sendid に相当する項目）と
-//    期待されるレスポンスは、テレコムの「退会データ仕様」を確認のうえ
-//    必要であれば調整してください。下記は一般的な想定での実装です。
+// ※ 依存パッケージ不要：Supabase の REST API を fetch で直接呼び出します
+//    （他の関数と同じ方式。@supabase/supabase-js は使いません）
 
-const { createClient } = require('@supabase/supabase-js');
-
-// テレコムの送信元IP（決済Webhookと同じ許可リスト）
 const ALLOWED_IPS = ['54.65.177.67', '52.196.8.0', '54.238.8.174', '54.95.89.20'];
 
 exports.handler = async (event) => {
@@ -50,25 +46,31 @@ exports.handler = async (event) => {
     return { statusCode: 200, body: 'SuccessOK' };
   }
 
-  // Supabase（サービスロールキーで更新）
-  const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
-
-  // 該当ユーザーを無料プランに戻す
-  const { data, error } = await supabase
-    .from('profiles')
-    .update({ plan: 'free', payment_status: 'cancelled' })
-    .eq('telecom_sendid', sendid)
-    .select('id, email');
-
-  if (error) {
-    console.error('[cancel-webhook] profiles更新エラー:', error);
-  } else if (!data || data.length === 0) {
-    console.warn('[cancel-webhook] 該当ユーザーなし sendid=', sendid);
-  } else {
-    console.log('[cancel-webhook] 無料プランに戻しました:', JSON.stringify(data));
+  // Supabase REST API で該当ユーザーを無料プランに戻す（サービスロールキー使用）
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  try {
+    const url = SUPABASE_URL + '/rest/v1/profiles?telecom_sendid=eq.' + encodeURIComponent(sendid);
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SERVICE_KEY,
+        'Authorization': 'Bearer ' + SERVICE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify({ plan: 'free', payment_status: 'cancelled' })
+    });
+    const result = await res.json().catch(() => null);
+    if (!res.ok) {
+      console.error('[cancel-webhook] Supabase更新エラー:', res.status, result);
+    } else if (!result || result.length === 0) {
+      console.warn('[cancel-webhook] 該当ユーザーなし sendid=', sendid);
+    } else {
+      console.log('[cancel-webhook] 無料プランに戻しました:', JSON.stringify(result));
+    }
+  } catch (e) {
+    console.error('[cancel-webhook] 例外:', e);
   }
 
   // テレコムには成功応答（再送防止）
