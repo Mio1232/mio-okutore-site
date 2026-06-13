@@ -479,6 +479,47 @@ body{
   color: var(--ink-soft);
 }
 .gate-footer a{ color: var(--ink-soft); text-decoration: none; }
+/* === 会話履歴ドロワー === */
+.header-actions{ display:flex; align-items:center; gap:6px; }
+.hbtn{
+  width:34px; height:34px; display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--line-strong); background:var(--bg-card); border-radius:10px;
+  color:var(--ink-mid); cursor:pointer; padding:0;
+}
+.hbtn:hover{ background:var(--rose-soft); color:var(--rose-deep); }
+.hbtn svg{ width:18px; height:18px; }
+.conv-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,0.35);
+  opacity:0; pointer-events:none; transition:opacity .2s; z-index:60;
+}
+.conv-overlay.open{ opacity:1; pointer-events:auto; }
+.conv-drawer{
+  position:fixed; top:0; left:0; bottom:0; width:min(320px,85%);
+  background:var(--bg); border-right:1px solid var(--line-strong);
+  transform:translateX(-100%); transition:transform .25s; z-index:61;
+  display:flex; flex-direction:column;
+}
+.conv-drawer.open{ transform:translateX(0); }
+.conv-drawer-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px; font-family:'Noto Serif JP',serif; font-weight:700;
+  border-bottom:1px solid var(--line);
+}
+.conv-close{ background:none; border:none; font-size:18px; color:var(--ink-soft); cursor:pointer; }
+.conv-new{
+  margin:12px; padding:11px; border:1px solid var(--rose); background:var(--rose-soft);
+  color:var(--rose-deep); border-radius:12px; font-weight:700; cursor:pointer; font-size:14px;
+}
+.conv-list{ flex:1; overflow-y:auto; padding:0 8px 16px; }
+.conv-item{ display:flex; align-items:center; gap:6px; padding:11px 10px; border-radius:10px; cursor:pointer; }
+.conv-item:hover{ background:var(--bg-soft); }
+.conv-item.active{ background:var(--rose-soft); }
+.conv-item-main{ flex:1; min-width:0; }
+.conv-item-title{ font-size:13px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.conv-item-date{ font-size:11px; color:var(--ink-soft); margin-top:2px; }
+.conv-del{ background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:13px; opacity:0; transition:opacity .15s; flex-shrink:0; }
+.conv-item:hover .conv-del{ opacity:1; }
+.conv-empty{ padding:20px; text-align:center; color:var(--ink-soft); font-size:13px; }
 </style>
 </head>
 <body>
@@ -493,7 +534,24 @@ body{
       <div class="header-name">美桜Mio AI</div>
       <div class="header-status" id="headerStatus">確認中</div>
     </div>
+    <div class="header-actions" id="headerActions" style="display:none; margin-left:auto;">
+      <button class="hbtn" id="newChatBtn" aria-label="新しいチャット" title="新しいチャット">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <button class="hbtn" id="historyBtn" aria-label="チャット履歴" title="チャット履歴">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </button>
+    </div>
   </header>
+  <div class="conv-overlay" id="convOverlay"></div>
+  <aside class="conv-drawer" id="convDrawer">
+    <div class="conv-drawer-head">
+      <span>チャット履歴</span>
+      <button class="conv-close" id="convClose" aria-label="閉じる">✕</button>
+    </div>
+    <button class="conv-new" id="convNewBtn">＋ 新しいチャット</button>
+    <div class="conv-list" id="convList"></div>
+  </aside>
   <div id="content" style="flex:1; display:flex; flex-direction:column; overflow:hidden;"></div>
 </div>
 
@@ -629,6 +687,7 @@ if (!session) {
   let userName = user.email.split('@')[0];
   let userContext = '';
   let conversationId = '';
+  let chatHistory = []; // {role:'user'|'assistant', content:string} の配列（直近のやり取り）
   let isLoading = false;
   let pendingImage = null; // { base64, type, name }
 
@@ -671,6 +730,130 @@ if (!session) {
   }
 
   updateLimitStatus();
+
+  // ===== 会話の保存・複数チャット =====
+  let currentConversationId = null;
+  const AI_HISTORY_WINDOW = 40; // AIに渡す直近メッセージ数（保存は全件）
+
+  const headerActions = document.getElementById('headerActions');
+  const convDrawer = document.getElementById('convDrawer');
+  const convOverlay = document.getElementById('convOverlay');
+  const convList = document.getElementById('convList');
+  if (headerActions) headerActions.style.display = 'flex';
+
+  // welcome カードのHTML（新規チャット時に復元）
+  const welcomeHTML = chatArea.innerHTML;
+
+  function openDrawer() { loadConversationList(); convDrawer.classList.add('open'); convOverlay.classList.add('open'); }
+  function closeDrawer() { convDrawer.classList.remove('open'); convOverlay.classList.remove('open'); }
+  function fmtDate(s) { try { const d = new Date(s); return `${d.getMonth()+1}/${d.getDate()}`; } catch (e) { return ''; } }
+
+  async function loadConversationList() {
+    convList.innerHTML = '<div class="conv-empty">読み込み中…</div>';
+    try {
+      const { data, error } = await supabase
+        .from('chat_conversations')
+        .select('id, title, updated_at')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      if (!data || data.length === 0) { convList.innerHTML = '<div class="conv-empty">まだ会話がありません</div>'; return; }
+      convList.innerHTML = '';
+      data.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'conv-item' + (c.id === currentConversationId ? ' active' : '');
+        item.innerHTML = '<div class="conv-item-main"><div class="conv-item-title"></div><div class="conv-item-date">' + fmtDate(c.updated_at) + '</div></div><button class="conv-del" aria-label="削除">✕</button>';
+        item.querySelector('.conv-item-title').textContent = c.title || '新しいチャット';
+        item.querySelector('.conv-item-main').onclick = () => openConversation(c.id);
+        item.querySelector('.conv-del').onclick = (e) => { e.stopPropagation(); deleteConversation(c.id); };
+        convList.appendChild(item);
+      });
+    } catch (e) {
+      console.error('[mioAI] 会話一覧の取得エラー:', e);
+      convList.innerHTML = '<div class="conv-empty">読み込みに失敗しました</div>';
+    }
+  }
+
+  async function openConversation(convId) {
+    closeDrawer();
+    try {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('role, content')
+        .eq('conversation_id', convId)
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      currentConversationId = convId;
+      chatHistory = (data || []).map(m => ({ role: m.role, content: m.content }));
+      chatArea.innerHTML = '';
+      chatHistory.forEach(m => addMessage(m.content, m.role === 'user'));
+      scrollToBottom();
+    } catch (e) {
+      console.error('[mioAI] 会話の読み込みエラー:', e);
+      showToast('会話の読み込みに失敗しました', true);
+    }
+  }
+
+  function startNewChat() {
+    closeDrawer();
+    currentConversationId = null;
+    chatHistory = [];
+    chatArea.innerHTML = welcomeHTML;
+  }
+
+  async function deleteConversation(convId) {
+    if (!confirm('この会話を削除しますか？')) return;
+    try {
+      await supabase.from('chat_conversations').delete().eq('id', convId);
+      if (convId === currentConversationId) startNewChat();
+      loadConversationList();
+    } catch (e) { console.error('[mioAI] 会話の削除エラー:', e); }
+  }
+
+  async function ensureConversation(firstText) {
+    if (currentConversationId) return currentConversationId;
+    const title = (firstText || '新しいチャット').slice(0, 30);
+    const { data, error } = await supabase
+      .from('chat_conversations')
+      .insert({ user_id: user.id, title })
+      .select('id')
+      .single();
+    if (error) throw error;
+    currentConversationId = data.id;
+    return data.id;
+  }
+
+  async function persistTurn(userText, aiText) {
+    try {
+      const convId = await ensureConversation(userText);
+      await supabase.from('chat_messages').insert([
+        { conversation_id: convId, role: 'user', content: userText },
+        { conversation_id: convId, role: 'assistant', content: aiText }
+      ]);
+      await supabase.from('chat_conversations').update({ updated_at: new Date().toISOString() }).eq('id', convId);
+    } catch (e) { console.error('[mioAI] 会話の保存エラー:', e); }
+  }
+
+  document.getElementById('newChatBtn').onclick = startNewChat;
+  document.getElementById('historyBtn').onclick = openDrawer;
+  document.getElementById('convNewBtn').onclick = startNewChat;
+  document.getElementById('convClose').onclick = closeDrawer;
+  convOverlay.onclick = closeDrawer;
+
+  // 起動時：最新の会話を開く（なければ新規のまま）
+  (async () => {
+    try {
+      const { data } = await supabase
+        .from('chat_conversations')
+        .select('id')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(1);
+      if (data && data.length) await openConversation(data[0].id);
+    } catch (e) { console.error('[mioAI] 初期会話の読み込みエラー:', e); }
+  })();
+
   const inputField = document.getElementById('inputField');
   const sendBtn = document.getElementById('sendBtn');
   const imgBtn = document.getElementById('imgBtn');
@@ -887,7 +1070,8 @@ if (!session) {
         user_name: userName,
         user_context: userContext,
         conversation_id: conversationId,
-        user_id: user.id
+        user_id: user.id,
+        history: chatHistory.slice(-AI_HISTORY_WINDOW)
       };
 
       if (image) {
@@ -910,7 +1094,15 @@ if (!session) {
 
       const data = await res.json();
       if (data.conversation_id) conversationId = data.conversation_id;
-      addMessage(data.text || '申し訳ありません、応答を取得できませんでした。', false);
+      const aiText = data.text || '申し訳ありません、応答を取得できませんでした。';
+      addMessage(aiText, false);
+      // 会話履歴に今回のやり取りを追加（次回以降の文脈として送る）
+      const userMsgForLog = text || '（チャート画像を送信）';
+      chatHistory.push({ role: 'user', content: userMsgForLog });
+      chatHistory.push({ role: 'assistant', content: aiText });
+      // Supabaseへ保存（複数チャット・ログ保持）
+      await persistTurn(userMsgForLog, aiText);
+      if (convDrawer.classList.contains('open')) loadConversationList();
       await bumpAiUsage();
 
     } catch (err) {
