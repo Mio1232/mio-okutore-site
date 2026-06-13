@@ -86,7 +86,7 @@ textarea{min-height:120px;resize:vertical;line-height:1.7;}
     <div class="row">
       <button class="btn btn-primary" id="generateBtn">🪄 最新ニュースから生成</button>
     </div>
-    <p class="note">最新のニュースをWeb検索で読み込み、mio口調の記事＋シナリオ表を自動生成します（数十秒かかります）。生成後に内容を確認・編集してから公開してください。</p>
+    <p class="note">最新のニュースをWeb検索で読み込み、mio口調の記事＋シナリオ表を自動生成します。生成は裏側で実行され、30秒〜1分ほどで完成した下書きがこの画面に読み込まれます（待っている間も画面を閉じなければOK）。内容を確認・編集してから公開してください。</p>
   </div>
 
   <!-- 編集・プレビュー -->
@@ -158,25 +158,42 @@ else {
       toast(error ? '保存に失敗しました' : 'キーワードを保存しました🌸');
     };
 
-    // ===== 生成 =====
+    // ===== 生成（バックグラウンド関数＋ポーリング）=====
     document.getElementById('generateBtn').onclick = async (e)=>{
       const btn = e.currentTarget;
-      btn.disabled = true; const old = btn.textContent; btn.textContent = '生成中…（数十秒）';
+      btn.disabled = true; const old = btn.textContent; btn.textContent = '生成中…（最大1分ほど）';
       try {
-        const res = await fetch('/.netlify/functions/gift-generate', {
+        // 生成前に既存の下書きIDを控える
+        const { data: before } = await supabase.from('gift_contents').select('id').eq('status','draft');
+        const beforeIds = new Set((before || []).map(r=>r.id));
+        // バックグラウンド生成を起動（即座に202が返る＝504にならない）
+        await fetch('/.netlify/functions/gift-generate-background', {
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ user_id: user.id, focus: focusSelect.value })
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || '生成に失敗しました');
-        currentEditId = null;
-        titleInput.value = data.title || '';
-        bodyInput.value = data.body_html || '';
-        tableInput.value = data.table_html || '';
-        renderPreview();
-        toast('生成しました。内容を確認してください🌸');
+        // 新しい下書きが現れるまでポーリング（5秒ごと・最大24回＝2分）
+        let found = null;
+        for (let i=0; i<24 && !found; i++){
+          await new Promise(r=>setTimeout(r, 5000));
+          const { data: now } = await supabase.from('gift_contents')
+            .select('id,title,body_html,table_html')
+            .eq('status','draft').order('created_at',{ascending:false}).limit(5);
+          found = (now || []).find(r=>!beforeIds.has(r.id));
+        }
+        if (found){
+          currentEditId = found.id; // 既に下書き保存済みの行を編集対象にする
+          titleInput.value = found.title || '';
+          bodyInput.value = found.body_html || '';
+          tableInput.value = found.table_html || '';
+          renderPreview();
+          loadList();
+          toast('生成しました。内容を確認してください🌸');
+        } else {
+          toast('まだ生成中かもしれません。少し待って一覧をご確認ください');
+          loadList();
+        }
       } catch (err) {
-        toast(err.message || '生成に失敗しました');
+        toast('生成の起動に失敗しました');
       } finally {
         btn.disabled = false; btn.textContent = old;
       }
