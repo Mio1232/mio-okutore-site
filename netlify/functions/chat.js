@@ -296,7 +296,7 @@ exports.handler = async function(event, context) {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { query, user_name, user_context, user_id, image_base64, image_type } = body;
+    const { query, user_name, user_context, user_id, image_base64, image_type, history } = body;
 
     if (!query || !query.trim()) {
       return {
@@ -316,19 +316,22 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // システムプロンプトにユーザー情報を埋め込む
-    let fullSystemPrompt = SYSTEM_PROMPT;
-    fullSystemPrompt += '\n\n【ユーザー情報】\n';
-    fullSystemPrompt += 'お名前: ' + (user_name || '(未設定)') + '\n';
+    // ユーザー個別情報（プロンプトキャッシュのため、固定のSYSTEM_PROMPTとは分離）
+    let dynamicPrompt = '【ユーザー情報】\n';
+    dynamicPrompt += 'お名前: ' + (user_name || '(未設定)') + '\n';
     if (user_context) {
-      fullSystemPrompt += 'ユーザー情報:\n' + user_context + '\n';
+      dynamicPrompt += 'ユーザー情報:\n' + user_context + '\n';
     }
-    fullSystemPrompt += '\n【返答ルール】\n';
-    fullSystemPrompt += '- お名前があれば「○○さん」と呼びかける\n';
-    fullSystemPrompt += '- お名前が空の場合は「お疲れさまです🌸」など名前なしで挨拶\n';
-    fullSystemPrompt += '- ユーザー情報を踏まえた個別最適化された回答\n';
-    fullSystemPrompt += '- 取引データがない場合は「これから一緒に学んでいきましょう✨」など励まし\n';
-    fullSystemPrompt += '- 「コミュニティ」の値を必ず確認し、Discord未参加ならEA/インジの話は絶対にしない\n';
+    dynamicPrompt += '\n【返答ルール】\n';
+    dynamicPrompt += '- お名前があれば「○○さん」と呼びかける\n';
+    dynamicPrompt += '- お名前が空の場合は「お疲れさまです🌸」など名前なしで挨拶\n';
+    dynamicPrompt += '- ユーザー情報を踏まえた個別最適化された回答\n';
+    dynamicPrompt += '- 取引データがない場合は「これから一緒に学んでいきましょう✨」など励まし\n';
+    dynamicPrompt += '- 「コミュニティ」の値を必ず確認し、Discord未参加ならEA/インジの話は絶対にしない\n';
+    dynamicPrompt += '\n【最新情報・会話の流れについて】\n';
+    dynamicPrompt += '- 「今日の相場」「なぜ動いた・下落した」「最近のニュース」など最新の事実が必要な質問では、Web検索で実際の情報を確認してから答えること\n';
+    dynamicPrompt += '- 検索結果はそのまま貼らず、要点をmioの口調でやさしく噛み砕いて伝えること\n';
+    dynamicPrompt += '- 直前までの会話の流れを必ず踏まえ、すでに出た通貨ペアや話題を聞き返さないこと\n';
 
     // メッセージを構築
     const userContent = [];
@@ -351,7 +354,24 @@ exports.handler = async function(event, context) {
       text: query
     });
 
-    // Anthropic API 呼び出し
+    // 会話履歴を組み立て（直近のやり取りを引き継ぐ）
+    const messages = [];
+    if (Array.isArray(history)) {
+      for (const m of history.slice(-20)) {
+        if (m && (m.role === 'user' || m.role === 'assistant')
+            && typeof m.content === 'string' && m.content.trim()) {
+          messages.push({ role: m.role, content: m.content });
+        }
+      }
+    }
+    // 先頭が assistant だと API エラーになるため除去
+    while (messages.length && messages[0].role === 'assistant') {
+      messages.shift();
+    }
+    // 今回のメッセージ（画像＋テキスト）
+    messages.push({ role: 'user', content: userContent });
+
+    // Anthropic API 呼び出し（Web検索ツールを有効化）
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -361,12 +381,18 @@ exports.handler = async function(event, context) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5-20250929',
-        max_tokens: 1500,
-        system: fullSystemPrompt,
-        messages: [
+        max_tokens: 2000,
+        system: [
+          { type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } },
+          { type: 'text', text: dynamicPrompt }
+        ],
+        messages: messages,
+        tools: [
           {
-            role: 'user',
-            content: userContent
+            type: 'web_search_20250305',
+            name: 'web_search',
+            max_uses: 3,
+            user_location: { type: 'approximate', country: 'JP', timezone: 'Asia/Tokyo' }
           }
         ]
       })
@@ -383,7 +409,11 @@ exports.handler = async function(event, context) {
     }
 
     const data = await response.json();
-    let text = (data.content && data.content[0] && data.content[0].text) || '';
+    let text = (data.content || [])
+      .filter(b => b && b.type === 'text')
+      .map(b => b.text)
+      .join('')
+      .trim();
 
     // ※マーク自動削除
     text = text.replace(/\n+(\u203B|\uff0a)[^\n]*/g, '').trim();
