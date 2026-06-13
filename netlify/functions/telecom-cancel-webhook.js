@@ -41,8 +41,8 @@ exports.handler = async (event) => {
     }
   }
 
-  // 会員番号（sendid）を取得。仕様確定後に正しいパラメータ名へ合わせる
-  const sendid = params.sendid || params.send_id || params.user_id || '';
+  // 会員番号を取得。テレコムの退会通知では「member_id」で送られる（値は登録時の sendid と同一）
+  const sendid = params.member_id || params.sendid || params.send_id || '';
   console.log('[cancel-webhook] 受信:', JSON.stringify({ ip, sendid, params }));
 
   if (!sendid) {
