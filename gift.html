@@ -29,6 +29,10 @@ input[type=text]{width:100%;padding:12px 14px;border:1px solid var(--line-strong
 .lock-icon{font-size:34px;text-align:center;margin-bottom:6px;}
 .lock-title{font-family:'Noto Serif JP',serif;font-weight:700;font-size:17px;text-align:center;margin-bottom:8px;}
 .lock-sub{font-size:13px;color:var(--ink-mid);text-align:center;margin-bottom:18px;line-height:1.9;}
+.steps{background:var(--bg-soft);border:1px solid var(--line);border-radius:13px;padding:14px 16px;margin-bottom:16px;}
+.steps-title{font-family:'Noto Serif JP',serif;font-weight:700;font-size:13px;color:var(--ink);margin-bottom:10px;}
+.step{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--ink-mid);margin:7px 0;line-height:1.6;}
+.step-no{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:var(--rose);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px;}
 .err{color:var(--rose-deep);font-size:13px;margin-top:8px;min-height:18px;text-align:center;}
 .gap{height:10px;}
 .list-item{margin:12px 16px;padding:16px 18px;background:var(--bg-card);border:1px solid var(--line);border-radius:16px;cursor:pointer;transition:transform .1s;}
@@ -45,7 +49,7 @@ input[type=text]{width:100%;padding:12px 14px;border:1px solid var(--line-strong
 .article-body li{margin:4px 0;}
 .article-body strong{color:var(--ink);font-weight:700;}
 .article-table{margin:14px 16px;overflow-x:auto;}
-.article-table table{width:100%;border-collapse:collapse;font-size:13px;}
+.article-table table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px;}
 .article-table th,.article-table td{border:1px solid var(--line-strong);padding:8px 10px;text-align:left;}
 .article-table th{background:var(--rose-soft);color:var(--rose-deep);}
 .chart-wrap{margin:16px;}
@@ -97,8 +101,14 @@ else {
       '<div class="card">'+
         '<div class="lock-icon">🔒</div>'+
         '<div class="lock-title">プレゼントコンテンツ</div>'+
-        '<div class="lock-sub">ドル円・ゴールドの最新分析レポートを<br>プレゼントしています🌸<br>閲覧には、公式LINEで配布中の<br><strong>キーワード</strong>が必要です。</div>'+
-        '<a class="btn btn-line" href="'+LINE_URL+'" target="_blank" rel="noopener">公式LINEでキーワードを受け取る</a>'+
+        '<div class="lock-sub">ドル円・ゴールドの最新分析レポートを<br>プレゼントしています🌸<br>閲覧には、公式LINEで受け取れる<br><strong>合言葉（キーワード）</strong>が必要です。</div>'+
+        '<div class="steps">'+
+          '<div class="steps-title">📩 キーワードの受け取り方</div>'+
+          '<div class="step"><span class="step-no">1</span><span>下のボタンから公式LINEを友だち追加</span></div>'+
+          '<div class="step"><span class="step-no">2</span><span>トークで「<strong>キーワード</strong>」と送信</span></div>'+
+          '<div class="step"><span class="step-no">3</span><span>届いた合言葉を下の欄に入力して解除🌸</span></div>'+
+        '</div>'+
+        '<a class="btn btn-line" href="'+LINE_URL+'" target="_blank" rel="noopener">公式LINEを開く（友だち追加）</a>'+
         '<div class="gap"></div>'+
         '<input type="text" id="kw" placeholder="キーワードを入力" autocomplete="off">'+
         '<div class="err" id="err"></div>'+
