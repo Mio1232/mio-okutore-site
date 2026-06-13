@@ -12,8 +12,8 @@ const { createClient } = require('@supabase/supabase-js');
 const ALLOWED_IPS = ['54.65.177.67', '52.196.8.0', '54.238.8.174', '54.95.89.20'];
 
 exports.handler = async (event) => {
-  // POST 以外は拒否
-  if (event.httpMethod !== 'POST') {
+  // GET / POST どちらでも受け取る（テレコムは既定でGET送信）
+  if (event.httpMethod !== 'POST' && event.httpMethod !== 'GET') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
@@ -25,16 +25,20 @@ exports.handler = async (event) => {
     return { statusCode: 403, body: 'Forbidden' };
   }
 
-  // ボディ解析（application/x-www-form-urlencoded を想定）
-  let params;
-  try {
-    const raw = event.isBase64Encoded
-      ? Buffer.from(event.body || '', 'base64').toString('utf8')
-      : (event.body || '');
-    params = Object.fromEntries(new URLSearchParams(raw));
-  } catch (e) {
-    console.error('[cancel-webhook] ボディ解析エラー:', e);
-    return { statusCode: 200, body: 'SuccessOK' }; // 再送させない
+  // パラメータ取得：GET（クエリ）と POST（ボディ）の両方に対応
+  let params = {};
+  if (event.queryStringParameters) {
+    params = { ...event.queryStringParameters };
+  }
+  if (event.body) {
+    try {
+      const raw = event.isBase64Encoded
+        ? Buffer.from(event.body, 'base64').toString('utf8')
+        : event.body;
+      params = { ...params, ...Object.fromEntries(new URLSearchParams(raw)) };
+    } catch (e) {
+      console.error('[cancel-webhook] ボディ解析エラー:', e);
+    }
   }
 
   // 会員番号（sendid）を取得。仕様確定後に正しいパラメータ名へ合わせる
