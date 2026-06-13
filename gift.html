@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プレゼント — mio億トレ</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F2EA; --bg-soft:#EFE7DA; --bg-card:#FFFEFB; --ink:#3A2E2A; --ink-mid:#6B5D57; --ink-soft:#998B83;
+  --rose:#C98B95; --rose-soft:#E8D0D2; --rose-deep:#B06B75; --sage:#9BB59C; --sage-soft:#C9DACA; --honey:#D4B677;
+  --line:rgba(58,46,42,0.08); --line-strong:rgba(58,46,42,0.14);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--ink);font-family:'Noto Sans JP',sans-serif;line-height:1.7;}
+.app{max-width:520px;margin:0 auto;padding:0 0 60px;}
+.page-header{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px;padding:14px 18px;background:rgba(247,242,234,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+.brand{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--rose-deep);text-decoration:none;}
+.page-title{font-family:'Noto Serif JP',serif;font-weight:700;font-size:15px;}
+.card{margin:16px;padding:22px;background:var(--bg-card);border:1px solid var(--line);border-radius:18px;}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:13px;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;text-decoration:none;}
+.btn-line{background:#06C755;color:#fff;}
+.btn-rose{background:var(--rose-deep);color:#fff;}
+.btn-discord{background:#5865F2;color:#fff;}
+.btn-ghost{background:var(--bg-soft);color:var(--ink-mid);border:1px solid var(--line-strong);}
+input[type=text]{width:100%;padding:12px 14px;border:1px solid var(--line-strong);border-radius:11px;font-family:inherit;font-size:15px;background:#fff;color:var(--ink);}
+.lock-icon{font-size:34px;text-align:center;margin-bottom:6px;}
+.lock-title{font-family:'Noto Serif JP',serif;font-weight:700;font-size:17px;text-align:center;margin-bottom:8px;}
+.lock-sub{font-size:13px;color:var(--ink-mid);text-align:center;margin-bottom:18px;line-height:1.9;}
+.err{color:var(--rose-deep);font-size:13px;margin-top:8px;min-height:18px;text-align:center;}
+.gap{height:10px;}
+.list-item{margin:12px 16px;padding:16px 18px;background:var(--bg-card);border:1px solid var(--line);border-radius:16px;cursor:pointer;transition:transform .1s;}
+.list-item:active{transform:scale(0.99);}
+.list-title{font-family:'Noto Serif JP',serif;font-weight:700;font-size:15px;color:var(--ink);line-height:1.5;}
+.list-date{font-size:11px;color:var(--ink-soft);margin-top:6px;}
+.article{margin:8px 0;}
+.article-title{font-family:'Noto Serif JP',serif;font-weight:700;font-size:18px;line-height:1.5;margin:6px 16px 4px;}
+.article-date{font-size:11px;color:var(--ink-soft);margin:0 16px 14px;}
+.article-body{margin:0 16px;}
+.article-body h3{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--rose-deep);margin:18px 0 8px;}
+.article-body p{font-size:14.5px;margin:8px 0;}
+.article-body ul{margin:8px 0 8px 20px;font-size:14.5px;}
+.article-body li{margin:4px 0;}
+.article-body strong{color:var(--ink);font-weight:700;}
+.article-table{margin:14px 16px;overflow-x:auto;}
+.article-table table{width:100%;border-collapse:collapse;font-size:13px;}
+.article-table th,.article-table td{border:1px solid var(--line-strong);padding:8px 10px;text-align:left;}
+.article-table th{background:var(--rose-soft);color:var(--rose-deep);}
+.chart-wrap{margin:16px;}
+.chart-label{font-family:'Noto Serif JP',serif;font-weight:700;font-size:13px;color:var(--ink-mid);margin-bottom:8px;}
+.cta{margin:14px 16px;padding:18px;border-radius:16px;}
+.cta-discord{background:linear-gradient(135deg,#5865F215,var(--bg-card));border:1px solid #5865F255;}
+.cta-ea{background:linear-gradient(135deg,var(--rose-soft),var(--bg-card));border:1px solid var(--rose);}
+.cta-title{font-family:'Noto Serif JP',serif;font-weight:700;font-size:15px;margin-bottom:4px;}
+.cta-sub{font-size:12.5px;color:var(--ink-mid);line-height:1.8;margin-bottom:12px;}
+.disclaimer{margin:18px 16px 0;font-size:11px;color:var(--ink-soft);line-height:1.8;}
+.back-link{display:inline-flex;align-items:center;gap:4px;margin:14px 16px 0;color:var(--rose-deep);font-size:13px;cursor:pointer;background:none;border:none;font-family:inherit;}
+.empty{margin:40px 16px;text-align:center;color:var(--ink-soft);font-size:14px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="page-header">
+    <a class="brand" href="dashboard.html">← mio okutore</a>
+    <div class="page-title">🎁 プレゼント</div>
+  </header>
+  <div id="content"><p class="empty">読み込み中…</p></div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const supabase = createClient(
+  'https://iupkaxzesrximmfkipzd.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ'
+);
+
+const LINE_URL = 'https://liff.line.me/2009118446-ZPutgCO0/landing?follow=%40161qazcj&lp=BGfQ1J&liff_id=2009118446-ZPutgCO0';
+const DISCORD_URL = 'https://discord.gg/NyNSrmhzsa';
+const EA_URL = 'https://miyabiealp.netlify.app/';
+
+const content = document.getElementById('content');
+
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) { location.href = 'login.html'; }
+else {
+  const user = session.user;
+  const { data: prof } = await supabase.from('profiles').select('gift_unlocked, is_admin, display_name').eq('id', user.id).single();
+  const unlocked = prof && (prof.gift_unlocked === true || prof.is_admin === true);
+  if (unlocked) showViewer();
+  else showUnlock();
+
+  // ===== 解除画面 =====
+  function showUnlock(){
+    content.innerHTML =
+      '<div class="card">'+
+        '<div class="lock-icon">🔒</div>'+
+        '<div class="lock-title">プレゼントコンテンツ</div>'+
+        '<div class="lock-sub">ドル円・ゴールドの最新分析レポートを<br>プレゼントしています🌸<br>閲覧には、公式LINEで配布中の<br><strong>キーワード</strong>が必要です。</div>'+
+        '<a class="btn btn-line" href="'+LINE_URL+'" target="_blank" rel="noopener">公式LINEでキーワードを受け取る</a>'+
+        '<div class="gap"></div>'+
+        '<input type="text" id="kw" placeholder="キーワードを入力" autocomplete="off">'+
+        '<div class="err" id="err"></div>'+
+        '<button class="btn btn-rose" id="unlockBtn">解除する</button>'+
+      '</div>';
+    const btn = document.getElementById('unlockBtn');
+    const err = document.getElementById('err');
+    btn.onclick = async ()=>{
+      const kw = document.getElementById('kw').value.trim();
+      if (!kw){ err.textContent = 'キーワードを入力してください'; return; }
+      btn.disabled = true; const old = btn.textContent; btn.textContent = '確認中…'; err.textContent = '';
+      try{
+        const res = await fetch('/.netlify/functions/gift-unlock', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ user_id: user.id, keyword: kw })
+        });
+        const data = await res.json();
+        if (data.ok){ showViewer(); }
+        else { err.textContent = data.error || 'キーワードが正しくありません🌸'; btn.disabled=false; btn.textContent=old; }
+      }catch(e){ err.textContent='通信エラーが発生しました'; btn.disabled=false; btn.textContent=old; }
+    };
+  }
+
+  // ===== 一覧 =====
+  async function showViewer(){
+    content.innerHTML = '<p class="empty">読み込み中…</p>';
+    const { data, error } = await supabase.from('gift_contents')
+      .select('id,title,body_html,table_html,published_at')
+      .eq('status','published').order('published_at',{ascending:false});
+    if (error){ content.innerHTML = '<p class="empty">読み込みに失敗しました</p>'; return; }
+    if (!data || !data.length){ content.innerHTML = '<p class="empty">まだプレゼントがありません🌸<br>近日公開予定です。</p>'; return; }
+    content.innerHTML = '';
+    data.forEach(row=>{
+      const d = row.published_at ? new Date(row.published_at) : null;
+      const el = document.createElement('div'); el.className='list-item';
+      el.innerHTML = '<div class="list-title"></div>'+(d?'<div class="list-date">'+(d.getFullYear())+'/'+(d.getMonth()+1)+'/'+d.getDate()+'</div>':'');
+      el.querySelector('.list-title').textContent = row.title;
+      el.onclick = ()=>openArticle(row);
+      content.appendChild(el);
+    });
+  }
+
+  // ===== 記事表示 =====
+  function openArticle(row){
+    const d = row.published_at ? new Date(row.published_at) : null;
+    content.innerHTML = '';
+
+    const back = document.createElement('button'); back.className='back-link'; back.textContent='← 一覧へ戻る';
+    back.onclick = showViewer; content.appendChild(back);
+
+    const art = document.createElement('div'); art.className='article';
+    art.innerHTML =
+      '<div class="article-title"></div>'+
+      (d?'<div class="article-date">'+(d.getFullYear())+'/'+(d.getMonth()+1)+'/'+d.getDate()+'</div>':'')+
+      '<div class="article-body"></div>'+
+      (row.table_html ? '<div class="article-table"></div>' : '');
+    art.querySelector('.article-title').textContent = row.title;
+    art.querySelector('.article-body').innerHTML = row.body_html || '';
+    if (row.table_html) art.querySelector('.article-table').innerHTML = row.table_html;
+    content.appendChild(art);
+
+    // TradingView ライブチャート（ドル円・ゴールド）
+    const chartWrap = document.createElement('div'); chartWrap.className='chart-wrap';
+    chartWrap.innerHTML = '<div class="chart-label">📈 ライブチャート（ドル円・ゴールド）</div>';
+    const tvContainer = document.createElement('div');
+    chartWrap.appendChild(tvContainer);
+    content.appendChild(chartWrap);
+    mountTradingView(tvContainer);
+
+    // ディスコード誘導
+    const discord = document.createElement('div'); discord.className='cta cta-discord';
+    discord.innerHTML =
+      '<div class="cta-title">💬 みんなで学ぶコミュニティ</div>'+
+      '<div class="cta-sub">リアルタイムの相場分析や、メンバー同士の情報交換はディスコードで。収支報告や週間振り返りも活発です🌸</div>';
+    const dBtn = document.createElement('a'); dBtn.className='btn btn-discord'; dBtn.href=DISCORD_URL; dBtn.target='_blank'; dBtn.rel='noopener'; dBtn.textContent='Discordに参加する';
+    discord.appendChild(dBtn); content.appendChild(discord);
+
+    // EA誘導
+    const ea = document.createElement('div'); ea.className='cta cta-ea';
+    ea.innerHTML =
+      '<div class="cta-title">🤖 自動売買EAのご案内</div>'+
+      '<div class="cta-sub">「分析する時間がない」「裁量に自信がない」という方へ。みやび・みお監修のEAで、ルールに沿った取引を自動化できます。</div>';
+    const eBtn = document.createElement('a'); eBtn.className='btn btn-rose'; eBtn.href=EA_URL; eBtn.target='_blank'; eBtn.rel='noopener'; eBtn.textContent='EAの詳細を見る';
+    ea.appendChild(eBtn); content.appendChild(ea);
+
+    // 免責
+    const disc = document.createElement('div'); disc.className='disclaimer';
+    disc.textContent = '※本コンテンツは情報提供・教育を目的としたものであり、投資の勧誘や売買の助言ではありません。相場の見通しは執筆時点のもので、将来の結果を保証するものではありません。投資の最終判断は、ご自身の責任において行ってください。';
+    content.appendChild(disc);
+
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  function mountTradingView(container){
+    container.innerHTML = '';
+    const wrap = document.createElement('div'); wrap.className='tradingview-widget-container';
+    const inner = document.createElement('div'); wrap.appendChild(inner);
+    const script = document.createElement('script');
+    script.type='text/javascript'; script.async=true;
+    script.src='https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
+    script.textContent = JSON.stringify({
+      symbols: [["ドル円","FX_IDC:USDJPY|3M"],["ゴールド","OANDA:XAUUSD|3M"]],
+      chartOnly:false, width:"100%", height:320, locale:"ja",
+      colorTheme:"light", isTransparent:true, autosize:false,
+      showVolume:false, hideDateRanges:false, scalePosition:"right",
+      gridLineColor:"rgba(58,46,42,0.06)", fontColor:"#6B5D57"
+    });
+    wrap.appendChild(script);
+    container.appendChild(wrap);
+  }
+}
+</script>
+</body>
+</html>
