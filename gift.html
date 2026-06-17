@@ -50,6 +50,24 @@ input[type=text]{width:100%;padding:12px 14px;border:1px solid var(--line-strong
 .article-body strong{color:var(--ink);font-weight:700;}
 .article-table{margin:14px 16px;overflow-x:auto;}
 .article-table table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px;}
+/* 折りたたみセクション */
+.c-sec{border:1px solid var(--line);border-radius:12px;margin:12px 0;overflow:hidden;}
+.c-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:var(--bg-soft);cursor:pointer;user-select:none;}
+.c-title{font-family:'Noto Serif JP',serif;font-weight:700;font-size:15px;color:var(--rose-deep);}
+.c-caret{color:var(--ink-soft);font-size:12px;transition:transform .2s;}
+.c-sec.collapsed .c-caret{transform:rotate(-90deg);}
+.c-body{padding:2px 14px 10px;}
+.c-sec.collapsed .c-body{display:none;}
+.article-body .c-body p{margin:8px 0;}
+/* シナリオ切り替えタブ */
+.sc-tabs{display:flex;gap:6px;margin:2px 0 8px;}
+.sc-tab{padding:5px 14px;border:1px solid var(--line-strong);border-radius:20px;background:#fff;color:var(--ink-mid);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sc-tab.active{background:var(--rose-deep);color:#fff;border-color:var(--rose-deep);}
+/* ソート可能な見出し */
+.sortable-th{position:relative;cursor:pointer;user-select:none;}
+.sortable-th::after{content:'⇅';opacity:.4;font-size:10px;margin-left:4px;}
+.sortable-th.sort-asc::after{content:'▲';opacity:.85;}
+.sortable-th.sort-desc::after{content:'▼';opacity:.85;}
 .article-table th,.article-table td{border:1px solid var(--line-strong);padding:8px 10px;text-align:left;}
 .article-table th{background:var(--rose-soft);color:var(--rose-deep);}
 .chart-wrap{margin:16px;}
@@ -169,6 +187,8 @@ else {
     art.querySelector('.article-body').innerHTML = row.body_html || '';
     if (row.table_html) art.querySelector('.article-table').innerHTML = row.table_html;
     content.appendChild(art);
+    makeCollapsible(art.querySelector('.article-body'));
+    enhanceTables(art);
 
     // TradingView ライブチャート（ドル円・ゴールド）
     const chartWrap = document.createElement('div'); chartWrap.className='chart-wrap';
@@ -200,6 +220,96 @@ else {
     content.appendChild(disc);
 
     window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  // 本文の<h3>セクションを折りたたみ可能にする
+  function makeCollapsible(bodyEl){
+    if (!bodyEl) return;
+    const nodes = Array.from(bodyEl.childNodes);
+    const frag = document.createDocumentFragment();
+    let curBody = null;
+    nodes.forEach(node=>{
+      if (node.nodeType===1 && node.tagName==='H3'){
+        const sec = document.createElement('div'); sec.className='c-sec';
+        const head = document.createElement('div'); head.className='c-head';
+        head.innerHTML = '<span class="c-title"></span><span class="c-caret">▾</span>';
+        head.querySelector('.c-title').textContent = node.textContent;
+        const sbody = document.createElement('div'); sbody.className='c-body';
+        head.onclick = ()=> sec.classList.toggle('collapsed');
+        sec.appendChild(head); sec.appendChild(sbody);
+        frag.appendChild(sec);
+        curBody = sbody;
+      } else {
+        if (curBody) curBody.appendChild(node);
+        else frag.appendChild(node);
+      }
+    });
+    bodyEl.innerHTML = '';
+    bodyEl.appendChild(frag);
+  }
+
+  // 表をソート可能＋（上昇/下落があれば）シナリオ切替タブを付ける
+  function enhanceTables(scope){
+    if (!scope) return;
+    scope.querySelectorAll('table').forEach(table=>{
+      makeSortable(table);
+      maybeScenarioTabs(table);
+    });
+  }
+  function cellVal(td){
+    if (!td) return '';
+    const t = td.textContent.trim();
+    const num = parseFloat(t.replace(/[^0-9.\-]/g,''));
+    return (/[0-9]/.test(t) && !isNaN(num)) ? num : t;
+  }
+  function makeSortable(table){
+    let headerCells = table.querySelectorAll('thead th');
+    if (!headerCells.length){
+      const firstRow = table.querySelector('tr');
+      if (firstRow) headerCells = firstRow.querySelectorAll('th');
+    }
+    if (!headerCells.length) return;
+    headerCells.forEach((th, idx)=>{
+      th.classList.add('sortable-th');
+      let dir = 1;
+      th.onclick = ()=>{
+        const tbody = table.tBodies[0] || table;
+        const rows = Array.from(tbody.querySelectorAll('tr')).filter(r=>r.querySelectorAll('td').length);
+        rows.sort((a,b)=>{
+          const av = cellVal(a.children[idx]); const bv = cellVal(b.children[idx]);
+          if (typeof av==='number' && typeof bv==='number') return (av-bv)*dir;
+          return String(av).localeCompare(String(bv),'ja')*dir;
+        });
+        rows.forEach(r=>tbody.appendChild(r));
+        table.querySelectorAll('th').forEach(h=>h.classList.remove('sort-asc','sort-desc'));
+        th.classList.add(dir===1?'sort-desc':'sort-asc');
+        dir*=-1;
+      };
+    });
+  }
+  function maybeScenarioTabs(table){
+    const tbody = table.tBodies[0] || table;
+    const rows = Array.from(tbody.querySelectorAll('tr')).filter(r=>r.querySelectorAll('td').length);
+    const reUp=/上昇|ロング|買い/, reDown=/下落|ショート|売り/;
+    const hasUp = rows.some(r=>reUp.test(r.textContent));
+    const hasDown = rows.some(r=>reDown.test(r.textContent));
+    if (!(hasUp && hasDown)) return;
+    const tabs = document.createElement('div'); tabs.className='sc-tabs';
+    [['all','すべて'],['up','上昇'],['down','下落']].forEach(([key,label],i)=>{
+      const b=document.createElement('button'); b.className='sc-tab'+(i===0?' active':''); b.textContent=label;
+      b.onclick=()=>{
+        tabs.querySelectorAll('.sc-tab').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        rows.forEach(r=>{
+          const up=reUp.test(r.textContent), down=reDown.test(r.textContent);
+          let show=true;
+          if (key==='up') show=up; else if (key==='down') show=down;
+          r.style.display = show ? '' : 'none';
+        });
+      };
+      tabs.appendChild(b);
+    });
+    table.parentNode.insertBefore(tabs, table);
   }
 
   function mountTradingView(container){
