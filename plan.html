@@ -440,9 +440,9 @@ const badge = document.getElementById('planBadge');
 badge.className = 'plan-badge ' + currentPlan;
 badge.innerHTML = '<span>' + currentPlan.toUpperCase() + '</span>';
 
-// 16桁の新しい会員番号(sendid)を発番する
+// 16桁のランダムなトークンを生成する（会員番号 sendid と退会用パスワードの両方に使用）
 // テレコムは退会済みでも同じ sendid の再登録を許さないため、申し込みのたびに新規発番する（再加入対策）
-function genFreshSendid() {
+function genToken16() {
   const bytes = crypto.getRandomValues(new Uint8Array(8));
   return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
 }
@@ -458,16 +458,18 @@ async function startCheckout(planTier) {
     return;
   }
 
-  // 申し込みのたびに新しい会員番号を発番して保存（再加入時の「IDが正しくない」を防ぐ）
-  const freshSendid = genFreshSendid();
+  // 申し込みのたびに新しい会員番号と退会用パスワードを発番して保存
+  // （sendid: 再加入時の「IDが正しくない」を防ぐ ／ password: 将来のサイト内退会で必要）
+  const freshSendid = genToken16();
+  const freshPassword = genToken16();
   try {
     const { error } = await supabase
       .from('profiles')
-      .update({ telecom_sendid: freshSendid })
+      .update({ telecom_sendid: freshSendid, telecom_password: freshPassword })
       .eq('id', user.id);
     if (error) throw error;
   } catch (e) {
-    console.error('[plan] sendid更新エラー:', e);
+    console.error('[plan] sendid/password更新エラー:', e);
     alert('お手続きの準備中にエラーが発生しました。少し時間をおいて、もう一度お試しください🌸');
     return;
   }
@@ -477,6 +479,8 @@ async function startCheckout(planTier) {
     money: cfg.money,
     sendid: freshSendid,
     rebill_param_id: cfg.rebill,
+    send_pass_bool: 'yes',
+    sendpass: freshPassword,
   };
   const form = document.createElement('form');
   form.method = 'POST';
