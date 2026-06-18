@@ -1340,5 +1340,31 @@ document.addEventListener('visibilitychange', () => {
 });
 </script>
 
+<style>
+.card{ position:relative; }
+.plan-lock-badge{ position:absolute; top:10px; right:10px; background:rgba(176,107,117,.92); color:#fff; font-size:10px; font-weight:700; padding:3px 9px; border-radius:11px; letter-spacing:.02em; z-index:3; box-shadow:0 1px 4px rgba(58,46,42,.18); }
+</style>
+<script>
+// フリー（未ログイン含む）のときだけ、制限カードに🔒バッジを表示
+(async () => {
+  let isFree = true;
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const { data: prof } = await sb.from('profiles').select('plan, is_admin').eq('id', session.user.id).single();
+      const plan = prof?.plan || 'free';
+      if (prof?.is_admin === true || plan === 'basic' || plan === 'pro') isFree = false;
+    }
+  } catch(e) { /* 判定失敗時はバッジ表示（安全側） */ }
+  if (isFree) {
+    ['chat.html','learn.html'].forEach(href => {
+      const card = document.querySelector('a.card[href="'+href+'"]');
+      if (card && !card.querySelector('.plan-lock-badge')) {
+        const b=document.createElement('span'); b.className='plan-lock-badge'; b.textContent='\u{1F512} ベーシック'; card.appendChild(b);
+      }
+    });
+  }
+})();
+</script>
 </body>
 </html>

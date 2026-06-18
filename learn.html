@@ -2591,7 +2591,29 @@ const mChapter = document.getElementById("m-chapter");
 const mBody = document.getElementById("m-body");
 const modal = document.getElementById("modal");
 
+function showLearnGate(){
+  mChapter.textContent = 'ベーシックプラン';
+  mBody.innerHTML = `
+    <div class="modal-cover">
+      <div class="icon-large" style="font-size:46px;line-height:1;">\u{1F512}</div>
+      <h2>この続きはベーシックプラン以上で</h2>
+      <div class="english">&mdash; Members Only &mdash;</div>
+    </div>
+    <p style="text-align:center;line-height:1.95;color:var(--ink-mid);font-size:15px;margin-top:8px;">
+      FX基礎は第3章まで無料でご覧いただけます\u{1F338}<br>
+      第4章以降と動画レッスン5本は、<br>ベーシックプラン（月¥500）からご利用いただけます。
+    </p>
+    <div style="text-align:center;margin-top:26px;">
+      <a href="plan.html" style="display:inline-block;padding:13px 30px;background:var(--rose);color:#fff;border-radius:24px;text-decoration:none;font-weight:600;">プランを見る \u{1F338}</a>
+    </div>
+    ${window.learnLoggedIn ? '' : '<p style="text-align:center;margin-top:16px;font-size:13px;color:var(--ink-soft);"><a href="register.html" style="color:var(--rose-deep);text-decoration:none;">無料で新規登録</a> ・ <a href="login.html" style="color:var(--ink-soft);text-decoration:none;">ログイン</a></p>'}
+  `;
+  overlay.classList.add("active");
+  modal.scrollTop = 0;
+  document.body.style.overflow = "hidden";
+}
 function openChapter(n){
+  if(window.learnAccess !== 'full' && n > 3){ showLearnGate(); return; }
   const data = chapters[n];
   const numLabel = n < 10 ? `Ch.0${n}` : `Ch.${n}`;
   mChapter.textContent = data.chapter;
@@ -2625,6 +2647,7 @@ document.addEventListener("keydown",e=>{
 
 function playVideo(el){
   if(el.classList.contains('playing')) return;
+  if(window.learnAccess !== 'full'){ showLearnGate(); return; }
   const vid = el.getAttribute('data-vid');
   // Detect file:// protocol — YouTube iframe doesn't work there
   if(location.protocol === 'file:'){
@@ -2641,6 +2664,44 @@ function playVideo(el){
   el.classList.add('playing');
 }
 </script>
-<script src="auth-header.js" defer></script>
+
+<style>
+.card-btn.locked{ opacity:.82; }
+.card-btn.locked .card-cta{ color: var(--rose-deep); font-weight:600; }
+.video-frame{ position:relative; }
+.video-frame.locked .video-thumb{ filter: grayscale(.45) brightness(.82); }
+.video-frame.locked .play-btn{ opacity:.35; }
+.video-frame .lock-badge{ position:absolute; top:8px; right:8px; width:30px; height:30px; border-radius:50%; background:rgba(58,46,42,.62); color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; z-index:6; }
+</style>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const SUPABASE_URL = 'https://iupkaxzesrximmfkipzd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1cGtheHplc3J4aW1tZmtpcHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDM1NjIsImV4cCI6MjA5NDM3OTU2Mn0.jDZOxyLkSd3NcZgIKHJGOK9m8D561eqoQYbOUxtFYOQ';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+window.learnAccess = 'preview';   // 既定はロック（判定前は安全側）
+window.learnLoggedIn = false;
+(async () => {
+  try{
+    const { data: { session } } = await supabase.auth.getSession();
+    if(session){
+      window.learnLoggedIn = true;
+      const { data: prof } = await supabase.from('profiles').select('plan, is_admin').eq('id', session.user.id).single();
+      const plan = prof?.plan || 'free';
+      if(prof?.is_admin === true || plan === 'basic' || plan === 'pro') window.learnAccess = 'full';
+    }
+  }catch(e){ console.error('[learn] plan check error:', e); }
+  if(window.learnAccess !== 'full') markLearnLocked();
+})();
+function markLearnLocked(){
+  for(let i=4;i<=12;i++){
+    const btn = document.querySelector('.card-btn.c'+i);
+    if(btn){ btn.classList.add('locked'); const cta = btn.querySelector('.card-cta'); if(cta) cta.innerHTML='\u{1F512} ベーシックで解放'; }
+  }
+  document.querySelectorAll('.video-frame').forEach(f=>{
+    f.classList.add('locked');
+    const b=document.createElement('div'); b.className='lock-badge'; b.textContent='\u{1F512}'; f.appendChild(b);
+  });
+}
+</script>
 </body>
 </html>

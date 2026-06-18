@@ -540,6 +540,7 @@ const CAT_CLASSES = { us: 'cat-us', jp: 'cat-jp', policy: 'cat-policy', other: '
 
 let allNews = [];
 let activeCat = 'all';
+let newsAccess = 'preview'; // free=preview / basic+=full
 
 function escapeHtml(s) {
   if (s == null) return '';
@@ -588,7 +589,7 @@ function renderItem(n) {
     : '';
 
   return `
-    <a class="news-item" href="${escapeHtml(n.url)}" target="_blank" rel="noopener">
+    <a class="news-item" href="${newsAccess==='full' ? escapeHtml(n.url) : 'plan.html'}" ${newsAccess==='full' ? 'target="_blank" rel="noopener"' : ''}>
       <div class="news-meta">
         <span class="news-cat ${catClass}">${catLabel}</span>
         <span class="news-source">
@@ -599,12 +600,12 @@ function renderItem(n) {
       </div>
       <div class="news-title">${escapeHtml(n.title)}</div>
       <div class="news-link-row">
-        <div class="news-read">
-          元記事を読む
+        <div class="news-read" style="${newsAccess==='full' ? '' : 'color:#B06B75;font-weight:600;'}">
+          ${newsAccess==='full' ? '元記事を読む' : '\u{1F512} ベーシックで全文・mio解説を見る'}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </div>
       </div>
-      ${comment}
+      ${newsAccess==='full' ? comment : ''}
     </a>
   `;
 }
@@ -653,7 +654,19 @@ function render() {
   container.innerHTML = html;
 }
 
+async function checkNewsAccess() {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const { data: prof } = await sb.from('profiles').select('plan, is_admin').eq('id', session.user.id).single();
+      const plan = prof?.plan || 'free';
+      if (prof?.is_admin === true || plan === 'basic' || plan === 'pro') newsAccess = 'full';
+    }
+  } catch(e) { /* 安全側でpreview */ }
+}
+
 async function load() {
+  await checkNewsAccess();
   let news = [];
   try {
     const { data, error } = await sb
@@ -691,6 +704,6 @@ document.querySelectorAll('.cat-tab').forEach(t => {
 
 load();
 </script>
-<script src="auth-header.js" defer></script>
+
 </body>
 </html>

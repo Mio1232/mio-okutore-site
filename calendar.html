@@ -767,12 +767,26 @@ async function loadHinataComment() {
     }
   } catch(e) { /* keep default text */ }
 }
-loadHinataComment();
-// Refresh on tab visibility change
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) loadHinataComment();
-});
+// プラン判定：見解（ひなたコメント）はベーシック以上のみ表示
+(async () => {
+  let access = 'preview';
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const { data: prof } = await sb.from('profiles').select('plan, is_admin').eq('id', session.user.id).single();
+      const plan = prof?.plan || 'free';
+      if (prof?.is_admin === true || plan === 'basic' || plan === 'pro') access = 'full';
+    }
+  } catch(e) { /* 判定失敗時は安全側でロック */ }
+  const msg = document.getElementById('hinata-msg');
+  if (access === 'full') {
+    loadHinataComment();
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) loadHinataComment(); });
+  } else if (msg) {
+    msg.innerHTML = '\u{1F512} 今週の見解は<a href="plan.html" style="color:var(--rose-deep);text-decoration:none;font-weight:600;">ベーシックプラン</a>以上でご覧いただけます\u{1F338}';
+  }
+})();
 </script>
-<script src="auth-header.js" defer></script>
+
 </body>
 </html>
