@@ -119,16 +119,16 @@ else {
       '<div class="card">'+
         '<div class="lock-icon">🔒</div>'+
         '<div class="lock-title">プレゼントコンテンツ</div>'+
-        '<div class="lock-sub">ドル円・ゴールドの最新分析レポートを<br>プレゼントしています🌸<br>閲覧には、公式LINEで受け取れる<br><strong>合言葉（キーワード）</strong>が必要です。</div>'+
+        '<div class="lock-sub">ドル円・ゴールドの最新分析レポートを<br>プレゼントしています🌸<br>閲覧には、公式LINEで受け取れる<br><strong>合言葉</strong>が必要です。</div>'+
         '<div class="steps">'+
-          '<div class="steps-title">📩 キーワードの受け取り方</div>'+
+          '<div class="steps-title">📩 合言葉の受け取り方</div>'+
           '<div class="step"><span class="step-no">1</span><span>下のボタンから公式LINEを友だち追加</span></div>'+
-          '<div class="step"><span class="step-no">2</span><span>トークで「<strong>キーワード</strong>」と送信</span></div>'+
+          '<div class="step"><span class="step-no">2</span><span>トークで「<strong>プレゼント</strong>」と送信</span></div>'+
           '<div class="step"><span class="step-no">3</span><span>届いた合言葉を下の欄に入力して解除🌸</span></div>'+
         '</div>'+
         '<a class="btn btn-line" href="'+LINE_URL+'" target="_blank" rel="noopener">公式LINEを開く（友だち追加）</a>'+
         '<div class="gap"></div>'+
-        '<input type="text" id="kw" placeholder="キーワードを入力" autocomplete="off">'+
+        '<input type="text" id="kw" placeholder="合言葉を入力" autocomplete="off">'+
         '<div class="err" id="err"></div>'+
         '<button class="btn btn-rose" id="unlockBtn">解除する</button>'+
       '</div>';
@@ -136,7 +136,7 @@ else {
     const err = document.getElementById('err');
     btn.onclick = async ()=>{
       const kw = document.getElementById('kw').value.trim();
-      if (!kw){ err.textContent = 'キーワードを入力してください'; return; }
+      if (!kw){ err.textContent = '合言葉を入力してください'; return; }
       btn.disabled = true; const old = btn.textContent; btn.textContent = '確認中…'; err.textContent = '';
       try{
         const res = await fetch('/.netlify/functions/gift-unlock', {
@@ -145,7 +145,7 @@ else {
         });
         const data = await res.json();
         if (data.ok){ showViewer(); }
-        else { err.textContent = data.error || 'キーワードが正しくありません🌸'; btn.disabled=false; btn.textContent=old; }
+        else { err.textContent = data.error || '合言葉が正しくありません🌸'; btn.disabled=false; btn.textContent=old; }
       }catch(e){ err.textContent='通信エラーが発生しました'; btn.disabled=false; btn.textContent=old; }
     };
   }

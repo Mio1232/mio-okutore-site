@@ -46,6 +46,9 @@ textarea{min-height:120px;resize:vertical;line-height:1.7;}
 .badge.draft{background:var(--bg-soft);color:var(--ink-soft);}
 .mini{padding:6px 9px;font-size:12px;border-radius:8px;border:1px solid var(--line-strong);background:#fff;color:var(--ink-mid);cursor:pointer;}
 .note{font-size:12px;color:var(--ink-soft);margin-top:8px;line-height:1.7;}
+.ind-row{display:grid;grid-template-columns:1fr 84px 84px 34px;gap:6px;align-items:center;margin-top:8px;}
+.ind-row input{padding:9px 10px;font-size:13px;}
+.ind-row .ind-del{padding:0;height:36px;line-height:1;font-size:16px;color:var(--rose-deep);}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;opacity:0;transition:opacity .25s;z-index:50;}
 .toast.show{opacity:1;}
 .deny{margin:40px 16px;text-align:center;color:var(--ink-mid);}
@@ -87,6 +90,20 @@ textarea{min-height:120px;resize:vertical;line-height:1.7;}
       <button class="btn btn-primary" id="generateBtn">🪄 最新ニュースから生成</button>
     </div>
     <p class="note">最新のニュースをWeb検索で読み込み、mio口調の記事＋シナリオ表を自動生成します。生成は裏側で実行され、30秒〜1分ほどで完成した下書きがこの画面に読み込まれます（待っている間も画面を閉じなければOK）。内容を確認・編集してから公開してください。</p>
+  </div>
+
+  <!-- 指標から生成 -->
+  <div class="section">
+    <h2>📊 経済指標から生成</h2>
+    <p class="note" style="margin:0 0 6px;">指標名・前回値・予想値を入れて生成すると、関連ファンダをWeb検索で調べたうえで、各指標のドル円・ゴールドの想定とロング/ショートの一択を記事にします🌸</p>
+    <div id="indRows"></div>
+    <div class="row">
+      <button class="btn btn-ghost" id="addIndBtn" type="button">＋ 指標を追加</button>
+    </div>
+    <div class="row">
+      <button class="btn btn-primary" id="generateIndBtn">🪄 指標から生成</button>
+    </div>
+    <p class="note">指標は一度に5個くらいまでがおすすめです（多すぎると文章が途中で切れることがあります）。生成後、内容を確認・編集してから公開してください。</p>
   </div>
 
   <!-- 編集・プレビュー -->
@@ -158,18 +175,17 @@ else {
       toast(error ? '保存に失敗しました' : 'キーワードを保存しました🌸');
     };
 
-    // ===== 生成（バックグラウンド関数＋ポーリング）=====
-    document.getElementById('generateBtn').onclick = async (e)=>{
-      const btn = e.currentTarget;
+    // ===== 生成（バックグラウンド関数＋ポーリング・共通処理）=====
+    async function runGenerate(extraBody, btn){
       btn.disabled = true; const old = btn.textContent; btn.textContent = '生成中…（最大1分ほど）';
       try {
         // 生成前に既存の下書きIDを控える
         const { data: before } = await supabase.from('gift_contents').select('id').eq('status','draft');
         const beforeIds = new Set((before || []).map(r=>r.id));
-        // バックグラウンド生成を起動（即座に202が返る＝504にならない）
+        // バックグラウンド生成を起動（即座に返る＝504にならない）
         await fetch('/.netlify/functions/gift-generate-background', {
           method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ user_id: user.id, focus: focusSelect.value })
+          body: JSON.stringify(Object.assign({ user_id: user.id }, extraBody))
         });
         // 新しい下書きが現れるまでポーリング（5秒ごと・最大24回＝2分）
         let found = null;
@@ -197,6 +213,41 @@ else {
       } finally {
         btn.disabled = false; btn.textContent = old;
       }
+    }
+
+    // 最新ニュースから生成
+    document.getElementById('generateBtn').onclick = (e)=> runGenerate({ focus: focusSelect.value }, e.currentTarget);
+
+    // ===== 経済指標から生成 =====
+    const indRows = document.getElementById('indRows');
+    function addIndRow(name='', prev='', forecast=''){
+      const row = document.createElement('div');
+      row.className = 'ind-row';
+      row.innerHTML =
+        '<input type="text" class="ind-name" placeholder="指標名（例：米CPI 前年比）">'+
+        '<input type="text" class="ind-prev" placeholder="前回値">'+
+        '<input type="text" class="ind-fore" placeholder="予想値">'+
+        '<button type="button" class="mini ind-del" title="削除">×</button>';
+      row.querySelector('.ind-name').value = name;
+      row.querySelector('.ind-prev').value = prev;
+      row.querySelector('.ind-fore').value = forecast;
+      row.querySelector('.ind-del').onclick = ()=>{
+        row.remove();
+        if (!indRows.querySelector('.ind-row')) addIndRow();
+      };
+      indRows.appendChild(row);
+    }
+    document.getElementById('addIndBtn').onclick = ()=> addIndRow();
+    addIndRow(); // 最初の1行
+
+    document.getElementById('generateIndBtn').onclick = (e)=>{
+      const indicators = Array.from(indRows.querySelectorAll('.ind-row')).map(r=>({
+        name: r.querySelector('.ind-name').value.trim(),
+        prev: r.querySelector('.ind-prev').value.trim(),
+        forecast: r.querySelector('.ind-fore').value.trim()
+      })).filter(x=>x.name);
+      if (!indicators.length){ toast('指標名を1つ以上入力してください'); return; }
+      runGenerate({ indicators }, e.currentTarget);
     };
 
     document.getElementById('previewBtn').onclick = renderPreview;
