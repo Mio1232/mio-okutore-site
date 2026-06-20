@@ -10,6 +10,9 @@ exports.handler = async (event) => {
   let body;
   try { body = JSON.parse(event.body || '{}'); } catch (e) { return { statusCode: 400, body: 'bad request' }; }
   const { user_id, focus } = body;
+  const indicators = Array.isArray(body.indicators)
+    ? body.indicators.filter(x => x && (x.name || '').trim())
+    : [];
 
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -30,26 +33,58 @@ exports.handler = async (event) => {
     return { statusCode: 500, body: 'error' };
   }
 
-  const topic = focus === 'gold' ? 'ゴールド（XAUUSD）'
-    : focus === 'usdjpy' ? 'ドル円（USD/JPY）'
-    : 'ドル円（USD/JPY）とゴールド（XAUUSD）';
+  let prompt, maxTokens;
 
-  const prompt =
-    'あなたはFX教育コミュニティ「億トレ」の主宰・美桜Mio（みお）です。\n' +
-    '今日の' + topic + 'に関する最新ニュース・経済指標・地政学リスク・重要な価格帯を、Web検索で実際に調べてください。\n' +
-    'そのうえで、コミュニティ登録者へのプレゼント記事を作成します。\n\n' +
-    '出力は必ず次のJSONのみ（前後に説明やコードブロック記号を付けない）：\n' +
-    '{\n' +
-    '  "title": "記事タイトル（30〜50字程度、引きのある見出し）",\n' +
-    '  "body_html": "記事本文のHTML。使用タグは <h3> <p> <ul> <li> <strong> のみ。mioの口調（ですます調・🌸を時々）。導入＋3〜4セクション構成。",\n' +
-    '  "table_html": "重要レベルやシナリオをまとめた<table>のHTML（属性やclassは付けない）。上昇/下落シナリオや節目の数字を入れる。"\n' +
-    '}\n\n' +
-    'ルール：\n' +
-    '- 実際にWeb検索で確認した最新の数字・出来事を使うこと\n' +
-    '- ニュース原文をそのまま転載せず、要点を自分の言葉でmio口調にまとめること\n' +
-    '- 投資助言ではなく教育・情報提供として書くこと（断定的な売買指示はしない）\n' +
-    '- ディスコードやEA・商品の宣伝文は入れないこと（別途ページ側で付与します）\n' +
-    '- JSON以外は一切出力しないこと';
+  if (indicators.length) {
+    // ===== 経済指標モード：指標→ファンダ検索→ドル円/ゴールドの想定＋ロング/ショート一択 =====
+    const lines = indicators.map(x =>
+      '- 指標名: ' + (x.name || '').trim() +
+      ' / 前回値: ' + ((x.prev || '').trim() || '-') +
+      ' / 予想値: ' + ((x.forecast || '').trim() || '-')
+    ).join('\n');
+    maxTokens = 4000;
+    prompt =
+      'あなたはFX教育コミュニティ「億トレ」の主宰・美桜Mio（みお）です。\n' +
+      'これから渡す経済指標について、Web検索で関連するファンダメンタルズ（市場の最新予想、直近の関連ニュース、FRB・日銀の金融政策スタンス、地政学リスクなど）を実際に調べてください。\n' +
+      'そのうえで、各指標が「ドル円（USD/JPY）」と「ゴールド（XAUUSD）」にどう影響しやすいかを分析し、トレード方向の一択（ロング または ショート）を示すプレゼント記事を作成します。\n\n' +
+      '【対象の経済指標（前回値・予想値）】\n' + lines + '\n\n' +
+      '出力は必ず次のJSONのみ（前後に説明やコードブロック記号を付けない）：\n' +
+      '{\n' +
+      '  "title": "記事タイトル（30〜50字程度、引きのある見出し）",\n' +
+      '  "body_html": "記事本文のHTML。使用タグは <h3> <p> <ul> <li> <strong> のみ。mioの口調（ですます調・🌸を時々）。導入のあと、各指標ごとに <h3> 見出しを立て、調べたファンダの要点・ドル円とゴールドへの想定影響・方向の根拠を簡潔にまとめる。",\n' +
+      '  "table_html": "各指標を1行にまとめた<table>のHTML（属性やclassは付けない）。列は「指標」「前回→予想」「ドル円」「ゴールド」「方向」。ドル円・ゴールドは上昇/下落の想定を矢印や短い言葉で、「方向」はロング/ショートの一択を入れる。"\n' +
+      '}\n\n' +
+      'ルール：\n' +
+      '- 各指標について、ドル円とゴールドそれぞれの想定方向と、ロング/ショートの一択を必ず示すこと\n' +
+      '- 一択には「結果が予想に対してどう出た場合か」を一言添えること（例：結果が予想を上回ればドル円はロング目線、など）\n' +
+      '- Web検索で確認した最新の市場予想・状況を反映すること\n' +
+      '- 投資助言ではなく教育・情報提供として書くこと。本文の最後に、最終的な売買判断は自己責任である旨を一言添えること\n' +
+      '- ニュース原文をそのまま転載せず、要点を自分の言葉でmio口調にまとめること\n' +
+      '- ディスコードやEA・商品の宣伝文は入れないこと（別途ページ側で付与します）\n' +
+      '- JSON以外は一切出力しないこと';
+  } else {
+    // ===== 最新ニュースモード（従来）=====
+    const topic = focus === 'gold' ? 'ゴールド（XAUUSD）'
+      : focus === 'usdjpy' ? 'ドル円（USD/JPY）'
+      : 'ドル円（USD/JPY）とゴールド（XAUUSD）';
+    maxTokens = 3000;
+    prompt =
+      'あなたはFX教育コミュニティ「億トレ」の主宰・美桜Mio（みお）です。\n' +
+      '今日の' + topic + 'に関する最新ニュース・経済指標・地政学リスク・重要な価格帯を、Web検索で実際に調べてください。\n' +
+      'そのうえで、コミュニティ登録者へのプレゼント記事を作成します。\n\n' +
+      '出力は必ず次のJSONのみ（前後に説明やコードブロック記号を付けない）：\n' +
+      '{\n' +
+      '  "title": "記事タイトル（30〜50字程度、引きのある見出し）",\n' +
+      '  "body_html": "記事本文のHTML。使用タグは <h3> <p> <ul> <li> <strong> のみ。mioの口調（ですます調・🌸を時々）。導入＋3〜4セクション構成。",\n' +
+      '  "table_html": "重要レベルやシナリオをまとめた<table>のHTML（属性やclassは付けない）。上昇/下落シナリオや節目の数字を入れる。"\n' +
+      '}\n\n' +
+      'ルール：\n' +
+      '- 実際にWeb検索で確認した最新の数字・出来事を使うこと\n' +
+      '- ニュース原文をそのまま転載せず、要点を自分の言葉でmio口調にまとめること\n' +
+      '- 投資助言ではなく教育・情報提供として書くこと（断定的な売買指示はしない）\n' +
+      '- ディスコードやEA・商品の宣伝文は入れないこと（別途ページ側で付与します）\n' +
+      '- JSON以外は一切出力しないこと';
+  }
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -57,7 +92,7 @@ exports.handler = async (event) => {
       headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5-20250929',
-        max_tokens: 3000,
+        max_tokens: maxTokens,
         messages: [{ role: 'user', content: prompt }],
         tools: [{
           type: 'web_search_20250305',

@@ -22,9 +22,9 @@ exports.handler = async (event) => {
     const rows = await r.json();
     const current = ((rows && rows[0] && rows[0].unlock_keyword) || '').trim();
 
-    if (!current) return resp(200, { ok: false, error: '現在キーワードが設定されていません。管理者にお問い合わせください。' });
+    if (!current) return resp(200, { ok: false, error: '現在、合言葉が設定されていません。管理者にお問い合わせください。' });
     if (keyword.trim().toLowerCase() !== current.toLowerCase()) {
-      return resp(200, { ok: false, error: 'キーワードが正しくありません🌸' });
+      return resp(200, { ok: false, error: '合言葉が正しくありません🌸' });
     }
 
     // 解除フラグを立てる
