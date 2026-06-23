@@ -25,9 +25,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
 .hero-sub{font-size:15px;color:var(--ink-mid);max-width:480px;margin:0 auto 36px;line-height:2;position:relative;z-index:1}
 .hero-cta{display:inline-block;background:var(--rose);color:#fff;padding:16px 40px;border-radius:30px;font-size:15px;font-weight:600;letter-spacing:.1em;text-decoration:none;transition:all .3s;position:relative;z-index:1;box-shadow:0 8px 24px rgba(201,139,149,0.3)}
 .hero-cta:hover{background:var(--rose-deep);transform:translateY(-2px);box-shadow:0 12px 32px rgba(176,107,117,0.35)}
-.hero-scroll{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.2em;color:var(--ink-soft);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:1}
-.hero-scroll::after{content:'';width:1px;height:32px;background:var(--ink-soft);animation:scrollLine 2s ease-in-out infinite}
-@keyframes scrollLine{0%{opacity:.3;transform:scaleY(.5)}50%{opacity:1;transform:scaleY(1)}100%{opacity:.3;transform:scaleY(.5)}}
 
 .section{padding:80px 24px;max-width:720px;margin:0 auto}
 .section-tag{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;letter-spacing:.2em;color:var(--rose);text-transform:uppercase;margin-bottom:12px}
@@ -50,9 +47,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
 
 .feature-grid{display:flex;flex-direction:column;gap:32px}
 .feature-card{background:var(--bg-card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
-.feature-card-img{width:100%;max-height:480px;overflow-y:auto;overflow-x:hidden;border-bottom:1px solid var(--line);background:var(--bg-soft);display:flex;align-items:flex-start;justify-content:center;-webkit-overflow-scrolling:touch;position:relative}
-.feature-card-img::after{content:'↕ スクロールで全体を確認';position:sticky;bottom:0;left:0;right:0;display:block;text-align:center;font-size:11px;color:var(--ink-soft);background:linear-gradient(transparent,rgba(239,231,218,0.95));padding:12px 0 8px;pointer-events:none}
-.feature-card-img img{width:100%;height:auto;display:block}
 .feature-card-body{padding:24px}
 .feature-card-badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.08em;padding:3px 10px;border-radius:6px;margin-bottom:10px}
 .badge-ai{background:var(--rose-soft);color:var(--rose-deep)}
@@ -107,9 +101,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
 .plan-feats li::before{content:'✓';position:absolute;left:0;color:var(--sage);font-weight:700}
 .plan-feats li.no{color:var(--ink-soft)}
 .plan-feats li.no::before{content:'—';color:var(--ink-soft);font-weight:400}
-.plan-yearly{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line-strong);font-size:12px;color:var(--ink-mid)}
-.plan-yearly strong{color:var(--rose-deep)}
-
 .compare-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:14px;background:var(--bg-card)}
 .compare-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:440px}
 .compare-table th,.compare-table td{padding:11px 12px;text-align:center;border-bottom:1px solid var(--line)}
@@ -122,6 +113,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
 .compare-table .col-pro{background:rgba(232,208,210,0.18)}
 .compare-table tbody tr:last-child td{border-bottom:none}
 .plan-note{font-size:12px;color:var(--ink-soft);line-height:1.8;margin-top:16px;text-align:center}
+.update-grid{display:flex;flex-direction:column;gap:16px}
+.update-card{background:var(--bg-card);border:1px solid var(--line);border-radius:16px;padding:22px 24px}
+.update-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px}
+.update-icon{font-size:26px;line-height:1}
+.update-plan{font-size:11px;font-weight:600;letter-spacing:.06em;padding:4px 12px;border-radius:20px;background:var(--bg-soft);color:var(--ink-mid);white-space:nowrap}
+.update-plan.plan-pro{background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:#fff}
+.update-title{font-family:'Noto Serif JP',serif;font-size:17px;font-weight:600;margin-bottom:8px;line-height:1.4}
+.update-desc{font-size:13.5px;color:var(--ink-mid);line-height:1.9}
 
 @media(max-width:480px){.hero{padding:48px 20px}.section{padding:56px 20px}.feature-card-body{padding:20px}.plan-card{padding:20px}}
 </style>
@@ -133,7 +132,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
   <h1 class="hero-title">トレードを<br><em>記録し、振り返り、<br>成長する</em>場所</h1>
   <p class="hero-sub">mio億トレアプリは、AIアシスタント・収支管理・学習ノート・<br>コミュニティ配信がすべて一つに。<br>あなたのトレードライフを丸ごとサポートします 🌸</p>
   <a href="/register.html" class="hero-cta">無料で始める</a>
-  <div class="hero-scroll">scroll</div>
 </section>
 
 <section class="section">
@@ -174,7 +172,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
   <div class="feature-grid">
 
     <div class="feature-card" id="ai">
-      <div class="feature-card-img"><img src="guide-images/ss-chat.jpg" alt="AIチャット画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-ai">AI</span>
         <h3 class="feature-card-title">美桜Mio AI — あなた専属のアシスタント</h3>
@@ -190,7 +187,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
     </div>
 
     <div class="feature-card" id="dashboard">
-      <div class="feature-card-img"><img src="guide-images/ss-dashboard.jpg" alt="マイページ画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-record">マイページ</span>
         <h3 class="feature-card-title">マイページ — 今月の状況がひと目で</h3>
@@ -205,7 +201,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
     </div>
 
     <div class="feature-card" id="record">
-      <div class="feature-card-img"><img src="guide-images/ss-record.jpg" alt="収支記録画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-record">記録</span>
         <h3 class="feature-card-title">収支記録 — トレードの積み重ねを形に</h3>
@@ -221,7 +216,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
     </div>
 
     <div class="feature-card" id="record-history">
-      <div class="feature-card-img"><img src="guide-images/ss-record-history.jpg" alt="取引履歴画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-record">履歴</span>
         <h3 class="feature-card-title">取引履歴 — 過去の記録をいつでも確認</h3>
@@ -235,7 +229,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
     </div>
 
     <div class="feature-card" id="stats">
-      <div class="feature-card-img"><img src="guide-images/ss-stats.jpg" alt="月次レポート画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-record">分析</span>
         <h3 class="feature-card-title">月次レポート — データがあなたの強みを教えてくれる</h3>
@@ -244,14 +237,13 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
           <li>日別の損益グラフで波を把握</li>
           <li>通貨ペア別・取引種類別の成績比較</li>
           <li>時間帯別ヒートマップで得意な時間がわかる</li>
-          <li>AIが今月の振り返りインサイトを自動生成</li>
+          <li>今月の振り返りインサイトを自動でまとめて表示</li>
         </ul>
         <div class="feature-card-tip"><strong>💡 ポイント：</strong>3ヶ月以上データを貯めると、トレンドや季節性の傾向も見えてきます。「裁量のドル円は得意だけどゴールドは苦手」のような発見が、戦略改善に直結します。</div>
       </div>
     </div>
 
     <div class="feature-card" id="notes">
-      <div class="feature-card-img"><img src="guide-images/ss-notes.jpg" alt="学びノート画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-learn">学び</span>
         <h3 class="feature-card-title">学びノート — 気づきを資産に変える</h3>
@@ -266,7 +258,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
     </div>
 
     <div class="feature-card" id="settings">
-      <div class="feature-card-img"><img src="guide-images/ss-settings.jpg" alt="設定画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-info">設定</span>
         <h3 class="feature-card-title">設定 — AIをもっと賢くする</h3>
@@ -277,12 +268,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
           <li>月間・年間の目標金額を設定</li>
           <li>LINEメンバー・Discord参加状況の登録</li>
         </ul>
-        <div class="feature-card-tip"><strong>💡 ポイント：</strong>設定を充実させるほど、AIの回答が的確になります。例えば「EA未使用」と設定すると、連敗時にAIがさりげなくEAを紹介してくれます。</div>
+        <div class="feature-card-tip"><strong>💡 ポイント：</strong>設定を充実させるほど、AIチャットの回答が的確になります。表示名・使用ツール・目標金額まで入れておくのがおすすめです。</div>
       </div>
     </div>
 
     <div class="feature-card" id="calendar">
-      <div class="feature-card-img"><img src="guide-images/ss-calendar.jpg" alt="経済指標カレンダー画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-info">情報</span>
         <h3 class="feature-card-title">経済指標カレンダー — 大切なイベントを逃さない</h3>
@@ -296,7 +286,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
     </div>
 
     <div class="feature-card" id="events">
-      <div class="feature-card-img"><img src="guide-images/ss-events.jpg" alt="配信スケジュール画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-community">コミュニティ</span>
         <h3 class="feature-card-title">配信スケジュール — ライブで学べる</h3>
@@ -310,7 +299,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
     </div>
 
     <div class="feature-card" id="profit">
-      <div class="feature-card-img"><img src="guide-images/ss-profit.jpg" alt="収支報告画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-community">コミュニティ</span>
         <h3 class="feature-card-title">収支報告 — リアルな声が集まる場所</h3>
@@ -324,7 +312,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
     </div>
 
     <div class="feature-card" id="news">
-      <div class="feature-card-img"><img src="guide-images/ss-news.jpg" alt="マーケットニュース画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-info">ニュース</span>
         <h3 class="feature-card-title">マーケットニュース — mioが厳選した記事</h3>
@@ -338,7 +325,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
     </div>
 
     <div class="feature-card" id="learn">
-      <div class="feature-card-img"><img src="guide-images/ss-learn.jpg" alt="FX手帖画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-learn">学習</span>
         <h3 class="feature-card-title">FX手帖 — 基礎から丁寧に</h3>
@@ -352,7 +338,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
     </div>
 
     <div class="feature-card" id="members">
-      <div class="feature-card-img"><img src="guide-images/ss-members.jpg" alt="メンバー紹介画面"></div>
       <div class="feature-card-body">
         <span class="feature-card-badge badge-community">メンバー</span>
         <h3 class="feature-card-title">メンバー紹介 — 4人の講師陣</h3>
@@ -389,12 +374,13 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
       </div>
       <p class="plan-tagline">まずはお試し。基本機能を無料で体験できます。</p>
       <ul class="plan-feats">
-        <li>トレード記録（月10件まで）</li>
-        <li>美桜Mio AIチャット（月10回まで）</li>
-        <li>学びノート（5件まで）</li>
-        <li>ダッシュボード・通貨ペア別ランキング</li>
-        <li class="no">チャート画像分析</li>
-        <li class="no">詳細な分析機能</li>
+        <li>トレード記録・取引履歴</li>
+        <li>学びノート</li>
+        <li>マイページ（今月の損益・勝率）</li>
+        <li>コミュニティ収支報告・配信スケジュール</li>
+        <li>FX手帖（第1〜3章プレビュー）・ニュース見出し</li>
+        <li class="no">美桜Mio AIチャット</li>
+        <li class="no">月次レポート（分析機能）</li>
       </ul>
     </div>
 
@@ -405,14 +391,13 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
       </div>
       <p class="plan-tagline">本格的にトレードを記録・分析したい方に。</p>
       <ul class="plan-feats">
-        <li>トレード記録・学びノート 無制限</li>
-        <li>AIチャット（月50回／1日5回まで）</li>
-        <li>チャート画像分析（月5回まで）</li>
-        <li>AI個別最適化（取引履歴を反映）</li>
-        <li>分析機能フル解放（時間帯別・通貨ペア別・PF等）</li>
-        <li>月次レポート（過去3ヶ月）</li>
+        <li>FREEの全機能</li>
+        <li>美桜Mio AIチャット</li>
+        <li>チャート画像分析</li>
+        <li>月次レポート（分析機能フル解放）</li>
+        <li>FX手帖 全章＋動画コンテンツ</li>
+        <li>ニュース本文＋mio解説・カレンダーのひなた見解</li>
       </ul>
-      <div class="plan-yearly">年払いなら <strong>¥4,800</strong>（20%OFF）</div>
     </div>
 
     <div class="plan-card featured">
@@ -423,13 +408,12 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
       </div>
       <p class="plan-tagline">すべてを無制限で。億トレを本気で目指す方に。</p>
       <ul class="plan-feats">
-        <li>AIチャット 無制限</li>
-        <li>チャート画像分析 無制限</li>
-        <li>AI過去会話保存 無制限</li>
+        <li>BASICの全機能</li>
+        <li>AIチャット・チャート画像分析をたっぷり</li>
+        <li>AI過去会話の保存数アップ</li>
         <li>月次レポート 全期間閲覧</li>
-        <li>BASICの全機能を含む</li>
+        <li>本気で億トレを目指す方へ</li>
       </ul>
-      <div class="plan-yearly">年払いなら <strong>¥14,400</strong>（20%OFF）</div>
     </div>
 
   </div>
@@ -445,37 +429,66 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
         </tr>
       </thead>
       <tbody>
-        <tr class="grp"><td colspan="4">基本機能</td></tr>
+        <tr class="grp"><td colspan="4">基本機能（無料でずっと使えます）</td></tr>
         <tr><td>会員登録・ログイン</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
-        <tr><td>トレード記録</td><td>月10件</td><td class="yes">無制限</td><td class="yes col-pro">無制限</td></tr>
-        <tr><td>学びノート</td><td>5件</td><td class="yes">無制限</td><td class="yes col-pro">無制限</td></tr>
-        <tr><td>ダッシュボード閲覧</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
-        <tr><td>通貨ペア別ランキング</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>トレード記録・取引履歴</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>学びノート</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>マイページ（損益・勝率）</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>コミュニティ収支報告・配信</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
+        <tr><td>プレゼント受け取り</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
 
-        <tr class="grp"><td colspan="4">AI機能</td></tr>
-        <tr><td>美桜Mio AIチャット</td><td>月10回</td><td>月50回</td><td class="yes col-pro">無制限</td></tr>
-        <tr><td>チャート画像分析</td><td class="no">—</td><td>月5回</td><td class="yes col-pro">無制限</td></tr>
-        <tr><td>AI個別最適化</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
-        <tr><td>AI過去会話保存</td><td>直近5件</td><td>直近50件</td><td class="yes col-pro">無制限</td></tr>
+        <tr class="grp"><td colspan="4">学習・情報</td></tr>
+        <tr><td>FX手帖（基礎テキスト）</td><td>第1〜3章</td><td class="yes">全章＋動画</td><td class="yes col-pro">全章＋動画</td></tr>
+        <tr><td>マーケットニュース</td><td>見出しのみ</td><td class="yes">本文＋mio解説</td><td class="yes col-pro">本文＋mio解説</td></tr>
+        <tr><td>経済指標カレンダー</td><td>カレンダー</td><td class="yes">＋ひなた見解</td><td class="yes col-pro">＋ひなた見解</td></tr>
 
-        <tr class="grp"><td colspan="4">分析機能</td></tr>
-        <tr><td>月次レポート</td><td>当月のみ</td><td>過去3ヶ月</td><td class="yes col-pro">無制限</td></tr>
-        <tr><td>取引種類別パフォーマンス</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
-        <tr><td>時間帯別ヒートマップ</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
-        <tr><td>通貨ペア別詳細分析</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
-        <tr><td>AIインサイト（改善提案）</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
-        <tr><td>最大DD・PF表示</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
-
-        <tr class="grp"><td colspan="4">設定・カスタマイズ</td></tr>
-        <tr><td>目標金額設定</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes col-pro">✓</td></tr>
-        <tr><td>通貨ペア複数登録</td><td>1個</td><td>5個</td><td class="yes col-pro">無制限</td></tr>
-
-        <tr class="grp"><td colspan="4">年払い特典</td></tr>
-        <tr><td>年払い割引</td><td class="no">—</td><td>¥4,800<br>(20%OFF)</td><td class="col-pro">¥14,400<br>(20%OFF)</td></tr>
+        <tr class="grp"><td colspan="4">AI・分析</td></tr>
+        <tr><td>美桜Mio AIチャット</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">たっぷり</td></tr>
+        <tr><td>チャート画像分析</td><td class="no">—</td><td class="yes">✓</td><td class="yes col-pro">たっぷり</td></tr>
+        <tr><td>月次レポート（分析機能）</td><td class="no">—</td><td class="yes">過去分</td><td class="yes col-pro">全期間</td></tr>
       </tbody>
     </table>
   </div>
   <p class="plan-note">表は左右にスクロールできます。プランはいつでも変更・解約できます 🌸</p>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<section class="section">
+  <div class="section-tag">— Coming Soon —</div>
+  <h2 class="section-title">これから増えていく<br>アップデート 🌸</h2>
+  <p class="section-lead">mio億トレアプリは、これからも進化し続けます。<br>近日追加を予定している機能をご紹介します。</p>
+  <div class="update-grid">
+
+    <div class="update-card">
+      <div class="update-head">
+        <span class="update-icon">🎓</span>
+        <span class="update-plan plan-pro">PRO限定</span>
+      </div>
+      <h3 class="update-title">仮想講義「億トレアカデミー」</h3>
+      <p class="update-desc">FX基礎・チャートの読み方・テクニカル分析・インジケーター活用・チャートクイズまで、11のテーマ別ルームを用意。みおと対話しながら、基礎から実践まで自分のペースで体系的に学べます。理解度を試せるクイズで、知識を「使える力」に変えていく学習空間です。プロプラン向けに準備中です。</p>
+    </div>
+
+    <div class="update-card">
+      <div class="update-head">
+        <span class="update-icon">🎬</span>
+        <span class="update-plan">順次追加</span>
+      </div>
+      <h3 class="update-title">動画・アニメによる解説コンテンツ</h3>
+      <p class="update-desc">講師陣による動画やアニメーションでの解説を、FX手帖などに順次追加予定。文字だけでは伝わりにくいチャートの動きや考え方を、より直感的に学べるようにしていきます。</p>
+    </div>
+
+    <div class="update-card">
+      <div class="update-head">
+        <span class="update-icon">⚙️</span>
+        <span class="update-plan">全プラン</span>
+      </div>
+      <h3 class="update-title">アプリ内でのプラン管理・退会</h3>
+      <p class="update-desc">プランの変更や退会の手続きを、アプリの中だけで完結できるように準備中です。よりスムーズに、安心してご利用いただけるようにしていきます。</p>
+    </div>
+
+  </div>
+  <p class="plan-note">※ 内容・提供時期は変更になる場合があります 🌸</p>
 </section>
 
 <div class="divider"><div class="divider-line"></div></div>
@@ -496,14 +509,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink)
       <div class="step-num">2</div>
       <div class="step-content">
         <div class="step-title">設定を整える</div>
-        <div class="step-desc">「設定」ページで表示名、使用中のツール、目標金額を入力。AIがあなたを認識して、パーソナルな回答をしてくれるようになります。</div>
+        <div class="step-desc">「設定」ページで表示名、使用中のツール、目標金額を入力。あとで使う美桜Mio AIが、あなたに合わせた回答をしてくれるようになります。</div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-content">
-        <div class="step-title">AIに話しかけてみる</div>
-        <div class="step-desc">「こんにちは」と送ってみてください。あなたの名前で呼びかけてくれます。あとは毎日のトレードを記録する習慣をつけるだけ。</div>
+        <div class="step-title">トレードを記録してみる</div>
+        <div class="step-desc">「収支記録」から、今日のトレード結果を入力。通貨ペア・損益・メモを残すだけ。続けるほど、あなただけのデータが育っていきます。AIチャットや月次レポートを使いたくなったら、ベーシックプランへ 🌸</div>
       </div>
     </div>
   </div>
