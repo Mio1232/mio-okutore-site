@@ -567,28 +567,16 @@ body{
     </div>
     <div class="setting-card">
       <div class="checkbox-list">
-        <div class="checkbox-row" onclick="toggleCheckbox('tool_miyabi_3m')">
-          <input type="checkbox" id="tool_miyabi_3m">
-          <label for="tool_miyabi_3m">
-            🤖 みやびロジックEA(3ヶ月版)
-          </label>
-        </div>
         <div class="checkbox-row" onclick="toggleCheckbox('tool_miyabi_perm')">
           <input type="checkbox" id="tool_miyabi_perm">
           <label for="tool_miyabi_perm">
-            🤖 みやびロジックEA(永久版)
+            🤖 みやびロジックEA
           </label>
         </div>
         <div class="checkbox-row" onclick="toggleCheckbox('tool_solid_edge')">
           <input type="checkbox" id="tool_solid_edge">
           <label for="tool_solid_edge">
             📊 Solid Edgeインジケーター
-          </label>
-        </div>
-        <div class="checkbox-row" onclick="toggleCheckbox('tool_all_system')">
-          <input type="checkbox" id="tool_all_system">
-          <label for="tool_all_system">
-            💎 全システム永久版
           </label>
         </div>
       </div>
@@ -788,7 +776,7 @@ document.getElementById('lineName').value = profile?.line_name || '';
 
 // 使用ツール初期化
 const toolsUsed = profile?.tools_used || [];
-['miyabi_3m', 'miyabi_perm', 'solid_edge', 'all_system'].forEach(t => {
+['miyabi_perm', 'solid_edge'].forEach(t => {
   document.getElementById('tool_' + t).checked = toolsUsed.includes(t);
 });
 
@@ -858,7 +846,7 @@ window.toggleSwitch = function(id) {
 
 function checkChanges() {
   const tools = [];
-  ['miyabi_3m', 'miyabi_perm', 'solid_edge', 'all_system'].forEach(t => {
+  ['miyabi_perm', 'solid_edge'].forEach(t => {
     if (document.getElementById('tool_' + t).checked) tools.push(t);
   });
   
