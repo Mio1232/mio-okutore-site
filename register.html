@@ -293,6 +293,14 @@ form.addEventListener('submit', async (e) => {
       return;
     }
 
+    // 確認メールOFF：登録と同時にセッションが返るので、そのまま初期設定へ
+    if (data.session) {
+      showMessage('ご登録ありがとうございます🌸<br>初期設定に進みます...', 'success');
+      window.location.href = 'onboarding.html';
+      return;
+    }
+
+    // 確認メールON（将来オンに戻したとき用のフォールバック）
     showMessage('ご登録ありがとうございます🌸<br>確認メールをお送りしました。メール内のリンクをクリックしてご登録を完了してください', 'success');
     form.reset();
     submitBtn.textContent = '送信完了';
