@@ -391,6 +391,13 @@ async function init() {
   const totalTrades = allTrades.length;
   const totalThisMonthPL = Object.values(userMap).reduce((sum, u) => sum + u.thisMonthPL, 0);
 
+  // プラン別集計（null・不明は無料として数える）
+  const planCounts = { free: 0, basic: 0, pro: 0 };
+  allProfiles.forEach(p => {
+    const plan = p.plan === 'basic' ? 'basic' : p.plan === 'pro' ? 'pro' : 'free';
+    planCounts[plan]++;
+  });
+
   // 要注意リスト
   const noRecord3Days = Object.values(userMap).filter(u => 
     !u.lastTradeDate || u.lastTradeDate < threeDaysAgo
@@ -441,6 +448,33 @@ async function init() {
           <div class="label">総取引数</div>
           <div class="value">${totalTrades}</div>
           <div class="sub">回</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // プラン別ユーザー数
+  html += `
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">💳</span>
+        <span class="section-title">プラン別ユーザー数</span>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="label">無料</div>
+          <div class="value">${planCounts.free}</div>
+          <div class="sub">名</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">ベーシック</div>
+          <div class="value">${planCounts.basic}</div>
+          <div class="sub">名</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">プロ</div>
+          <div class="value">${planCounts.pro}</div>
+          <div class="sub">名</div>
         </div>
       </div>
     </div>
