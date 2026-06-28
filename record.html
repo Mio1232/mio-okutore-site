@@ -615,6 +615,80 @@ body{
           <button type="submit" class="submit-btn" id="submitBtn">記録する</button>
         </form>
       </div>
+
+      <!-- CSV一括取り込み (MT4 / MT5) -->
+      <style>
+      #importCard .import-head{ font-weight:700; color:var(--ink,#3A2E2A); margin-bottom:8px; }
+      #importCard .import-desc{ font-size:13px; color:var(--ink,#3A2E2A); opacity:.85; line-height:1.6; margin-bottom:10px; }
+      #importCard .import-steps{ background:rgba(0,0,0,.03); border-radius:10px; padding:10px 12px; margin-bottom:12px; font-size:12.5px; color:var(--ink,#3A2E2A); }
+      #importCard .import-steps summary{ cursor:pointer; font-weight:600; }
+      #importCard .import-steps ol{ margin:8px 0 0; padding-left:1.2em; line-height:1.7; }
+      #importCard .import-warn{ color:var(--rose-deep,#B06B75); margin-top:8px; font-size:12px; }
+      #importCard .import-controls{ display:flex; gap:10px; }
+      #importCard .import-field{ flex:1; }
+      #importCard .import-hint{ font-size:11.5px; opacity:.7; margin:6px 0 12px; color:var(--ink,#3A2E2A); }
+      #importCard .import-file{ width:100%; margin-bottom:12px; font-size:13px; }
+      #importCard .import-summary{ font-weight:700; margin:6px 0 8px; color:var(--ink,#3A2E2A); }
+      #importCard .import-table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+      #importCard .import-table{ width:100%; border-collapse:collapse; font-size:12px; }
+      #importCard .import-table th, #importCard .import-table td{ padding:6px 8px; border-bottom:1px solid rgba(0,0,0,.08); text-align:left; white-space:nowrap; }
+      #importCard .import-table th{ color:var(--ink,#3A2E2A); opacity:.7; font-weight:600; }
+      #importCard .pl-plus{ color:#2D7A4F; font-weight:600; }
+      #importCard .pl-minus{ color:#B0414B; font-weight:600; }
+      #importCard .import-raw{ opacity:.55; font-size:11px; margin-left:4px; }
+      #importCard .import-note, #importCard .import-empty{ font-size:12px; opacity:.7; margin:8px 0; color:var(--ink,#3A2E2A); }
+      #importCard .import-upload-btn{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; width:100%; padding:20px 12px; border:2px dashed var(--rose,#C98B95); border-radius:14px; background:rgba(201,139,149,0.07); color:var(--rose-deep,#B06B75); cursor:pointer; text-align:center; transition:background .15s,border-color .15s; margin-bottom:8px; box-sizing:border-box; }
+      #importCard .import-upload-btn:active{ background:rgba(201,139,149,0.16); border-color:var(--rose-deep,#B06B75); }
+      #importCard .import-upload-icon{ font-size:28px; line-height:1; }
+      #importCard .import-upload-text{ font-weight:700; font-size:15px; }
+      #importCard .import-upload-sub{ font-size:11.5px; opacity:.75; }
+      #importCard .import-filename{ font-size:12.5px; color:var(--ink,#3A2E2A); margin-bottom:12px; text-align:center; word-break:break-all; }
+      #importCard .import-filename.has-file{ color:#2D7A4F; font-weight:600; }
+      </style>
+      <div class="form-card" id="importCard">
+        <div class="import-head">📥 CSVから一括取り込み（MT4 / MT5）</div>
+        <div class="import-desc">
+          MT4・MT5の<b>取引履歴レポート</b>を<b>CSVで保存</b>してアップロードすると、まとめて記録できます。
+        </div>
+        <details class="import-steps">
+          <summary>CSVの作り方（タップで開く）</summary>
+          <ol>
+            <li><b>MT5</b>：「取引」履歴を右クリック →「レポート」で保存。<br><b>MT4</b>：「口座履歴」を右クリック →「詳細レポートの保存」。</li>
+            <li>保存したファイルを <b>Excel（またはGoogleスプレッドシート）で開く</b>。</li>
+            <li><b>「名前を付けて保存」→「CSV（コンマ区切り）」</b>を選んで保存。</li>
+            <li>下の「ファイルを選択」からそのCSVをアップロード。</li>
+          </ol>
+          <div class="import-warn">※対応はこの方法のCSVのみです。同じファイルを2回アップロードすると重複登録されるのでご注意ください。</div>
+        </details>
+
+        <div class="import-controls">
+          <div class="import-field">
+            <label class="label">取引種別</label>
+            <select id="importTradeType" class="select">
+              <option value="discretionary">🧠 裁量</option>
+              <option value="miyabi_ea">🤖 みやびEA</option>
+            </select>
+          </div>
+          <div class="import-field">
+            <label class="label">通貨</label>
+            <select id="importCurrency" class="select">
+              <option value="USD">USD（EBC・裁量）</option>
+              <option value="JPY">JPY（XM・みやびEA）</option>
+            </select>
+          </div>
+        </div>
+        <div class="import-hint">裁量＝EBC（USD）／みやびEA＝XM（JPY）。アップロードするレポートに合わせて選んでください。</div>
+
+        <input type="file" id="importFile" accept=".csv,text/csv" style="display:none;">
+        <label for="importFile" class="import-upload-btn">
+          <span class="import-upload-icon">📎</span>
+          <span class="import-upload-text">CSVファイルを選ぶ</span>
+          <span class="import-upload-sub">タップしてCSVを選択してください</span>
+        </label>
+        <div class="import-filename" id="importFilename"></div>
+        <div id="importPreview"></div>
+        <button type="button" class="submit-btn" id="importSubmitBtn" style="display:none;">この内容で登録する</button>
+      </div>
     </div>
   </div>
 
@@ -1006,8 +1080,233 @@ async function deleteTrade(id) {
   document.getElementById('modalOverlay').classList.remove('show');
   loadHistory();
 }
+// ====== CSV一括取り込み (MT4 / MT5 レポート) ======
+(function(){
+  const fileInput = document.getElementById('importFile');
+  const previewBox = document.getElementById('importPreview');
+  const importBtn  = document.getElementById('importSubmitBtn');
+  const typeSel    = document.getElementById('importTradeType');
+  const curSel     = document.getElementById('importCurrency');
+  if (!fileInput) return;
+
+  let parsedRows = [];
+  let lastSkipped = 0;
+
+  const SYMBOL_MAP = {
+    USDJPY:'USD/JPY', EURJPY:'EUR/JPY', GBPJPY:'GBP/JPY', AUDJPY:'AUD/JPY',
+    EURUSD:'EUR/USD', GBPUSD:'GBP/USD', XAUUSD:'XAU/USD', BTCUSD:'BTC/USD', ETHUSD:'ETH/USD'
+  };
+
+  function mapSymbol(raw){
+    if(!raw) return 'その他';
+    let s = raw.toUpperCase().replace(/[^A-Z]/g,'');
+    if(s.length > 6) s = s.slice(0,6);
+    return SYMBOL_MAP[s] || 'その他';
+  }
+  function toNum(v){
+    if(v==null) return 0;
+    const n = parseFloat(String(v).replace(/[\s,]/g,'').replace(/[^0-9.\-]/g,''));
+    return isNaN(n) ? 0 : n;
+  }
+  function normHeader(h){ return String(h).trim().toLowerCase().replace(/\s+/g,''); }
+
+  function parseCsvLine(line, delim){
+    const out=[]; let cur=''; let q=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(q){
+        if(c==='"'){ if(line[i+1]==='"'){cur+='"';i++;} else q=false; }
+        else cur+=c;
+      } else {
+        if(c==='"') q=true;
+        else if(c===delim){ out.push(cur); cur=''; }
+        else cur+=c;
+      }
+    }
+    out.push(cur);
+    return out.map(s=>s.trim());
+  }
+
+  function parseDateTime(s){
+    if(!s) return null;
+    const m = String(s).match(/(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+    if(!m) return null;
+    const pad=(x)=>String(x).padStart(2,'0');
+    const date = `${m[1]}-${pad(m[2])}-${pad(m[3])}`;
+    const time = m[4]!=null ? `${pad(m[4])}:${pad(m[5])}:${pad(m[6]||'00')}` : null;
+    return { date, time, dt: new Date(`${date}T${time||'00:00:00'}`) };
+  }
+
+  function indicesOf(headers, names){
+    const res=[];
+    headers.forEach((h,i)=>{ if(names.includes(normHeader(h))) res.push(i); });
+    return res;
+  }
+  function findHeaderRow(rows){
+    for(let i=0;i<rows.length;i++){
+      const hs = rows[i].map(normHeader);
+      const hasSym = hs.some(h=>['銘柄','symbol','item','シンボル','アイテム'].includes(h));
+      const hasProfit = hs.some(h=>['損益','profit','利益','純益'].includes(h));
+      const hasType = hs.some(h=>['タイプ','type','売買','取引種別'].includes(h));
+      if(hasSym && hasProfit && hasType) return i;
+    }
+    return -1;
+  }
+  function buildMap(headers){
+    const first=(arr)=>arr.length?arr[0]:undefined;
+    const sym  = first(indicesOf(headers,['銘柄','symbol','item','シンボル','アイテム']));
+    const type = first(indicesOf(headers,['タイプ','type','売買','取引種別']));
+    const vol  = first(indicesOf(headers,['数量','size','volume','lots','ロット','出来高']));
+    const profit = first(indicesOf(headers,['損益','profit','利益','純益']));
+    const comm = first(indicesOf(headers,['手数料','commission']));
+    const swap = first(indicesOf(headers,['スワップ','swap']));
+    const tax  = first(indicesOf(headers,['税金','taxes','tax']));
+    let openT  = first(indicesOf(headers,['opentime','約定時間(始)','開始時間','エントリー時間']));
+    let closeT = first(indicesOf(headers,['closetime','決済時間','終了時間']));
+    const times = indicesOf(headers,['時間','time']);
+    if(openT==null) openT = times[0];
+    if(closeT==null) closeT = times.length>1 ? times[times.length-1] : undefined;
+    const prices = indicesOf(headers,['価格','price']);
+    const openP  = prices[0];
+    const closeP = prices.length>1 ? prices[prices.length-1] : undefined;
+    return { sym,type,vol,profit,comm,swap,tax,openT,closeT,openP,closeP };
+  }
+
+  function processText(text){
+    const lines = text.split(/\r?\n/).filter(l=>l.trim()!=='');
+    if(lines.length===0){ showMessage('空のファイルです','error'); return; }
+    const sample = lines.find(l=>l.includes(',')||l.includes('\t')) || lines[0];
+    const delim = (sample.split('\t').length > sample.split(',').length) ? '\t' : ',';
+    const rows = lines.map(l=>parseCsvLine(l, delim));
+
+    const hi = findHeaderRow(rows);
+    if(hi<0){ showMessage('取引履歴の表が見つかりませんでした。MT4/MT5レポートをCSV保存したファイルかご確認ください','error'); return; }
+    const headers = rows[hi];
+    const map = buildMap(headers);
+    if(map.sym==null || map.profit==null){ showMessage('必要な列(銘柄・損益)が見つかりませんでした','error'); return; }
+
+    const result=[]; let skipped=0;
+    for(let i=hi+1;i<rows.length;i++){
+      const r = rows[i];
+      // 次セクション(注文/約定/サマリ等)や再ヘッダー行で終了
+      const headerAgain = r.map(normHeader).some(h=>['銘柄','symbol','item'].includes(h));
+      const joined = r.join(' ').toLowerCase();
+      if(headerAgain || /(注文|約定|サマリー|summary|working|opentrades|open trades|deals|orders|残高|balance)/.test(joined)) break;
+
+      if(r.length < headers.length - 3){ skipped++; continue; }
+      const symRaw = (map.sym!=null ? r[map.sym] : '') || '';
+      const open = parseDateTime(map.openT!=null ? r[map.openT] : '');
+      if(!open || !symRaw){ skipped++; continue; }
+      const typeRaw = (map.type!=null ? r[map.type] : '').toLowerCase();
+      let dir=null;
+      if(typeRaw.includes('buy')||typeRaw.includes('買')) dir='buy';
+      else if(typeRaw.includes('sell')||typeRaw.includes('売')) dir='sell';
+      else { skipped++; continue; }
+      const close = map.closeT!=null ? parseDateTime(r[map.closeT]) : null;
+      const profit = toNum(map.profit!=null?r[map.profit]:0)
+                   + toNum(map.swap!=null?r[map.swap]:0)
+                   + toNum(map.comm!=null?r[map.comm]:0)
+                   + toNum(map.tax!=null?r[map.tax]:0);
+      let duration=null;
+      if(open.dt && close && close.dt) duration = Math.max(0, Math.round((close.dt - open.dt)/60000));
+      result.push({
+        trade_date: open.date,
+        trade_time: open.time,
+        pair: mapSymbol(symRaw),
+        direction: dir,
+        lot_size: map.vol!=null ? (toNum(r[map.vol])||null) : null,
+        entry_price: map.openP!=null ? (toNum(r[map.openP])||null) : null,
+        exit_price: map.closeP!=null ? (toNum(r[map.closeP])||null) : null,
+        profit_loss: Math.round(profit*100)/100,
+        duration_minutes: duration,
+        _symRaw: symRaw
+      });
+    }
+    parsedRows = result; lastSkipped = skipped;
+    renderPreview();
+  }
+
+  function renderPreview(){
+    const rows = parsedRows;
+    if(rows.length===0){
+      previewBox.innerHTML = `<div class="import-empty">取り込める取引が見つかりませんでした（スキップ:${lastSkipped}件）</div>`;
+      importBtn.style.display='none';
+      return;
+    }
+    const cur = curSel.value;
+    const mark = cur==='JPY' ? '¥' : '$';
+    const sign = (n)=> (n>=0?'+':'') + n.toLocaleString('ja-JP');
+    let html = `<div class="import-summary">${rows.length}件を取り込みます${lastSkipped>0?`（スキップ:${lastSkipped}件）`:''}</div>`;
+    html += '<div class="import-table-wrap"><table class="import-table"><thead><tr><th>日付</th><th>ペア</th><th>方向</th><th>ロット</th><th>損益</th></tr></thead><tbody>';
+    rows.slice(0,50).forEach(r=>{
+      const raw = r.pair==='その他' ? `<span class="import-raw">(${r._symRaw})</span>` : '';
+      html += `<tr><td>${r.trade_date}</td><td>${r.pair}${raw}</td><td>${r.direction==='buy'?'買':'売'}</td><td>${r.lot_size??''}</td><td class="${r.profit_loss>=0?'pl-plus':'pl-minus'}">${mark}${sign(r.profit_loss)}</td></tr>`;
+    });
+    html += '</tbody></table></div>';
+    if(rows.length>50) html += `<div class="import-note">プレビューは先頭50件のみ表示（登録は全${rows.length}件）</div>`;
+    previewBox.innerHTML = html;
+    importBtn.style.display='block';
+  }
+
+  async function doImport(){
+    if(parsedRows.length===0) return;
+    importBtn.disabled=true; importBtn.textContent='登録中...';
+    const cur = curSel.value;
+    const tt  = typeSel.value;
+    const payload = parsedRows.map(r=>({
+      user_id: user.id,
+      trade_date: r.trade_date,
+      trade_time: r.trade_time,
+      currency: cur,
+      pair: r.pair,
+      direction: r.direction,
+      trade_type: tt,
+      lot_size: r.lot_size,
+      entry_price: r.entry_price,
+      exit_price: r.exit_price,
+      profit_loss: r.profit_loss,
+      duration_minutes: r.duration_minutes,
+      memo: null
+    }));
+    const { error } = await supabase.from('trades').insert(payload);
+    if(error){
+      console.error(error);
+      showMessage('一括登録に失敗しました','error');
+      importBtn.disabled=false; importBtn.textContent='この内容で登録する';
+      return;
+    }
+    showMessage(`${payload.length}件を登録しました 🌸`,'success');
+    parsedRows=[]; lastSkipped=0; previewBox.innerHTML=''; importBtn.style.display='none';
+    importBtn.disabled=false; importBtn.textContent='この内容で登録する';
+    fileInput.value='';
+    const fn = document.getElementById('importFilename');
+    if(fn){ fn.textContent=''; fn.classList.remove('has-file'); }
+    loadHistory();
+  }
+
+  function handleFile(file){
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      try { processText(e.target.result); }
+      catch(err){ console.error(err); showMessage('CSVの解析に失敗しました。ファイル形式をご確認ください','error'); }
+    };
+    reader.readAsText(file);
+  }
+
+  fileInput.addEventListener('change', (e)=>{
+    const f = e.target.files[0];
+    const fn = document.getElementById('importFilename');
+    if(f){
+      if(fn){ fn.textContent = '選択中: ' + f.name; fn.classList.add('has-file'); }
+      handleFile(f);
+    } else if(fn){
+      fn.textContent = ''; fn.classList.remove('has-file');
+    }
+  });
+  curSel.addEventListener('change', ()=>{ if(parsedRows.length) renderPreview(); });
+  importBtn.addEventListener('click', doImport);
+})();
 </script>
 
 </body>
-  <script type="module" src="/ea-popup.js"></script>
 </html>
