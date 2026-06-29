@@ -1124,12 +1124,8 @@ if (!session) {
     inputField.style.height = Math.min(inputField.scrollHeight, 100) + 'px';
   });
 
-  inputField.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  });
+  // Enterは改行（送信は送信ボタンのみ）
+  // ※以前はEnterで送信していたが、改行できるように送信ボタン送信へ変更
 
   inputField.addEventListener('focus', () => { setTimeout(scrollToBottom, 300); });
   if (window.visualViewport) {
