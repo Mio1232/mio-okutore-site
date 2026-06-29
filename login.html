@@ -264,10 +264,15 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// すでにログインしている場合はダッシュボードへ
-const { data: { session } } = await supabase.auth.getSession();
-if (session) {
-  window.location.href = 'dashboard.html';
+// パスワード再設定リンクから来た場合は、新パスワード設定ページへ転送（自動ログインさせない）
+if (window.location.hash && window.location.hash.includes('type=recovery')) {
+  window.location.replace('update-password.html' + window.location.hash);
+} else {
+  // すでにログインしている場合はダッシュボードへ
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    window.location.href = 'dashboard.html';
+  }
 }
 
 const form = document.getElementById('loginForm');

@@ -206,7 +206,7 @@ form.addEventListener('submit', async (e) => {
 
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/login.html'
+      redirectTo: window.location.origin + '/update-password.html'
     });
 
     if (error) {
