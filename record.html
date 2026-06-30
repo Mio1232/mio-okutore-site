@@ -1099,9 +1099,14 @@ async function deleteTrade(id) {
 
   function mapSymbol(raw){
     if(!raw) return 'その他';
-    let s = raw.toUpperCase().replace(/[^A-Z]/g,'');
-    if(s.length > 6) s = s.slice(0,6);
-    return SYMBOL_MAP[s] || 'その他';
+    const u = raw.toUpperCase();
+    if(u.includes('XAU') || u.includes('GOLD')) return 'XAU/USD';
+    if(u.includes('BTC')) return 'BTC/USD';
+    if(u.includes('ETH')) return 'ETH/USD';
+    const letters = u.replace(/[^A-Z]/g,'');
+    for(const k of Object.keys(SYMBOL_MAP)){ if(letters.startsWith(k)) return SYMBOL_MAP[k]; }
+    const head = letters.slice(0,6);
+    return SYMBOL_MAP[head] || 'その他';
   }
   function toNum(v){
     if(v==null) return 0;
@@ -1173,6 +1178,7 @@ async function deleteTrade(id) {
   }
 
   function processText(text){
+    text = text.replace(/^\uFEFF/, '');
     const lines = text.split(/\r?\n/).filter(l=>l.trim()!=='');
     if(lines.length===0){ showMessage('空のファイルです','error'); return; }
     const sample = lines.find(l=>l.includes(',')||l.includes('\t')) || lines[0];
@@ -1188,10 +1194,10 @@ async function deleteTrade(id) {
     const result=[]; let skipped=0;
     for(let i=hi+1;i<rows.length;i++){
       const r = rows[i];
-      // 次セクション(注文/約定/サマリ等)や再ヘッダー行で終了
-      const headerAgain = r.map(normHeader).some(h=>['銘柄','symbol','item'].includes(h));
-      const joined = r.join(' ').toLowerCase();
-      if(headerAgain || /(注文|約定|サマリー|summary|working|opentrades|open trades|deals|orders|残高|balance)/.test(joined)) break;
+      // 次セクション(Open Trades / 注文一覧 等)の見出し行で終了。
+      // ※credit/balance等の入出金行は途中に混ざるが、ここでは止めずにスキップする
+      const headerAgain = r.map(normHeader).some(h=>['銘柄','symbol','item','シンボル','アイテム'].includes(h));
+      if(headerAgain) break;
 
       if(r.length < headers.length - 3){ skipped++; continue; }
       const symRaw = (map.sym!=null ? r[map.sym] : '') || '';
@@ -1268,14 +1274,22 @@ async function deleteTrade(id) {
       duration_minutes: r.duration_minutes,
       memo: null
     }));
-    const { error } = await supabase.from('trades').insert(payload);
-    if(error){
-      console.error(error);
-      showMessage('一括登録に失敗しました','error');
-      importBtn.disabled=false; importBtn.textContent='この内容で登録する';
-      return;
+    const CHUNK = 500;
+    let done = 0;
+    for(let i=0; i<payload.length; i+=CHUNK){
+      const slice = payload.slice(i, i+CHUNK);
+      const { error } = await supabase.from('trades').insert(slice);
+      if(error){
+        console.error(error);
+        showMessage(`登録中にエラーが発生しました（${done}件まで登録済み）`,'error');
+        importBtn.disabled=false; importBtn.textContent='この内容で登録する';
+        if(done>0) loadHistory();
+        return;
+      }
+      done += slice.length;
+      importBtn.textContent = `登録中... ${done}/${payload.length}`;
     }
-    showMessage(`${payload.length}件を登録しました 🌸`,'success');
+    showMessage(`${done}件を登録しました 🌸`,'success');
     parsedRows=[]; lastSkipped=0; previewBox.innerHTML=''; importBtn.style.display='none';
     importBtn.disabled=false; importBtn.textContent='この内容で登録する';
     fileInput.value='';
