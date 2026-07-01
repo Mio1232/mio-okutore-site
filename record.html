@@ -696,9 +696,22 @@ body{
   <div class="tab-content" id="tab-history">
     <div class="section">
 
+      <style>
+      #monthNav{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:14px;}
+      #monthNav .mn-btn{width:38px;height:38px;border:1px solid var(--line-strong,rgba(58,46,42,.16));background:var(--bg-card,#FFFEFB);border-radius:10px;font-size:20px;line-height:1;color:var(--ink,#3A2E2A);cursor:pointer;}
+      #monthNav .mn-btn:active{background:rgba(0,0,0,.05);}
+      #monthNav .mn-btn:disabled{opacity:.35;cursor:not-allowed;}
+      #monthNav .mn-label{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:500;min-width:120px;text-align:center;}
+      </style>
+      <div id="monthNav">
+        <button class="mn-btn" id="prevMonth" onclick="changeMonth(-1)" aria-label="前の月">‹</button>
+        <div class="mn-label" id="monthLabel">今月</div>
+        <button class="mn-btn" id="nextMonth" onclick="changeMonth(1)" aria-label="次の月">›</button>
+      </div>
+
       <div class="month-stats" id="monthStats">
         <div>
-          <div class="month-stat-label">今月の収支</div>
+          <div class="month-stat-label" id="plLabel">今月の収支</div>
           <div class="month-stat-value" id="historyPL">¥0</div>
         </div>
         <div>
@@ -907,9 +920,39 @@ document.getElementById('tradeForm').addEventListener('submit', async (e) => {
 });
 
 // 履歴読み込み
-async function loadHistory() {
+// 表示中の月（既定＝今月）。過去に取り込んだ月も見られるようにする
+let viewMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+function fmtMonthLabel(d){
   const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+  const isThis = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  return `${d.getFullYear()}年${d.getMonth() + 1}月` + (isThis ? '（今月）' : '');
+}
+
+window.changeMonth = function(delta){
+  viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + delta, 1);
+  // 未来の月へは進めない
+  const now = new Date();
+  const cur = new Date(now.getFullYear(), now.getMonth(), 1);
+  if (viewMonth > cur) viewMonth = cur;
+  const nextBtn = document.getElementById('nextMonth');
+  if (nextBtn) nextBtn.disabled = (viewMonth.getFullYear() === cur.getFullYear() && viewMonth.getMonth() === cur.getMonth());
+  loadHistory();
+};
+
+async function loadHistory() {
+  const start = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 1).toISOString().split('T')[0];
+  const end = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1).toISOString().split('T')[0];
+
+  // ラベル更新
+  const label = document.getElementById('monthLabel');
+  if (label) label.textContent = fmtMonthLabel(viewMonth);
+  const plLabel = document.getElementById('plLabel');
+  if (plLabel) plLabel.textContent = `${viewMonth.getMonth() + 1}月の収支`;
+  const now = new Date();
+  const cur = new Date(now.getFullYear(), now.getMonth(), 1);
+  const nextBtn = document.getElementById('nextMonth');
+  if (nextBtn) nextBtn.disabled = (viewMonth.getFullYear() === cur.getFullYear() && viewMonth.getMonth() === cur.getMonth());
 
   // Supabaseは1回の読み取りで最大1000件までのため、1000件ずつ全件を取得する
   let all = [];
@@ -919,7 +962,8 @@ async function loadHistory() {
       .from('trades')
       .select('*')
       .eq('user_id', user.id)
-      .gte('trade_date', startOfMonth)
+      .gte('trade_date', start)
+      .lt('trade_date', end)
       .order('trade_date', { ascending: false })
       .order('created_at', { ascending: false })
       .range(from, from + size - 1);
