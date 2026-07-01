@@ -911,20 +911,28 @@ async function loadHistory() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
 
-  const { data, error } = await supabase
-    .from('trades')
-    .select('*')
-    .eq('user_id', user.id)
-    .gte('trade_date', startOfMonth)
-    .order('trade_date', { ascending: false })
-    .order('created_at', { ascending: false });
+  // Supabaseは1回の読み取りで最大1000件までのため、1000件ずつ全件を取得する
+  let all = [];
+  const size = 1000;
+  for (let from = 0; ; from += size) {
+    const { data, error } = await supabase
+      .from('trades')
+      .select('*')
+      .eq('user_id', user.id)
+      .gte('trade_date', startOfMonth)
+      .order('trade_date', { ascending: false })
+      .order('created_at', { ascending: false })
+      .range(from, from + size - 1);
 
-  if (error) {
-    console.error(error);
-    return;
+    if (error) {
+      console.error(error);
+      break;
+    }
+    all = all.concat(data || []);
+    if (!data || data.length < size) break;
   }
 
-  allTrades = data || [];
+  allTrades = all;
   renderHistory();
   updateMonthStats();
 }
