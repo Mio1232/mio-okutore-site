@@ -970,14 +970,38 @@ if (!session) {
 
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const dataUrl = ev.target.result;
-      const base64 = dataUrl.split(',')[1];
-      pendingImage = { base64, type: file.type, name: file.name };
+      const img = new Image();
+      img.onload = () => {
+        // Claude Visionの推奨上限に合わせて長辺1568pxへ縮小
+        const MAX = 1568;
+        let width = img.naturalWidth || img.width;
+        let height = img.naturalHeight || img.height;
+        if (width > MAX || height > MAX) {
+          if (width >= height) { height = Math.round(height * MAX / width); width = MAX; }
+          else { width = Math.round(width * MAX / height); height = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        // 透過画像（PNG等）対策で白背景を敷いてからJPEG化
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        // JPEG品質0.85で再エンコード（数百KB程度に収まりNetlifyの6MB制限を回避）
+        const jpegUrl = canvas.toDataURL('image/jpeg', 0.85);
+        const base64 = jpegUrl.split(',')[1];
+        pendingImage = { base64, type: 'image/jpeg', name: file.name };
 
-      imgPreview.src = dataUrl;
-      imgPreviewName.textContent = file.name;
-      imgPreviewWrap.classList.add('active');
-      updateSendBtn();
+        imgPreview.src = jpegUrl;
+        imgPreviewName.textContent = file.name;
+        imgPreviewWrap.classList.add('active');
+        updateSendBtn();
+      };
+      img.onerror = () => {
+        showToast('画像を読み込めませんでした', true);
+        imgInput.value = '';
+      };
+      img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   });
