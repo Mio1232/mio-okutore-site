@@ -507,20 +507,24 @@ async function loadMonth() {
   const nextBtn = document.getElementById('nextMonth');
   nextBtn.disabled = (year === now.getFullYear() && month >= now.getMonth());
 
-  const { data, error } = await supabase
-    .from('trades')
-    .select('*')
-    .eq('user_id', user.id)
-    .gte('trade_date', startOfMonth)
-    .lte('trade_date', endOfMonth)
-    .order('trade_date', { ascending: true });
-
-  if (error) {
-    console.error(error);
-    return;
+  // Supabaseは1回の読み取りで最大1000件までのため、1000件ずつ全件を取得する
+  let all = [];
+  const size = 1000;
+  for (let from = 0; ; from += size) {
+    const { data, error } = await supabase
+      .from('trades')
+      .select('*')
+      .eq('user_id', user.id)
+      .gte('trade_date', startOfMonth)
+      .lte('trade_date', endOfMonth)
+      .order('trade_date', { ascending: true })
+      .range(from, from + size - 1);
+    if (error) { console.error(error); break; }
+    all = all.concat(data || []);
+    if (!data || data.length < size) break;
   }
 
-  currentTrades = data || [];
+  currentTrades = all;
   renderReport();
 }
 

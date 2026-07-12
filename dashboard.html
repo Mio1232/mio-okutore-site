@@ -803,12 +803,23 @@ document.getElementById('currentMonth').textContent = month;
 
 // 今月のトレード取得
 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-const { data: trades, error } = await supabase
-  .from('trades')
-  .select('*')
-  .eq('user_id', user.id)
-  .gte('trade_date', startOfMonth)
-  .order('trade_date', { ascending: false });
+// Supabaseは1回の読み取りで最大1000件までのため、1000件ずつ全件を取得する
+let trades = [];
+{
+  const size = 1000;
+  for (let from = 0; ; from += size) {
+    const { data, error } = await supabase
+      .from('trades')
+      .select('*')
+      .eq('user_id', user.id)
+      .gte('trade_date', startOfMonth)
+      .order('trade_date', { ascending: false })
+      .range(from, from + size - 1);
+    if (error) { console.error(error); break; }
+    trades = trades.concat(data || []);
+    if (!data || data.length < size) break;
+  }
+}
 
 if (trades && trades.length > 0) {
   // 月間サマリー計算
