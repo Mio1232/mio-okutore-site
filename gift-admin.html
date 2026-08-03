@@ -106,6 +106,29 @@ textarea{min-height:120px;resize:vertical;line-height:1.7;}
     <p class="note">指標は一度に5個くらいまでがおすすめです（多すぎると文章が途中で切れることがあります）。生成後、内容を確認・編集してから公開してください。</p>
   </div>
 
+  <!-- チャート画像から生成 -->
+  <style>
+  .chart-thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .chart-thumb{position:relative;width:96px;height:68px;border-radius:8px;overflow:hidden;border:1px solid var(--line-strong);}
+  .chart-thumb img{width:100%;height:100%;object-fit:cover;}
+  .chart-thumb button{position:absolute;top:2px;right:2px;width:20px;height:20px;border:none;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:13px;line-height:1;cursor:pointer;}
+  </style>
+  <div class="section">
+    <h2>📈 チャート画像から生成</h2>
+    <p class="note" style="margin:0 0 8px;">チャートのスクリーンショットを貼ると、画像に写っている実際の価格・サポレジ・トレンドを読み取って記事にします🌸 価格を手で入力する必要はありません。複数の時間足（日足・1時間足など）を貼るとMTF分析になります（最大3枚）。</p>
+    <input type="file" id="chartFiles" accept="image/*" multiple style="display:none;">
+    <div class="row">
+      <label for="chartFiles" class="btn btn-ghost" style="cursor:pointer;">🖼 チャート画像を選ぶ</label>
+    </div>
+    <div id="chartThumbs" class="chart-thumbs"></div>
+    <label style="display:block;margin-top:10px;">メモ（任意）：通貨ペア・時間足など</label>
+    <input type="text" id="chartContext" placeholder="例：USD/JPY 日足＋1時間足">
+    <div class="row">
+      <button class="btn btn-primary" id="generateChartBtn">🪄 チャート画像から生成</button>
+    </div>
+    <p class="note">生成後、シナリオ表に「読み取った主要レベル」が入るので、チャートと数字が合っているか見比べてから公開してください🌸</p>
+  </div>
+
   <!-- 編集・プレビュー -->
   <div class="section">
     <h2>内容の確認・編集</h2>
@@ -115,6 +138,7 @@ textarea{min-height:120px;resize:vertical;line-height:1.7;}
     <textarea id="bodyInput" placeholder="生成するとここに入ります"></textarea>
     <label>シナリオ表（HTML・任意）</label>
     <textarea id="tableInput" placeholder="&lt;table&gt;...&lt;/table&gt;"></textarea>
+    <p class="note" style="margin:8px 0 4px;">公開前チェック🌸　①価格はチャートと合っている？　②「必ず上がる／絶対に稼げる」等の保証表現はない？　③EA・商品の宣伝は入っていない？</p>
     <div class="row">
       <button class="btn btn-ghost" id="previewBtn">プレビュー更新</button>
       <button class="btn btn-ghost" id="draftBtn">下書き保存</button>
@@ -251,6 +275,62 @@ else {
     };
 
     document.getElementById('previewBtn').onclick = renderPreview;
+
+    // ===== チャート画像から生成 =====
+    let chartImages = []; // { data(base64), media_type, url(dataURL) }
+    const chartFiles = document.getElementById('chartFiles');
+    const chartThumbs = document.getElementById('chartThumbs');
+
+    function renderChartThumbs(){
+      chartThumbs.innerHTML = '';
+      chartImages.forEach((img, i)=>{
+        const d = document.createElement('div'); d.className = 'chart-thumb';
+        const im = document.createElement('img'); im.src = img.url;
+        const b = document.createElement('button'); b.type = 'button'; b.title = '削除'; b.textContent = '×';
+        b.onclick = ()=>{ chartImages.splice(i,1); renderChartThumbs(); };
+        d.appendChild(im); d.appendChild(b); chartThumbs.appendChild(d);
+      });
+    }
+
+    function compressImage(file){
+      return new Promise((resolve, reject)=>{
+        const url = URL.createObjectURL(file);
+        const im = new Image();
+        im.onload = ()=>{
+          const maxSide = 1568;
+          let w = im.width, h = im.height;
+          if (Math.max(w, h) > maxSide){
+            const s = maxSide / Math.max(w, h);
+            w = Math.round(w * s); h = Math.round(h * s);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(im, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          URL.revokeObjectURL(url);
+          resolve({ data: dataUrl.split(',')[1], media_type: 'image/jpeg', url: dataUrl });
+        };
+        im.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error('image load failed')); };
+        im.src = url;
+      });
+    }
+
+    chartFiles.onchange = async (e)=>{
+      const files = Array.from(e.target.files || []);
+      for (const f of files){
+        if (chartImages.length >= 3){ toast('画像は最大3枚までです'); break; }
+        try { chartImages.push(await compressImage(f)); } catch(err){ toast('画像の処理に失敗しました'); }
+      }
+      chartFiles.value = '';
+      renderChartThumbs();
+    };
+
+    document.getElementById('generateChartBtn').onclick = (e)=>{
+      if (!chartImages.length){ toast('チャート画像を1枚以上選んでください'); return; }
+      const images = chartImages.map(im=>({ data: im.data, media_type: im.media_type }));
+      const chart_context = document.getElementById('chartContext').value.trim();
+      runGenerate({ images, chart_context }, e.currentTarget);
+    };
 
     // ===== 保存・公開 =====
     async function savePost(status){
