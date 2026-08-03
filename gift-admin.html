@@ -115,14 +115,14 @@ textarea{min-height:120px;resize:vertical;line-height:1.7;}
   </style>
   <div class="section">
     <h2>📈 チャート画像から生成</h2>
-    <p class="note" style="margin:0 0 8px;">チャートのスクリーンショットを貼ると、画像に写っている実際の価格・サポレジ・トレンドを読み取って記事にします🌸 価格を手で入力する必要はありません。複数の時間足（日足・1時間足など）を貼るとMTF分析になります（最大3枚）。</p>
+    <p class="note" style="margin:0 0 8px;">チャートのスクリーンショットを貼ると、画像に写っている実際の価格・サポレジ・トレンドを読み取って記事にします🌸 ドル円・ゴールドのどちらにも対応（両方の画像を貼れば、それぞれ分けて書きます）。価格を手で入力する必要はありません。複数の時間足（日足・1時間足など）を貼るとMTF分析になります（最大3枚）。</p>
     <input type="file" id="chartFiles" accept="image/*" multiple style="display:none;">
     <div class="row">
       <label for="chartFiles" class="btn btn-ghost" style="cursor:pointer;">🖼 チャート画像を選ぶ</label>
     </div>
     <div id="chartThumbs" class="chart-thumbs"></div>
     <label style="display:block;margin-top:10px;">メモ（任意）：通貨ペア・時間足など</label>
-    <input type="text" id="chartContext" placeholder="例：USD/JPY 日足＋1時間足">
+    <input type="text" id="chartContext" placeholder="例：USD/JPYの日足＋1時間足／ドル円とゴールド">
     <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;cursor:pointer;">
       <input type="checkbox" id="chartUseNews" style="width:auto;">
       最新ニュースも参考にする（価格はチャート優先・材料だけニュースから／数十秒長くなります）
