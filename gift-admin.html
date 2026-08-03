@@ -123,6 +123,10 @@ textarea{min-height:120px;resize:vertical;line-height:1.7;}
     <div id="chartThumbs" class="chart-thumbs"></div>
     <label style="display:block;margin-top:10px;">メモ（任意）：通貨ペア・時間足など</label>
     <input type="text" id="chartContext" placeholder="例：USD/JPY 日足＋1時間足">
+    <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;cursor:pointer;">
+      <input type="checkbox" id="chartUseNews" style="width:auto;">
+      最新ニュースも参考にする（価格はチャート優先・材料だけニュースから／数十秒長くなります）
+    </label>
     <div class="row">
       <button class="btn btn-primary" id="generateChartBtn">🪄 チャート画像から生成</button>
     </div>
@@ -329,7 +333,8 @@ else {
       if (!chartImages.length){ toast('チャート画像を1枚以上選んでください'); return; }
       const images = chartImages.map(im=>({ data: im.data, media_type: im.media_type }));
       const chart_context = document.getElementById('chartContext').value.trim();
-      runGenerate({ images, chart_context }, e.currentTarget);
+      const use_news = document.getElementById('chartUseNews').checked;
+      runGenerate({ images, chart_context, use_news }, e.currentTarget);
     };
 
     // ===== 保存・公開 =====
