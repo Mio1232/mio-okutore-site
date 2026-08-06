@@ -437,23 +437,22 @@ exports.handler = async function(event, context) {
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({
+      body: JSON.stringify(Object.assign({
         model: 'claude-sonnet-4-5-20250929',
         max_tokens: 2000,
         system: [
           { type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } },
           { type: 'text', text: dynamicPrompt }
         ],
-        messages: messages,
-        tools: [
-          {
-            type: 'web_search_20250305',
-            name: 'web_search',
-            max_uses: 3,
-            user_location: { type: 'approximate', country: 'JP', timezone: 'Asia/Tokyo' }
-          }
-        ]
-      })
+        messages: messages
+      }, image_base64 ? {} : { tools: [
+        {
+          type: 'web_search_20250305',
+          name: 'web_search',
+          max_uses: 3,
+          user_location: { type: 'approximate', country: 'JP', timezone: 'Asia/Tokyo' }
+        }
+      ] }))
     });
 
     if (!response.ok) {
