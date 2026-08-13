@@ -1061,6 +1061,26 @@ if (!session) {
     if (el) el.remove();
   }
 
+  // 画像分析の結果をDBからポーリングして取得（バックグラウンド関数が書き込む）
+  async function pollImageResult(requestId) {
+    const maxMs = 100000, intervalMs = 1500;
+    const start = Date.now();
+    while (Date.now() - start < maxMs) {
+      await new Promise(r => setTimeout(r, intervalMs));
+      const { data, error } = await supabase
+        .from('ai_image_results')
+        .select('status, result_text, error')
+        .eq('id', requestId)
+        .maybeSingle();
+      if (error) { console.warn('[mioAI] 結果取得エラー:', error); continue; }
+      if (data) {
+        if (data.status === 'done') return { text: data.result_text };
+        if (data.status === 'error') throw new Error(data.error || 'AI応答エラー');
+      }
+    }
+    throw new Error('時間がかかっています。もう一度お試しください。');
+  }
+
   async function sendMessage() {
     const text = inputField.value.trim();
     const image = pendingImage;
@@ -1103,20 +1123,40 @@ if (!session) {
         payload.image_type = image.type;
       }
 
-      const res = await fetch('/.netlify/functions/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+      let data;
+      if (image) {
+        // 画像はバックグラウンド関数で処理（10秒制限を回避）→ 結果をDBからポーリング取得
+        const requestId = (self.crypto && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : (Date.now() + '-' + Math.random().toString(16).slice(2));
+        payload.request_id = requestId;
+        const res = await fetch('/.netlify/functions/chat-image-background', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok && res.status !== 202) {
+          removeTyping();
+          throw new Error('通信エラー');
+        }
+        data = await pollImageResult(requestId);
+        removeTyping();
+      } else {
+        const res = await fetch('/.netlify/functions/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
-      removeTyping();
+        removeTyping();
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || '通信エラー');
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || '通信エラー');
+        }
+
+        data = await res.json();
       }
-
-      const data = await res.json();
       if (data.conversation_id) conversationId = data.conversation_id;
       const aiText = data.text || '申し訳ありません、応答を取得できませんでした。';
       addMessage(aiText, false);
