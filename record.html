@@ -742,6 +742,26 @@ body{
           「新しい記録」タブから登録してください 🌸
         </div>
       </div>
+
+      <style>
+      #tab-history .period-del{ margin-top:16px; background:#FBEFF0; border:1px solid #E8C8CC; border-radius:12px; padding:12px 14px; }
+      #tab-history .period-del summary{ cursor:pointer; font-weight:700; color:var(--rose-deep,#B06B75); }
+      #tab-history .pd-note{ font-size:12px; color:var(--ink-mid,#6B5D57); margin:8px 0 10px; line-height:1.7; }
+      #tab-history .pd-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+      #tab-history .pd-row label{ font-size:12px; color:var(--ink-mid,#6B5D57); display:flex; flex-direction:column; gap:4px; flex:1; min-width:130px; }
+      #tab-history .pd-row input[type=date]{ padding:9px 10px; border:1px solid var(--line-strong,rgba(58,46,42,.16)); border-radius:8px; font-family:inherit; font-size:14px; color:var(--ink,#3A2E2A); background:#fff; }
+      #tab-history .pd-btn{ width:100%; padding:12px; border:none; border-radius:10px; background:var(--rose-deep,#B06B75); color:#fff; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+      #tab-history .pd-btn:disabled{ opacity:.5; cursor:not-allowed; }
+      </style>
+      <details class="period-del">
+        <summary>🗑 期間を選んで削除</summary>
+        <p class="pd-note">選んだ期間の「自分の取引」だけをまとめて削除します。CSVを入れ直したいときなどにどうぞ。取り消せないのでご注意ください🌸</p>
+        <div class="pd-row">
+          <label>開始日<input type="date" id="delFrom"></label>
+          <label>終了日<input type="date" id="delTo"></label>
+        </div>
+        <button class="pd-btn" id="periodDelBtn">この期間の取引を削除</button>
+      </details>
     </div>
   </div>
 
@@ -954,6 +974,17 @@ async function loadHistory() {
   const nextBtn = document.getElementById('nextMonth');
   if (nextBtn) nextBtn.disabled = (viewMonth.getFullYear() === cur.getFullYear() && viewMonth.getMonth() === cur.getMonth());
 
+  // 期間削除の日付欄を、表示中の月に合わせて初期化
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const dfEl = document.getElementById('delFrom');
+  const dtEl = document.getElementById('delTo');
+  if (dfEl && dtEl) {
+    const y = viewMonth.getFullYear(), mo = viewMonth.getMonth();
+    const lastDay = new Date(y, mo + 1, 0).getDate();
+    dfEl.value = `${y}-${pad2(mo + 1)}-01`;
+    dtEl.value = `${y}-${pad2(mo + 1)}-${pad2(lastDay)}`;
+  }
+
   // Supabaseは1回の読み取りで最大1000件までのため、1000件ずつ全件を取得する
   let all = [];
   const size = 1000;
@@ -980,6 +1011,46 @@ async function loadHistory() {
   renderHistory();
   updateMonthStats();
 }
+
+// 期間を選んで一括削除（自分の取引・trade_dateベース）
+(function () {
+  const btn = document.getElementById('periodDelBtn');
+  if (!btn) return;
+  btn.onclick = async () => {
+    const from = document.getElementById('delFrom').value;
+    const to = document.getElementById('delTo').value;
+    if (!from || !to) { showMessage('開始日と終了日を選んでください', 'error'); return; }
+    if (from > to) { showMessage('開始日は終了日より前にしてください', 'error'); return; }
+    const orig = btn.textContent;
+    btn.disabled = true; btn.textContent = '確認中...';
+
+    // 件数を数える（1000件上限を避けるため head+count）
+    const { count, error: cErr } = await supabase
+      .from('trades')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .gte('trade_date', from)
+      .lte('trade_date', to);
+    if (cErr) { console.error(cErr); showMessage('件数の確認に失敗しました', 'error'); btn.disabled = false; btn.textContent = orig; return; }
+    if (!count) { showMessage('その期間に削除する取引はありません', 'error'); btn.disabled = false; btn.textContent = orig; return; }
+
+    if (!confirm(`${from} 〜 ${to} の取引 ${count}件を削除します。\nこの操作は取り消せません。よろしいですか？`)) {
+      btn.disabled = false; btn.textContent = orig; return;
+    }
+
+    btn.textContent = '削除中...';
+    const { error } = await supabase
+      .from('trades')
+      .delete()
+      .eq('user_id', user.id)
+      .gte('trade_date', from)
+      .lte('trade_date', to);
+    btn.disabled = false; btn.textContent = orig;
+    if (error) { console.error(error); showMessage('削除に失敗しました', 'error'); return; }
+    showMessage(`${count}件を削除しました🌸`, 'success');
+    loadHistory();
+  };
+})();
 
 // 月間統計更新
 function updateMonthStats() {
