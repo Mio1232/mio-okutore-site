@@ -972,8 +972,8 @@ if (!session) {
     reader.onload = (ev) => {
       const img = new Image();
       img.onload = () => {
-        // Claude Visionの推奨上限に合わせて長辺1568pxへ縮小
-        const MAX = 1568;
+        // Vision用に長辺1280pxへ縮小（アップロードとDB保存を軽く）
+        const MAX = 1280;
         let width = img.naturalWidth || img.width;
         let height = img.naturalHeight || img.height;
         if (width > MAX || height > MAX) {
@@ -987,8 +987,8 @@ if (!session) {
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, width, height);
         ctx.drawImage(img, 0, 0, width, height);
-        // JPEG品質0.85で再エンコード（数百KB程度に収まりNetlifyの6MB制限を回避）
-        const jpegUrl = canvas.toDataURL('image/jpeg', 0.85);
+        // JPEG品質0.8で再エンコード
+        const jpegUrl = canvas.toDataURL('image/jpeg', 0.8);
         const base64 = jpegUrl.split(',')[1];
         pendingImage = { base64, type: 'image/jpeg', name: file.name };
 
@@ -1125,15 +1125,29 @@ if (!session) {
 
       let data;
       if (image) {
-        // 画像はバックグラウンド関数で処理（10秒制限を回避）→ 結果をDBからポーリング取得
+        // 画像は大きく、バックグラウンド関数の本文上限(約256KB)を超えるため、
+        // いったんDBに保存し、関数にはIDだけ渡す（関数がDBから画像を読んで分析する）
         const requestId = (self.crypto && crypto.randomUUID)
           ? crypto.randomUUID()
           : (Date.now() + '-' + Math.random().toString(16).slice(2));
-        payload.request_id = requestId;
+
+        const { error: insErr } = await supabase.from('ai_image_results').insert({
+          id: requestId,
+          user_id: user.id,
+          status: 'pending',
+          image_base64: image.base64,
+          image_type: image.type,
+          query: payload.query,
+          user_name: userName,
+          user_context: userContext,
+          history: chatHistory.slice(-AI_HISTORY_WINDOW)
+        });
+        if (insErr) { removeTyping(); console.error('[mioAI] 画像保存エラー:', insErr); throw new Error('通信エラー'); }
+
         const res = await fetch('/.netlify/functions/chat-image-background', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ request_id: requestId })
         });
         if (!res.ok && res.status !== 202) {
           removeTyping();
